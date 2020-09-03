@@ -1808,6 +1808,17 @@ function rand_bits(::FlintIntegerRing, b::Int)
    return z
 end
 
+function rand_bits(rng::AbstractRNG, ::FlintIntegerRing, b::Int)
+   b >= 0 || throw(DomainError(b, "Bit count must be non-negative"))
+   if b <= Base.GMP.BITS_PER_LIMB - 2
+      Limb = Base.GMP.Limb
+      z = fmpz(Limb(2)^(b-1) + rand(rng, Limb(0):Limb(2)^(b-1)-1))
+   else
+      z = fmpz(big(2)^(b-1) + rand(rng, big(0):big(2)^(b-1)-1))
+   end
+   rand(rng, Bool) ? z : -z
+end
+
 @doc Markdown.doc"""
     rand_bits_prime(::FlintIntegerRing, n::Int, proved::Bool=true)
 > Return a random prime number with the given number of bits. If only a
