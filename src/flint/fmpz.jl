@@ -1274,21 +1274,21 @@ Return the positive divisors of $a$ in an array, not necessarily in growing orde
 is zero it returns an empty array.
 """
 function divisors(a::fmpz)
-  iszero(a) && return []
+   iszero(a) && return []
 
-  divs = [one(ZZ)]
-  isone(a) && return divs
+   divs = [one(ZZ)]
+   isone(a) && return divs
 
-  for (p,e) in factor(abs(a))
-    p = fmpz(p)
-    ndivs = deepcopy(divs)
-    for i = 1:e
-      map!((d) -> p*d, ndivs, ndivs)
-      append!(divs, ndivs)
-    end
-  end
+   for (p,e) in factor(abs(a))
+      p = fmpz(p)
+      ndivs = deepcopy(divs)
+      for i = 1:e
+         map!((d) -> p*d, ndivs, ndivs)
+         append!(divs, ndivs)
+      end
+   end
 
-  return divs
+   return divs
 end
 
 @doc Markdown.doc"""
@@ -1313,8 +1313,8 @@ issquare(x::fmpz) = Bool(ccall((:fmpz_is_square, libflint), Cint,
 Return the prime divisors of $a$. If $a$ is zero it returns an empty array.
 """
 function prime_divisors(a::fmpz)
-  iszero(a) && return []
-  [p for (p,e) in factor(abs(a))]
+   iszero(a) && return []
+   [p for (p,e) in factor(abs(a))]
 end
 
 @doc Markdown.doc"""
