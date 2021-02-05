@@ -37,11 +37,11 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash,
        powmod, abs, isqrt, popcount, prevpow2, nextpow2, ndigits, dec,
        bin, oct, hex, base, one, zero, divexact, fits, sign, nbits, deepcopy,
        tdivpow2, fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!,
-       combit!, crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2,
-       gcdinv, isprobable_prime, jacobi_symbol, remove, root, size,
-       isqrtrem, sqrtmod, trailing_zeros, divisor_sigma, euler_phi, fibonacci,
-       moebius_mu, primorial, rising_factorial, number_of_partitions,
-       canonical_unit, isunit, isequal, addeq!, mul!,
+       combit!, crt, divisible, divisors, prime_divisors, divisor_lenstra,
+       fdivrem, tdivrem, fmodpow2, gcdinv, isprobable_prime, jacobi_symbol,
+       remove, root, size, isqrtrem, sqrtmod, trailing_zeros, divisor_sigma,
+       euler_phi, fibonacci, moebius_mu, primorial, rising_factorial,
+       number_of_partitions, canonical_unit, isunit, isequal, addeq!, mul!,
        issquare, square_root, issquare_with_square_root,
        iszero, rand, rand_bits, binomial, factorial, rand_bits_prime
 
@@ -1268,12 +1268,61 @@ function divisible(x::fmpz, y::Int)
 end
 
 @doc Markdown.doc"""
+    divisors(a::fmpz)
+
+Return the positive divisors of $a$ in an array, not necessarily in growing order. If $a$
+is zero it returns an empty array.
+"""
+function divisors(a::fmpz)
+  iszero(a) && return []
+
+  divs = [one(ZZ)]
+  isone(a) && return divs
+
+  for (p,e) in factor(abs(a))
+    p = fmpz(p)
+    ndivs = deepcopy(divs)
+    for i = 1:e
+      map!((d) -> p*d, ndivs, ndivs)
+      append!(divs, ndivs)
+    end
+  end
+
+  return divs
+end
+
+@doc Markdown.doc"""
+    divisors(a::Int)
+
+Return the positive divisors of $a$ in an array, not necessarily in growing order. If $a$
+is zero it returns an empty array.
+"""
+divisors(a::Int) = map(Int, divisors(ZZ(a)))
+
+@doc Markdown.doc"""
     issquare(x::fmpz)
 
 Return `true` if $x$ is a square, otherwise return `false`.
 """
 issquare(x::fmpz) = Bool(ccall((:fmpz_is_square, libflint), Cint,
                                (Ref{fmpz},), x))
+
+@doc Markdown.doc"""
+    prime_divisors(a::fmpz)
+
+Return the prime divisors of $a$. If $a$ is zero it returns an empty array.
+"""
+function prime_divisors(a::fmpz)
+  iszero(a) && return []
+  [p for (p,e) in factor(abs(a))]
+end
+
+@doc Markdown.doc"""
+    prime_divisors(a::Int)
+
+Return the prime divisors of $a$. If $a$ is zero it returns an empty array.
+"""
+prime_divisors(a::Int) = Int.(prime_divisors(ZZ(a)))
 
 isprime(x::UInt) = Bool(ccall((:n_is_prime, libflint), Cint, (UInt,), x))
 
