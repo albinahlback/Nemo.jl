@@ -1270,20 +1270,19 @@ end
 @doc Markdown.doc"""
     divisors(a::fmpz)
 
-Return the positive divisors of $a$ in an array, not necessarily in growing order. If $a$
-is zero it returns an empty array.
+Return the positive divisors of $a$ in an array, not necessarily in growing
+order. We require $a \neq 0$.
 """
 function divisors(a::fmpz)
-   iszero(a) && return []
+   iszero(a) && throw(DomainError("Argument must be non-zero"))
 
-   divs = [one(ZZ)]
+   divs = fmpz[one(FlintZZ)]
    isone(a) && return divs
 
-   for (p,e) in factor(abs(a))
-      p = fmpz(p)
+   for (p,e) in factor(a)
       ndivs = deepcopy(divs)
       for i = 1:e
-         map!((d) -> p*d, ndivs, ndivs)
+         map!(d -> p*d, ndivs, ndivs)
          append!(divs, ndivs)
       end
    end
@@ -1294,10 +1293,10 @@ end
 @doc Markdown.doc"""
     divisors(a::Int)
 
-Return the positive divisors of $a$ in an array, not necessarily in growing order. If $a$
-is zero it returns an empty array.
+Return the positive divisors of $a$ in an array, not necessarily in growing
+order. We require $a \neq 0$.
 """
-divisors(a::Int) = map(Int, divisors(ZZ(a)))
+divisors(a::Int) = Int.(divisors(FlintZZ(a)))
 
 @doc Markdown.doc"""
     issquare(x::fmpz)
@@ -1310,19 +1309,19 @@ issquare(x::fmpz) = Bool(ccall((:fmpz_is_square, libflint), Cint,
 @doc Markdown.doc"""
     prime_divisors(a::fmpz)
 
-Return the prime divisors of $a$. If $a$ is zero it returns an empty array.
+Return the prime divisors of $a$ in an array. We require $a \neq 0$.
 """
 function prime_divisors(a::fmpz)
-   iszero(a) && return []
-   [p for (p,e) in factor(abs(a))]
+   iszero(a) && throw(DomainError("Argument must be non-zero"))
+   fmpz[p for (p,e) in factor(a)]
 end
 
 @doc Markdown.doc"""
     prime_divisors(a::Int)
 
-Return the prime divisors of $a$. If $a$ is zero it returns an empty array.
+Return the prime divisors of $a$ in an array. We require $a \neq 0$.
 """
-prime_divisors(a::Int) = Int.(prime_divisors(ZZ(a)))
+prime_divisors(a::Int) = Int.(prime_divisors(FlintZZ(a)))
 
 isprime(x::UInt) = Bool(ccall((:n_is_prime, libflint), Cint, (UInt,), x))
 
