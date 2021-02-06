@@ -1313,7 +1313,7 @@ Return the prime divisors of $a$ in an array. We require $a \neq 0$.
 """
 function prime_divisors(a::fmpz)
    iszero(a) && throw(DomainError("Argument must be non-zero"))
-   fmpz[p for (p,e) in factor(a)]
+   fmpz[p for (p, e) in factor(a)]
 end
 
 @doc Markdown.doc"""
