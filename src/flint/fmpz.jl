@@ -1280,7 +1280,7 @@ function divisors(a::fmpz)
    isone(a) && return divs
 
    for (p,e) in factor(a)
-      ndivs = deepcopy(divs)
+      ndivs = copy(divs)
       for i = 1:e
          map!(d -> p*d, ndivs, ndivs)
          append!(divs, ndivs)
