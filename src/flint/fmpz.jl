@@ -1268,11 +1268,13 @@ function divisible(x::fmpz, y::Int)
 end
 
 @doc Markdown.doc"""
-    divisors(a::fmpz)
+divisors(a::Union{Int, fmpz})
 
 Return the positive divisors of $a$ in an array, not necessarily in growing
 order. We require $a \neq 0$.
 """
+function divisors end
+
 function divisors(a::fmpz)
    iszero(a) && throw(DomainError("Argument must be non-zero"))
 
@@ -1290,12 +1292,6 @@ function divisors(a::fmpz)
    return divs
 end
 
-@doc Markdown.doc"""
-    divisors(a::Int)
-
-Return the positive divisors of $a$ in an array, not necessarily in growing
-order. We require $a \neq 0$.
-"""
 divisors(a::Int) = Int.(divisors(FlintZZ(a)))
 
 @doc Markdown.doc"""
