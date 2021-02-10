@@ -1268,7 +1268,7 @@ function divisible(x::fmpz, y::Int)
 end
 
 @doc Markdown.doc"""
-divisors(a::Union{Int, fmpz})
+    divisors(a::Union{Int, fmpz})
 
 Return the positive divisors of $a$ in an array, not necessarily in growing
 order. We require $a \neq 0$.
