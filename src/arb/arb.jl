@@ -2165,6 +2165,12 @@ end
 #
 ################################################################################
 
+@doc Markdown.doc"""
+    rand(rng::AbstractRNG, r::ArbField; randtype::Symbol=:null)
+
+Return a random element in the given Arb field. The values are distributed
+non-uniformly in order to exercise corner cases.
+"""
 function rand(rng::AbstractRNG, r::ArbField; randtype::Symbol=:null)
   state = rand_ctx()
   ccall((:flint_randseed, libarb), Nothing, (Ptr{Cvoid}, UInt, UInt),
