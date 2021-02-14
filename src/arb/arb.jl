@@ -2158,3 +2158,66 @@ end
 ################################################################################
 
 # see inner constructor for ArbField
+
+################################################################################
+#
+#  Random generation
+#
+################################################################################
+
+function rand(rng::AbstractRNG, r::ArbField; randtype::Symbol=:null)
+  state = rand_ctx()
+  ccall((:flint_randseed, libarb), Nothing, (Ptr{Cvoid}, UInt, UInt),
+      state.ptr, rand(rng, UInt), rand(rng, UInt))
+
+  x = r()
+  if randtype == :null
+    ccall((:arb_randtest, libarb), Nothing,
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 53)
+  elseif randtype == :exact
+    ccall((:arb_randtest_exact, libarb), Nothing,
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 53)
+  elseif randtype == :precise
+    ccall((:arb_randtest_precise, libarb), Nothing,
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 53)
+  elseif randtype == :wide
+    ccall((:arb_randtest_wide, libarb), Nothing,
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 53)
+  elseif randtype == :special
+    ccall((:arb_randtest_special, libarb), Nothing,
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 53)
+  else
+    error("randtype not defined")
+  end
+
+  return x
+end
+
+function rand(r::ArbField; randtype::Symbol=:null)
+  rng = Random.GLOBAL_RNG
+  state = rand_ctx()
+  ccall((:flint_randseed, libarb), Nothing, (Ptr{Cvoid}, UInt, UInt),
+      state.ptr, rand(rng, UInt), rand(rng, UInt))
+
+  x = r()
+  if randtype == :null
+    ccall((:arb_randtest, libarb), Nothing,
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 53)
+  elseif randtype == :exact
+    ccall((:arb_randtest_exact, libarb), Nothing,
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 53)
+  elseif randtype == :precise
+    ccall((:arb_randtest_precise, libarb), Nothing,
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 53)
+  elseif randtype == :wide
+    ccall((:arb_randtest_wide, libarb), Nothing,
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 53)
+  elseif randtype == :special
+    ccall((:arb_randtest_special, libarb), Nothing,
+          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 53)
+  else
+    error("randtype not defined")
+  end
+
+  return x
+end
