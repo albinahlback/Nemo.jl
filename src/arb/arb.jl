@@ -2166,46 +2166,21 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    rand(rng::AbstractRNG, r::ArbField; randtype::Symbol=:null)
+    rand(r::ArbField; randtype::Symbol=:null)
 
 Return a random element in the given Arb field. The values are distributed
 non-uniformly in order to exercise corner cases.
+
+The `randtype` default is `:null` that return a finite midpoint and radius.
+The other options are `:exact` which return a zero radius, `precise` which
+return a radius around $2^{-\mathrm{prec}}$ the magnitude of the midpoint,
+`:wide` whose returned radius might be big relative to its midpoint, and
+`:special` which return a midpoint and radius that might be NaN or infinity.
 """
-function rand(rng::AbstractRNG, r::ArbField; randtype::Symbol=:null)
-  state = rand_ctx()
-  ccall((:flint_randseed, libarb), Nothing, (Ptr{Cvoid}, UInt, UInt),
-      state.ptr, rand(rng, UInt), rand(rng, UInt))
-
-  x = r()
-  if randtype == :null
-    ccall((:arb_randtest, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
-  elseif randtype == :exact
-    ccall((:arb_randtest_exact, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
-  elseif randtype == :precise
-    ccall((:arb_randtest_precise, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
-  elseif randtype == :wide
-    ccall((:arb_randtest_wide, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
-  elseif randtype == :special
-    ccall((:arb_randtest_special, libarb), Nothing,
-          (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
-  else
-    error("randtype not defined")
-  end
-
-  return x
-end
-
 function rand(r::ArbField; randtype::Symbol=:null)
-  rng = Random.GLOBAL_RNG
-  state = rand_ctx()
-  ccall((:flint_randseed, libarb), Nothing, (Ptr{Cvoid}, UInt, UInt),
-      state.ptr, rand(rng, UInt), rand(rng, UInt))
-
+  state = _flint_rand_states[Threads.threadid()]
   x = r()
+
   if randtype == :null
     ccall((:arb_randtest, libarb), Nothing,
           (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
