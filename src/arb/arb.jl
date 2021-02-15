@@ -2172,8 +2172,8 @@ Return a random element in the given Arb field. The values are distributed
 non-uniformly in order to exercise corner cases.
 
 The `randtype` default is `:null` that return a finite midpoint and radius.
-The other options are `:exact` which return a zero radius, `precise` which
-return a radius around $2^{-\mathrm{prec}}$ the magnitude of the midpoint,
+The other options are `:exact` which return a radius that is zero, `precise`
+which return a radius around $2^{-\mathrm{prec}}$ the magnitude of the midpoint,
 `:wide` whose returned radius might be big relative to its midpoint, and
 `:special` which return a midpoint and radius that might be NaN or infinity.
 """
