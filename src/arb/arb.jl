@@ -2171,17 +2171,24 @@ end
 Return a random element in the given Arb field. The values are distributed
 non-uniformly in order to exercise corner cases.
 
-The `randtype` default is `:null` that return a finite midpoint and radius.
-The other options are `:exact` which return a radius that is zero, `precise`
-which return a radius around $2^{-\mathrm{prec}}$ the magnitude of the midpoint,
-`:wide` whose returned radius might be big relative to its midpoint, and
-`:special` which return a midpoint and radius that might be NaN or infinity.
+The `randtype` default is `:null` for which the midpoint and radius lie within
+$[0, 1]$. Another option is `:null_exact` which return a midpoint in $[0, 1]$
+with a zero radius. The rest of the options are based on the option `:randtype`
+whose only contraint is to return finite numbers. The options include `:exact`
+which return a radius that is zero, `precise` which return a radius around
+$2^{-\mathrm{prec}}$ the magnitude of the midpoint, `:wide` whose returned
+radius might be big relative to its midpoint, and `:special` which return a
+midpoint and radius that might be NaN or infinity.
 """
 function rand(r::ArbField; randtype::Symbol=:null)
   state = _flint_rand_states[Threads.threadid()]
   x = r()
 
   if randtype == :null
+    x = r(rand(BigFloat), rand(BigFloat))
+  elseif randtype == :null_exact
+    x = r(rand(BigFloat))
+  elseif randtype == :randtype
     ccall((:arb_randtest, libarb), Nothing,
           (Ref{arb}, Ptr{Cvoid}, Int, Int), x, state.ptr, r.prec, 30)
   elseif randtype == :exact
