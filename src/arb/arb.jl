@@ -2185,7 +2185,8 @@ function rand(r::ArbField; randtype::Symbol=:null)
   x = r()
 
   if randtype == :null
-    x = r(rand(BigFloat), rand(BigFloat))
+    a = r.(rand(BigFloat, 2))
+    x = ball(a[1], a[2])
   elseif randtype == :null_exact
     x = r(rand(BigFloat))
   elseif randtype == :randtype
