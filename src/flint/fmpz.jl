@@ -627,7 +627,40 @@ function ^(x::fmpz, y::Int)
       deepcopy(x)
    else
       z = fmpz()
-      ccall((:fmpz_pow_ui, libflint), Nothing, (Ref{fmpz}, Ref{fmpz}, UInt), z, x, UInt(y))
+      ccall((:fmpz_pow_ui, libflint), Nothing,
+            (Ref{fmpz}, Ref{fmpz}, UInt), z, x, UInt(y))
+      z
+   end
+end
+
+function ^(x::fmpz, y::UInt)
+   if isone(x) || y == 0
+      one(x)
+   elseif x == -1
+      isodd(y) ? deepcopy(x) : one(x)
+   elseif y == 1
+      deepcopy(x)
+   else
+      z = fmpz()
+      ccall((:fmpz_pow_ui, libflint), Nothing,
+            (Ref{fmpz}, Ref{fmpz}, UInt), z, x, y)
+      z
+   end
+end
+
+function ^(x::fmpz, y::fmpz)
+   if isone(x) || y == 0
+      one(x)
+   elseif x == -1
+      isodd(y) ? deepcopy(x) : one(x)
+   elseif y < 0
+      throw(DomainError(y, "Exponent must be non-negative"))
+   elseif y == 1
+      deepcopy(x)
+   else
+      z = fmpz()
+      ccall((:fmpz_pow_fmpz, libflint), Nothing,
+            (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
       z
    end
 end
