@@ -470,17 +470,17 @@ end
 
       # These first two tests are not as exact, since those rand-methods depend
       # on conversion from BigFloat to arb.
-      @test contains(R(".5001 +/- 1.5002"), r_null)
+      @test contains(R(".5 +/- 1.501"), r_null)
       @test abs(r_null_exact) <= R(1) + R(2)^(-precision(R)) &&
             abs(radius(r_null_exact)) <= R(2)^(-precision(R))
       @test isfinite(r_randtype)
       @test isfinite(r_exact) && isexact(r_exact)
       @test isfinite(r_precise)
-      # Verified experimentally for precision 5 to 500 for n = 10^6
+      # Does not work for small precisions (< 20) because of radius
       if midpoint(r_precise) != 0 != radius(r_precise)
-         @test R(2)^(-7 - precision(R)) <
+         @test R(0.99) * R(2)^(-6 - precision(R)) <
                abs(radius(r_precise) / midpoint(r_precise)) <
-               R(2)^(4 - precision(R))
+               R(1.01) * R(2)^(3 - precision(R))
       end
       @test isfinite(r_wide)
       @test r_special isa arb
