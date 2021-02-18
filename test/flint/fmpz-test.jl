@@ -348,6 +348,8 @@ end
    @test a^1 == a
    @test a^1 !== a
 
+   @test a^a == a^Int(a) == a^UInt(a)
+
    @test isone(a^0)
 
    for a in fmpz.(-5:5)
