@@ -659,8 +659,9 @@ function ^(x::fmpz, y::fmpz)
       deepcopy(x)
    else
       z = fmpz()
-      ccall((:fmpz_pow_fmpz, libflint), Nothing,
-            (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+      sucess = ccall((:fmpz_pow_fmpz, libflint), Bool,
+                     (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
+      sucess || throw(OutOfMemoryError())
       z
    end
 end
