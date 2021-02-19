@@ -343,39 +343,34 @@ end
 @testset "fmpz.powering..." begin
    a = fmpz(-12)
 
-   @test a^5 == -248832
+   @test a^5 == a^fmpz(5) == -248832
 
-   @test a^1 == a
-   @test a^1 !== a
-
-   @test isone(a^0)
-
-   a = fmpz(10)
-   @test a^a == a^Int(a) == a^UInt(a)
+   @test isone(a^0) && isone(a^fmpz(0))
 
    for a in fmpz.(-5:5)
       for e = -5:-1
          if a != 1 && a != -1
             @test_throws DomainError a^e
+            @test_throws DomainError a^fmpz(e)
          end
       end
-      @test a^1 == a
-      @test a^1 !== a
+      @test a^1 == a^fmpz(1) == a
+      @test a^1 !== a^fmpz(1) !== a
    end
 
    a = fmpz(1)
    for e = -2:2
-      @test isone(a^e)
-      @test a^e !== a
+      @test isone(a^e) && isone(a^fmpz(e))
+      @test a^e !== a^fmpz(e) !== a
    end
 
    a = fmpz(-1)
    for e = [-3, -1, 1, 3, 5]
-      @test a^e == a
-      @test a^e !== a
+      @test a^e == a^fmpz(e) == a
+      @test a^e !== a^fmpz(e) == a
    end
    for e = [-2, 0, 2, 4]
-      @test isone(a^e )
+      @test isone(a^e) && isone(a^fmpz(e))
    end
 end
 
