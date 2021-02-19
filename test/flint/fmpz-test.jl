@@ -347,6 +347,12 @@ end
 
    @test isone(a^0) && isone(a^fmpz(0))
 
+   a = fmpz(10)^600
+   @test_throws OutOfMemoryError a^(10^8)
+
+   a = fmpz(2)
+   @test_throws OutOfMemoryError a^(a^60)
+
    for a in fmpz.(-5:5)
       for e = -5:-1
          if a != 1 && a != -1
