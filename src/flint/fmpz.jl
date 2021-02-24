@@ -616,7 +616,7 @@ end
 #
 ###############################################################################
 
-function ^(x::fmpz, y::Union{Int, fmpz})
+function ^(x::fmpz, y::Union{Int, UInt, fmpz})
    if isone(x) || y == 0
       one(x)
    elseif x == -1
@@ -629,21 +629,6 @@ function ^(x::fmpz, y::Union{Int, fmpz})
       z = fmpz()
       ccall((:fmpz_pow_ui, libflint), Nothing,
             (Ref{fmpz}, Ref{fmpz}, UInt), z, x, UInt(y))
-      z
-   end
-end
-
-function ^(x::fmpz, y::UInt)
-   if isone(x) || y == 0
-      one(x)
-   elseif x == -1
-      isodd(y) ? deepcopy(x) : one(x)
-   elseif y == 1
-      deepcopy(x)
-   else
-      z = fmpz()
-      ccall((:fmpz_pow_ui, libflint), Nothing,
-            (Ref{fmpz}, Ref{fmpz}, UInt), z, x, y)
       z
    end
 end
