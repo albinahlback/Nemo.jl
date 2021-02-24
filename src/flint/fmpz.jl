@@ -616,7 +616,7 @@ end
 #
 ###############################################################################
 
-function ^(x::fmpz, y::Int)
+function ^(x::fmpz, y::Union{Int, fmpz})
    if isone(x) || y == 0
       one(x)
    elseif x == -1
@@ -644,24 +644,6 @@ function ^(x::fmpz, y::UInt)
       z = fmpz()
       ccall((:fmpz_pow_ui, libflint), Nothing,
             (Ref{fmpz}, Ref{fmpz}, UInt), z, x, y)
-      z
-   end
-end
-
-function ^(x::fmpz, y::fmpz)
-   if isone(x) || y == 0
-      one(x)
-   elseif x == -1
-      isodd(y) ? deepcopy(x) : one(x)
-   elseif y < 0
-      throw(DomainError(y, "Exponent must be non-negative"))
-   elseif y == 1
-      deepcopy(x)
-   else
-      z = fmpz()
-      sucess = ccall((:fmpz_pow_fmpz, libflint), Bool,
-                     (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), z, x, y)
-      sucess || throw(OutOfMemoryError())
       z
    end
 end
