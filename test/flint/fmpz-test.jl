@@ -370,7 +370,7 @@ end
    a = fmpz(-1)
    for e = [-3, -1, 1, 3, 5]
       @test a^e == a^fmpz(e) == a
-      @test a^e !== a^fmpz(e) == a
+      @test a^e !== a^fmpz(e) !== a
    end
    for e = [-2, 0, 2, 4]
       @test isone(a^e) && isone(a^fmpz(e))
@@ -666,7 +666,7 @@ end
    pdivsr = prime_divisors(n)
    @test all([k in divsr for k in d])
    @test all([k in pdivsr for k in p])
-   
+
    @test issquare(fmpz(36))
 
    @test factorial(ZZ(100)) == fmpz("93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000")
