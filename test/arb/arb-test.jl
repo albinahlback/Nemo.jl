@@ -183,7 +183,7 @@ end
    @test x + y == 6
    @test x - y == -2
    @test x * y == 8
-   @test x // y == 0.5
+   @test x / y == 0.5
    @test x ^ y == 16
 
    for T in [fmpz, fmpq, Int, BigInt, Rational{Int}, Rational{BigInt}]
@@ -191,11 +191,11 @@ end
       @test x + T(4) == 6
       @test x - T(4) == -2
       @test x * T(4) == 8
-      @test x // T(4) == 0.5
+      @test x / T(4) == 0.5
       @test T(2) + y == 6
       @test T(2) - y == -2
       @test T(2) * y == 8
-      @test T(2) // y == 0.5
+      @test T(2) / y == 0.5
       @test x ^ T(4) == 16
    end
 
@@ -203,11 +203,11 @@ end
       @test contains(x + T(4), 6)
       @test contains(x - T(4), -2)
       @test contains(x * T(4), 8)
-      @test contains(x // T(4), fmpq(1, 2))
+      @test contains(x / T(4), fmpq(1, 2))
       @test contains(T(2) + y, 6)
       @test contains(T(2) - y, -2)
       @test contains(T(2) * y, 8)
-      @test contains(T(2) // y, fmpq(1, 2))
+      @test contains(T(2) / y, fmpq(1, 2))
       @test contains(x ^ T(4), 16)
    end
 end
