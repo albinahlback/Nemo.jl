@@ -618,7 +618,7 @@ end
 #
 ################################################################################
 
-for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (://, "arb_div"), (:-,"arb_sub"))
+for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (:/, "arb_div"), (:-,"arb_sub"))
   @eval begin
     function ($s)(x::arb, y::arb)
       z = parent(x)()
@@ -715,7 +715,7 @@ end
 
 *(x::arb, y::Integer) = x*fmpz(y)
 
-//(x::arb, y::Integer) = x//fmpz(y)
+/(x::arb, y::Integer) = x/fmpz(y)
 
 +(x::Integer, y::arb) = fmpz(x) + y
 
@@ -723,30 +723,30 @@ end
 
 *(x::Integer, y::arb) = fmpz(x)*y
 
-//(x::Integer, y::arb) = fmpz(x)//y
+/(x::Integer, y::arb) = fmpz(x)/y
 
-#function //(x::arb, y::arf)
+#function /(x::arb, y::arf)
 #  z = parent(x)()
 #  ccall((:arb_div_arf, libarb), Nothing,
 #              (Ref{arb}, Ref{arb}, Ref{arf}, Int), z, x, y, parent(x).prec)
 #  return z
 #end
 
-function //(x::arb, y::UInt)
+function /(x::arb, y::UInt)
   z = parent(x)()
   ccall((:arb_div_ui, libarb), Nothing,
               (Ref{arb}, Ref{arb}, UInt, Int), z, x, y, parent(x).prec)
   return z
 end
 
-function //(x::arb, y::Int)
+function /(x::arb, y::Int)
   z = parent(x)()
   ccall((:arb_div_si, libarb), Nothing,
               (Ref{arb}, Ref{arb}, Int, Int), z, x, y, parent(x).prec)
   return z
 end
 
-function //(x::arb, y::fmpz)
+function /(x::arb, y::fmpz)
   z = parent(x)()
   ccall((:arb_div_fmpz, libarb), Nothing,
               (Ref{arb}, Ref{arb}, Ref{fmpz}, Int),
@@ -754,14 +754,14 @@ function //(x::arb, y::fmpz)
   return z
 end
 
-function //(x::UInt, y::arb)
+function /(x::UInt, y::arb)
   z = parent(y)()
   ccall((:arb_ui_div, libarb), Nothing,
               (Ref{arb}, UInt, Ref{arb}, Int), z, x, y, parent(y).prec)
   return z
 end
 
-function //(x::Int, y::arb)
+function /(x::Int, y::arb)
   z = parent(y)()
   t = arb(x)
   ccall((:arb_div, libarb), Nothing,
@@ -769,7 +769,7 @@ function //(x::Int, y::arb)
   return z
 end
 
-function //(x::fmpz, y::arb)
+function /(x::fmpz, y::arb)
   z = parent(y)()
   t = arb(x)
   ccall((:arb_div, libarb), Nothing,
@@ -812,8 +812,8 @@ end
 +(x::fmpq, y::arb) = parent(y)(x) + y
 +(x::arb, y::fmpq) = x + parent(x)(y)
 -(x::fmpq, y::arb) = parent(y)(x) - y
-//(x::arb, y::fmpq) = x//parent(x)(y)
-//(x::fmpq, y::arb) = parent(y)(x)//y
+/(x::arb, y::fmpq) = x/parent(x)(y)
+/(x::fmpq, y::arb) = parent(y)(x)/y
 -(x::arb, y::fmpq) = x - parent(x)(y)
 *(x::fmpq, y::arb) = parent(y)(x) * y
 *(x::arb, y::fmpq) = x * parent(x)(y)
@@ -822,8 +822,8 @@ end
 +(x::Float64, y::arb) = parent(y)(x) + y
 +(x::arb, y::Float64) = x + parent(x)(y)
 -(x::Float64, y::arb) = parent(y)(x) - y
-//(x::arb, y::Float64) = x//parent(x)(y)
-//(x::Float64, y::arb) = parent(y)(x)//y
+/(x::arb, y::Float64) = x/parent(x)(y)
+/(x::Float64, y::arb) = parent(y)(x)/y
 -(x::arb, y::Float64) = x - parent(x)(y)
 *(x::Float64, y::arb) = parent(y)(x) * y
 *(x::arb, y::Float64) = x * parent(x)(y)
@@ -833,8 +833,8 @@ end
 +(x::BigFloat, y::arb) = parent(y)(x) + y
 +(x::arb, y::BigFloat) = x + parent(x)(y)
 -(x::BigFloat, y::arb) = parent(y)(x) - y
-//(x::arb, y::BigFloat) = x//parent(x)(y)
-//(x::BigFloat, y::arb) = parent(y)(x)//y
+/(x::arb, y::BigFloat) = x/parent(x)(y)
+/(x::BigFloat, y::arb) = parent(y)(x)/y
 -(x::arb, y::BigFloat) = x - parent(x)(y)
 *(x::BigFloat, y::arb) = parent(y)(x) * y
 *(x::arb, y::BigFloat) = x * parent(x)(y)
@@ -845,44 +845,12 @@ end
 +(x::arb, y::Rational{T}) where {T <: Integer} = x + fmpq(y)
 -(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) - y
 -(x::arb, y::Rational{T}) where {T <: Integer} = x - fmpq(y)
-//(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x)//y
-//(x::arb, y::Rational{T}) where {T <: Integer} = x//fmpq(y)
+/(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x)/y
+/(x::arb, y::Rational{T}) where {T <: Integer} = x/fmpq(y)
 *(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) * y
 *(x::arb, y::Rational{T}) where {T <: Integer} = x * fmpq(y)
 ^(x::Rational{T}, y::arb) where {T <: Integer} = fmpq(x) ^ y
 ^(x::arb, y::Rational{T}) where {T <: Integer} = x ^ fmpq(y)
-
-/(x::arb, y::arb) = x // y
-/(x::fmpz, y::arb) = x // y
-/(x::arb, y::fmpz) = x // y
-/(x::Int, y::arb) = x // y
-/(x::arb, y::Int) = x // y
-/(x::UInt, y::arb) = x // y
-/(x::arb, y::UInt) = x // y
-/(x::fmpq, y::arb) = x // y
-/(x::arb, y::fmpq) = x // y
-/(x::Float64, y::arb) = x // y
-/(x::arb, y::Float64) = x // y
-/(x::BigFloat, y::arb) = x // y
-/(x::arb, y::BigFloat) = x // y
-/(x::Rational{T}, y::arb) where {T <: Integer} = x // y
-/(x::arb, y::Rational{T}) where {T <: Integer} = x // y
-
-divexact(x::arb, y::arb) = x // y
-divexact(x::fmpz, y::arb) = x // y
-divexact(x::arb, y::fmpz) = x // y
-divexact(x::Int, y::arb) = x // y
-divexact(x::arb, y::Int) = x // y
-divexact(x::UInt, y::arb) = x // y
-divexact(x::arb, y::UInt) = x // y
-divexact(x::fmpq, y::arb) = x // y
-divexact(x::arb, y::fmpq) = x // y
-divexact(x::Float64, y::arb) = x // y
-divexact(x::arb, y::Float64) = x // y
-divexact(x::BigFloat, y::arb) = x // y
-divexact(x::arb, y::BigFloat) = x // y
-divexact(x::Rational{T}, y::arb) where {T <: Integer} = x // y
-divexact(x::arb, y::Rational{T}) where {T <: Integer} = x // y
 
 ################################################################################
 #
