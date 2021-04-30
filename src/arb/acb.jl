@@ -1185,9 +1185,9 @@ $\mathfrak{f}(\tau) = \frac{\eta^2(\tau)}{\eta(\tau/2)\eta(2\tau)},$
 at $x$ in the complex upper half plane.
 """
 function modweber_f(x::acb)
-   x_on_2 = divexact(x, 2)
+   x_on_2 = x/2
    x_times_2 = 2*x
-   return divexact(modeta(x)^2, modeta(x_on_2)*modeta(x_times_2))
+   return modeta(x)^2/(modeta(x_on_2)*modeta(x_times_2))
 end
 
 @doc Markdown.doc"""
@@ -1198,8 +1198,8 @@ $\mathfrak{f}_1(\tau) = \frac{\eta(\tau/2)}{\eta(\tau)},$
 at $x$ in the complex upper half plane.
 """
 function modweber_f1(x::acb)
-   x_on_2 = divexact(x, 2)
-   return divexact(modeta(x_on_2), modeta(x))
+   x_on_2 = x/2
+   return modeta(x_on_2)/modeta(x)
 end
 
 @doc Markdown.doc"""
@@ -1211,7 +1211,7 @@ at $x$ in the complex upper half plane.
 """
 function modweber_f2(x::acb)
    x_times_2 = x*2
-   return divexact(modeta(x_times_2), modeta(x))*sqrt(parent(x)(2))
+   return sqrt(parent(x)(2))*modeta(x_times_2)/modeta(x)
 end
 
 @doc Markdown.doc"""
