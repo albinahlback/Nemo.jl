@@ -289,15 +289,11 @@ end
 
 for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb]
    @eval begin
-      divexact(x::arb_poly, y::$T) = x * inv(base_ring(parent(x))(y))
-
-      //(x::arb_poly, y::$T) = divexact(x, y)
+      /(x::arb_poly, y::$T) = x * inv(base_ring(parent(x))(y))
    end
 end
 
-divexact(x::arb_poly, y::Rational{T}) where {T <: Integer} = x * inv(base_ring(parent(x))(y))
-
-//(x::arb_poly, y::Rational{T}) where {T <: Integer} = divexact(x, y)
+/(x::arb_poly, y::Rational{T}) where {T <: Integer} = x * inv(base_ring(parent(x))(y))
 
 ###############################################################################
 #
@@ -322,7 +318,7 @@ function mod(x::arb_poly, y::arb_poly)
    return divrem(x, y)[2]
 end
 
-function divexact(x::arb_poly, y::arb_poly)
+function div(x::arb_poly, y::arb_poly)
    return divrem(x, y)[1]
 end
 
