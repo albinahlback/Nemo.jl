@@ -232,7 +232,7 @@ end
 
 # acb - acb
 
-for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
+for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (:/, "acb_div"), (:-,"acb_sub"), (:^,"acb_pow"))
   @eval begin
     function ($s)(x::acb, y::acb)
       z = parent(x)()
@@ -243,7 +243,7 @@ for (s,f) in ((:+,"acb_add"), (:*,"acb_mul"), (://, "acb_div"), (:-,"acb_sub"), 
   end
 end
 
-for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (://, "div"), (:^, "pow"))
+for (f,s) in ((:+, "add"), (:-, "sub"), (:*, "mul"), (:/, "div"), (:^, "pow"))
   @eval begin
 
     function ($f)(x::acb, y::UInt)
@@ -290,10 +290,10 @@ end
 *(x::fmpz,y::acb) = *(y,x)
 *(x::arb,y::acb) = *(y,x)
 
-//(x::UInt,y::acb) = (x == 1) ? inv(y) : parent(y)(x) // y
-//(x::Int,y::acb) = (x == 1) ? inv(y) : parent(y)(x) // y
-//(x::fmpz,y::acb) = isone(x) ? inv(y) : parent(y)(x) // y
-//(x::arb,y::acb) = isone(x) ? inv(y) : parent(y)(x) // y
+/(x::UInt,y::acb) = (x == 1) ? inv(y) : parent(y)(x) / y
+/(x::Int,y::acb) = (x == 1) ? inv(y) : parent(y)(x) / y
+/(x::fmpz,y::acb) = isone(x) ? inv(y) : parent(y)(x) / y
+/(x::arb,y::acb) = isone(x) ? inv(y) : parent(y)(x) / y
 
 ^(x::UInt,y::acb) = parent(y)(x) ^ y
 ^(x::Int,y::acb) = parent(y)(x) ^ y
@@ -335,7 +335,7 @@ end
 
 *(x::acb, y::Integer) = x*fmpz(y)
 
-//(x::acb, y::Integer) = x//fmpz(y)
+/(x::acb, y::Integer) = x/fmpz(y)
 
 +(x::Integer, y::acb) = fmpz(x) + y
 
@@ -343,53 +343,21 @@ end
 
 *(x::Integer, y::acb) = fmpz(x)*y
 
-//(x::Integer, y::acb) = fmpz(x)//y
+/(x::Integer, y::acb) = fmpz(x)/y
 
 ^(x::acb, y::Integer) = x ^ parent(x)(y)
 
 +(x::acb, y::fmpq) = x + parent(x)(y)
 -(x::acb, y::fmpq) = x - parent(x)(y)
 *(x::acb, y::fmpq) = x * parent(x)(y)
-//(x::acb, y::fmpq) = x // parent(x)(y)
+/(x::acb, y::fmpq) = x / parent(x)(y)
 ^(x::acb, y::fmpq) = x ^ parent(x)(y)
 
 +(x::fmpq, y::acb) = parent(y)(x) + y
 -(x::fmpq, y::acb) = parent(y)(x) - y
 *(x::fmpq, y::acb) = parent(y)(x) * y
-//(x::fmpq, y::acb) = parent(y)(x) // y
+/(x::fmpq, y::acb) = parent(y)(x) / y
 ^(x::fmpq, y::acb) = parent(y)(x) ^ y
-
-divexact(x::acb, y::acb) = x // y
-divexact(x::fmpz, y::acb) = x // y
-divexact(x::acb, y::fmpz) = x // y
-divexact(x::Int, y::acb) = x // y
-divexact(x::acb, y::Int) = x // y
-divexact(x::UInt, y::acb) = x // y
-divexact(x::acb, y::UInt) = x // y
-divexact(x::fmpq, y::acb) = x // y
-divexact(x::acb, y::fmpq) = x // y
-divexact(x::arb, y::acb) = x // y
-divexact(x::acb, y::arb) = x // y
-divexact(x::Float64, y::acb) = x // y
-divexact(x::acb, y::Float64) = x // y
-divexact(x::BigFloat, y::acb) = x // y
-divexact(x::acb, y::BigFloat) = x // y
-divexact(x::Integer, y::acb) = x // y
-divexact(x::acb, y::Integer) = x // y
-divexact(x::Rational{T}, y::acb) where {T <: Integer} = x // y
-divexact(x::acb, y::Rational{T}) where {T <: Integer} = x // y
-
-/(x::acb, y::acb) = x // y
-/(x::fmpz, y::acb) = x // y
-/(x::acb, y::fmpz) = x // y
-/(x::Int, y::acb) = x // y
-/(x::acb, y::Int) = x // y
-/(x::UInt, y::acb) = x // y
-/(x::acb, y::UInt) = x // y
-/(x::fmpq, y::acb) = x // y
-/(x::acb, y::fmpq) = x // y
-/(x::arb, y::acb) = x // y
-/(x::acb, y::arb) = x // y
 
 +(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) + y
 +(x::acb, y::Rational{T}) where {T <: Integer} = x + fmpq(y)
@@ -397,8 +365,8 @@ divexact(x::acb, y::Rational{T}) where {T <: Integer} = x // y
 -(x::acb, y::Rational{T}) where {T <: Integer} = x - fmpq(y)
 *(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) * y
 *(x::acb, y::Rational{T}) where {T <: Integer} = x * fmpq(y)
-//(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) // y
-//(x::acb, y::Rational{T}) where {T <: Integer} = x // fmpq(y)
+/(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x) / y
+/(x::acb, y::Rational{T}) where {T <: Integer} = x / fmpq(y)
 ^(x::Rational{T}, y::acb) where {T <: Integer} = fmpq(x)^y
 ^(x::acb, y::Rational{T}) where {T <: Integer} = x ^ fmpq(y)
 
@@ -408,8 +376,8 @@ divexact(x::acb, y::Rational{T}) where {T <: Integer} = x // y
 -(x::acb, y::Float64) = x - parent(x)(y)
 *(x::Float64, y::acb) = parent(y)(x) * y
 *(x::acb, y::Float64) = x * parent(x)(y)
-//(x::Float64, y::acb) = parent(y)(x) // y
-//(x::acb, y::Float64) = x // parent(x)(y)
+/(x::Float64, y::acb) = parent(y)(x) / y
+/(x::acb, y::Float64) = x / parent(x)(y)
 ^(x::Float64, y::acb) = parent(y)(x)^y
 ^(x::acb, y::Float64) = x ^ parent(x)(y)
 
@@ -419,8 +387,8 @@ divexact(x::acb, y::Rational{T}) where {T <: Integer} = x // y
 -(x::acb, y::BigFloat) = x - parent(x)(y)
 *(x::BigFloat, y::acb) = parent(y)(x) * y
 *(x::acb, y::BigFloat) = x * parent(x)(y)
-//(x::BigFloat, y::acb) = parent(y)(x) // y
-//(x::acb, y::BigFloat) = x // parent(x)(y)
+/(x::BigFloat, y::acb) = parent(y)(x) / y
+/(x::acb, y::BigFloat) = x / parent(x)(y)
 ^(x::BigFloat, y::acb) = parent(y)(x)^y
 ^(x::acb, y::BigFloat) = x ^ parent(x)(y)
 
