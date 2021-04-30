@@ -240,7 +240,7 @@ end
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
 
-   @test divexact(f*g, f) == g
+   @test div(f*g, f) == g
 end
 
 @testset "arb_poly_scalar_division" begin
@@ -248,15 +248,15 @@ end
 
    f = x^2 + 2x + 1
 
-   @test divexact(2*f, ZZ(2)) == f
+   @test (2*f) / ZZ(2) == f
 
-   @test divexact(2*f, 2) == f
+   @test (2*f) / 2 == f
 
-   @test divexact(2*f, QQ(2)) == f
+   @test (2*f) / QQ(2) == f
 
-   @test divexact(2*f, RR(2)) == f
+   @test (2*f) / RR(2) == f
 
-   @test divexact(2*f, 2.0) == f
+   @test (2*f) / 2.0 == f
 end
 
 @testset "arb_poly.evaluation" begin
