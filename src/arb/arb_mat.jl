@@ -4,8 +4,8 @@
 #
 ###############################################################################
 
-export zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
-       overlaps, contains, inv, divexact, charpoly, det, lu, lu!, solve,
+export zero, one, deepcopy, -, transpose, +, *, /, &, ==, !=,
+       overlaps, contains, inv, charpoly, det, lu, lu!, solve,
        solve!, solve_lu_precomp, solve_lu_precomp!, swap_rows, swap_rows!,
        bound_inf_norm
 
@@ -417,22 +417,22 @@ end
 
 ###############################################################################
 #
-#   Exact division
+#   Matrix division
 #
 ###############################################################################
 
-function divexact(x::arb_mat, y::arb_mat)
+function /(x::arb_mat, y::arb_mat)
    ncols(x) != ncols(y) && error("Incompatible matrix dimensions")
    x*inv(y)
 end
 
 ###############################################################################
 #
-#   Ad hoc exact division
+#   Ad hoc division
 #
 ###############################################################################
 
-function divexact(x::arb_mat, y::Int)
+function /(x::arb_mat, y::Int)
   y == 0 && throw(DivideError())
   z = similar(x)
   ccall((:arb_mat_scalar_div_si, libarb), Nothing,
@@ -441,7 +441,7 @@ function divexact(x::arb_mat, y::Int)
   return z
 end
 
-function divexact(x::arb_mat, y::fmpz)
+function /(x::arb_mat, y::fmpz)
   z = similar(x)
   ccall((:arb_mat_scalar_div_fmpz, libarb), Nothing,
               (Ref{arb_mat}, Ref{arb_mat}, Ref{fmpz}, Int),
@@ -449,7 +449,7 @@ function divexact(x::arb_mat, y::fmpz)
   return z
 end
 
-function divexact(x::arb_mat, y::arb)
+function /(x::arb_mat, y::arb)
   z = similar(x)
   ccall((:arb_mat_scalar_div_arb, libarb), Nothing,
               (Ref{arb_mat}, Ref{arb_mat}, Ref{arb}, Int),
