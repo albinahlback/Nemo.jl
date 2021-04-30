@@ -4,8 +4,8 @@
 #
 ###############################################################################
 
-export zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
-       overlaps, contains, inv, divexact, charpoly, det, lu, lu!, solve,
+export zero, one, deepcopy, -, transpose, +, *, /, &, ==, !=,
+       overlaps, contains, inv, charpoly, det, lu, lu!, solve,
        solve!, solve_lu_precomp, solve_lu_precomp!, swap_rows, swap_rows!,
        bound_inf_norm, isreal, eigvals, eigvals_simple
 
@@ -464,22 +464,22 @@ end
 
 ###############################################################################
 #
-#   Exact division
+#   Matrix division
 #
 ###############################################################################
 
-function divexact(x::acb_mat, y::acb_mat)
+function /(x::acb_mat, y::acb_mat)
    ncols(x) != ncols(y) && error("Incompatible matrix dimensions")
    x*inv(y)
 end
 
 ###############################################################################
 #
-#   Ad hoc exact division
+#   Ad hoc division
 #
 ###############################################################################
 
-function divexact(x::acb_mat, y::Int)
+function /(x::acb_mat, y::Int)
   y == 0 && throw(DivideError())
   z = similar(x)
   ccall((:acb_mat_scalar_div_si, libarb), Nothing,
@@ -488,7 +488,7 @@ function divexact(x::acb_mat, y::Int)
   return z
 end
 
-function divexact(x::acb_mat, y::fmpz)
+function /(x::acb_mat, y::fmpz)
   z = similar(x)
   ccall((:acb_mat_scalar_div_fmpz, libarb), Nothing,
               (Ref{acb_mat}, Ref{acb_mat}, Ref{fmpz}, Int),
@@ -496,7 +496,7 @@ function divexact(x::acb_mat, y::fmpz)
   return z
 end
 
-function divexact(x::acb_mat, y::arb)
+function /(x::acb_mat, y::arb)
   z = similar(x)
   ccall((:acb_mat_scalar_div_arb, libarb), Nothing,
               (Ref{acb_mat}, Ref{acb_mat}, Ref{arb}, Int),
@@ -504,7 +504,7 @@ function divexact(x::acb_mat, y::arb)
   return z
 end
 
-function divexact(x::acb_mat, y::acb)
+function /(x::acb_mat, y::acb)
   z = similar(x)
   ccall((:acb_mat_scalar_div_acb, libarb), Nothing,
               (Ref{acb_mat}, Ref{acb_mat}, Ref{acb}, Int),
@@ -512,13 +512,13 @@ function divexact(x::acb_mat, y::acb)
   return z
 end
 
-divexact(x::acb_mat, y::Float64) = divexact(x, base_ring(x)(y))
+/(x::acb_mat, y::Float64) = x/base_ring(x)(y)
 
-divexact(x::acb_mat, y::BigFloat) = divexact(x, base_ring(x)(y))
+/(x::acb_mat, y::BigFloat) = x/base_ring(x)(y)
 
-divexact(x::acb_mat, y::Integer) = divexact(x, fmpz(y))
+/(x::acb_mat, y::Integer) = x/fmpz(y)
 
-divexact(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt} = divexact(x, fmpq(y))
+/(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt} = x/fmpq(y)
 
 ################################################################################
 #
