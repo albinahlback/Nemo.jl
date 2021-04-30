@@ -296,27 +296,27 @@ end
    @test contains(C, B)
 end
 
-@testset "arb_mat.divexact" begin
+@testset "arb_mat.division" begin
    S = MatrixSpace(RR, 3, 3)
    R = MatrixSpace(ZZ, 3, 3)
 
    A = S([1 2 1001; 0 3 1; 0 2 1])
    B = R([1 2000 -3001; 0 1 -1; 0 -2 3])
 
-   @test overlaps(divexact(A, A), one(S))
-   @test contains(divexact(one(S), A), B)
+   @test overlaps(A / A, one(S))
+   @test contains(one(S) / A, B)
 end
 
-@testset "arb_mat.adhoc_divexact" begin
+@testset "arb_mat.adhoc_division" begin
    S = MatrixSpace(RR, 3, 3)
    R = MatrixSpace(ZZ, 3, 3)
 
    A = S([3 0 0; 0 3 0; 0 0 3])
    B = one(R)
 
-   @test contains(divexact(A, 3), B)
-   @test contains(divexact(A, fmpz(3)), B)
-   @test contains(divexact(A, RR("3.0 +/- 0.5")), B)
+   @test contains(A / 3, B)
+   @test contains(A / fmpz(3), B)
+   @test contains(A / RR("3.0 +/- 0.5"), B)
 end
 
 @testset "arb_mat.charpoly" begin
