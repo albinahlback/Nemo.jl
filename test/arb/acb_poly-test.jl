@@ -242,13 +242,13 @@ end
    @test_throws DomainError f^-1
 end
 
-@testset "acb_poly.exact_division" begin
+@testset "acb_poly.division" begin
    R, x = PolynomialRing(CC, "x")
 
    f = x^2 + 2x + 1
    g = x^3 + 3x + 1
 
-   @test divexact(f*g, f) == g
+   @test div(f*g, f) == g
 end
 
 @testset "acb_poly.scalar_division" begin
@@ -256,15 +256,15 @@ end
 
    f = x^2 + 2x + 1
 
-   @test divexact(2*f, ZZ(2)) == f
+   @test (2*f) / ZZ(2) == f
 
-   @test divexact(2*f, 2) == f
+   @test (2*f) / 2 == f
 
-   @test divexact(2*f, QQ(2)) == f
+   @test (2*f) / QQ(2) == f
 
-   @test divexact(2*f, CC(2)) == f
+   @test (2*f) / CC(2) == f
 
-   @test divexact(2*f, 2.0) == f
+   @test (2*f) / 2.0 == f
 end
 
 @testset "acb_poly.evaluation" begin
