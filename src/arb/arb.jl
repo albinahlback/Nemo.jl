@@ -135,6 +135,27 @@ function convert(::Type{Float64}, x::arb)
     return Float64(x)
 end
 
+function fmpz(x::arb)
+   isint(x) || error("Argument must be an integer.")
+   GC.@preserve x begin
+      t = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{arb}, ), x)
+      # 4 == round to nearest
+      m = fmpz()
+      e = fmpz()
+      ccall((:arf_get_fmpz_2exp, libarb), Nothing,
+            (Ref{fmpz}, Ref{fmpz}, Ptr{arf_struct}), m, e, t)
+   end
+   return m
+end
+
+BigInt(x::arb) = BigInt(fmpz(x))
+
+function (::Type{T})(x::arb) where {T <: Integer}
+  typemin(T) <= x <= typemax(T) ||
+      error("Argument does not fit inside datatype.")
+  return T(fmpz(x))
+end
+
 ################################################################################
 #
 #  String I/O
