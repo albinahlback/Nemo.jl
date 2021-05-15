@@ -7,8 +7,6 @@
 #
 ###############################################################################
 
-import Base: ceil
-
 export ball, radius, midpoint, contains, contains_zero,
        contains_negative, contains_positive, contains_nonnegative,
        contains_nonpositive, convert, iszero,
