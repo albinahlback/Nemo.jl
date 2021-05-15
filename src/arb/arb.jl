@@ -133,17 +133,15 @@ function convert(::Type{Float64}, x::arb)
     return Float64(x)
 end
 
+@doc Markdown.doc"""
+    fmpz(x::arb)
+
+Return $x$ as an `fmpz` if it represents an unique integer, else throws an
+error.
+"""
 function fmpz(x::arb)
-   isint(x) || error("Argument must be an integer.")
-   GC.@preserve x begin
-      t = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{arb}, ), x)
-      # 4 == round to nearest
-      m = fmpz()
-      e = fmpz()
-      ccall((:arf_get_fmpz_2exp, libarb), Nothing,
-            (Ref{fmpz}, Ref{fmpz}, Ptr{arf_struct}), m, e, t)
-   end
-   return m
+  (b, n) = unique_integer(x)
+  b == 0 ? error("Argument must represent be an unique integer") : return n
 end
 
 BigInt(x::arb) = BigInt(fmpz(x))
@@ -153,6 +151,16 @@ function (::Type{T})(x::arb) where {T <: Integer}
       error("Argument does not fit inside datatype.")
   return T(fmpz(x))
 end
+
+@doc Markdown.doc"""
+    convert(::Type{T}, x::arb) where {T <: Union{Integer, fmpz}}
+
+Converts $x$ to the integer type `T` if it uniquely represents an integer, else
+throws an error.
+"""
+convert(::Type{fmpz}, x::arb) = fmpz(x)
+convert(::Type{BigInt}, x::arb) = BigInt(x)
+(::Type{T})(x::arb) where {T <: Integer} = T(x)
 
 ################################################################################
 #
@@ -1144,8 +1152,7 @@ end
 @doc Markdown.doc"""
     floor(x::arb)
 
-Compute the floor of $x$, i.e. the greatest integer not exceeding $x$, as an
-Arb.
+Return floor of $x$, i.e. the greatest integer not exceeding $x$, as an Arb.
 """
 function floor(x::arb)
    z = parent(x)()
@@ -1154,16 +1161,33 @@ function floor(x::arb)
 end
 
 @doc Markdown.doc"""
+    floor(::Type{T}, x::arb) where {T <: Union{arb, fmpz, Integer}
+
+Return floor of $x$ as an element of type `T`.
+"""
+floor(::Type{arb}, x::arb) = floor(x)
+floor(::Type{fmpz}, x::arb) = fmpz(floor(x))
+floor(::Type{T}, x::arb) where {T <: Integer} = T(floor(x))
+
+@doc Markdown.doc"""
     ceil(x::arb)
 
-Return the ceiling of $x$, i.e. the least integer not less than $x$, as an
-Arb.
+Return ceiling of $x$, i.e. the least integer not less than $x$, as an Arb.
 """
 function ceil(x::arb)
    z = parent(x)()
    ccall((:arb_ceil, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
+
+@doc Markdown.doc"""
+    ceil(::Type{T}, x::arb) where {T <: Union{arb, fmpz, Integer}
+
+Return ceiling of $x$ as an element of type `T`.
+"""
+ceil(::Type{arb}, x::arb) = ceil(x)
+ceil(::Type{fmpz}, x::arb) = fmpz(ceil(x))
+ceil(::Type{T}, x::arb) where {T <: Integer} = T(ceil(x))
 
 @doc Markdown.doc"""
     sqrt(x::arb)
