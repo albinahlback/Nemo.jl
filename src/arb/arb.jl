@@ -160,7 +160,7 @@ throws an error.
 """
 convert(::Type{fmpz}, x::arb) = fmpz(x)
 convert(::Type{BigInt}, x::arb) = BigInt(x)
-(::Type{T})(x::arb) where {T <: Integer} = T(x)
+convert(::Type{T}, x::arb) where {T <: Integer} = T(x)
 
 ################################################################################
 #
