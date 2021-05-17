@@ -152,16 +152,6 @@ function (::Type{T})(x::arb) where {T <: Integer}
   return T(fmpz(x))
 end
 
-@doc Markdown.doc"""
-    convert(::Type{T}, x::arb) where {T <: Union{Integer, fmpz}}
-
-Converts $x$ to the integer type `T` if it uniquely represents an integer, else
-throws an error.
-"""
-convert(::Type{fmpz}, x::arb) = fmpz(x)
-convert(::Type{BigInt}, x::arb) = BigInt(x)
-convert(::Type{T}, x::arb) where {T <: Integer} = T(x)
-
 ################################################################################
 #
 #  String I/O
