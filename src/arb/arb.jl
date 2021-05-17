@@ -141,7 +141,7 @@ error.
 """
 function fmpz(x::arb)
   (b, n) = unique_integer(x)
-  b == 0 ? error("Argument must represent be an unique integer") : return n
+  !b ? error("Argument must represent be an unique integer") : return n
 end
 
 BigInt(x::arb) = BigInt(fmpz(x))
