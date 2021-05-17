@@ -46,13 +46,10 @@ end
    b = -8162
    c = 0.12
    @test fmpz(RR(a)) == a
-   @test convert(fmpz, RR(b)) == b
    @test_throws ErrorException fmpz(RR(c))
    @test BigInt(RR(a)) == a
-   @test convert(BigInt, RR(b)) == b
    @test_throws ErrorException BigInt(RR(c))
    @test Int(RR(a)) == a
-   @test convert(Int, RR(b)) == b
    @test_throws ErrorException Int(RR(c))
 
    @test abs(Float64(RR("2.3")) - 2.3) < 1e-10
