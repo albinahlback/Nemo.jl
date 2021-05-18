@@ -140,8 +140,9 @@ Return $x$ as an `fmpz` if it represents an unique integer, else throws an
 error.
 """
 function fmpz(x::arb)
+  !isexact(x) && error("Argument must represent a unique integer")
   (b, n) = unique_integer(x)
-  !b ? error("Argument must represent be an unique integer") : return n
+  !b ? error("Argument must represent a unique integer") : return n
 end
 
 BigInt(x::arb) = BigInt(fmpz(x))
