@@ -667,7 +667,7 @@ besselk(::acb, ::acb)
 ```
 
 ```@docs
-hyp1f1(::acb, ::acb, ::acb)
+hypergeometric_1f1(::acb, ::acb, ::acb)
 ```
 
 ```@docs
@@ -701,7 +701,7 @@ z = CC("1.23", "3.45")
 a = sin(z)^2 + cos(z)^2
 b = zeta(z)
 c = besselj(s, z)
-d = hyp1f1(s, s+1, z)
+d = hypergeometric_1f1(s, s+1, z)
 ```
 
 ### Linear dependence

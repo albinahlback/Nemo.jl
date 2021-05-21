@@ -53,3 +53,5 @@
 @deprecate expint(s::acb, x::acb) exp_integral_e(s, x)
 
 @deprecate lioffset(x::acb) log_integral_offset(x)
+
+@deprecate hyp1f1(a::acb, b::acb, x::acb) hypergeometric_1f1(a, b, x)
