@@ -21,7 +21,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        ei, si, ci, shi, chi, li, lioffset, expint, gamma,
        hyp1f1, hyp1f1r, hyperu, hyp2f1,
        jtheta,
-       modular_delta, modular_eta, modular_eisenstein, modular_j,
+       modular_delta, modular_eta, modular_eisenstein_g, modular_j,
        modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
        ellipwp, ellipk, ellipe,
        canonical_unit, root_of_unity
@@ -1285,12 +1285,12 @@ function modular_delta(x::acb)
 end
 
 @doc Markdown.doc"""
-    modular_eisenstein(k::Int, x::acb)
+    modular_eisenstein_g(k::Int, x::acb)
 
 Return the non-normalized Eisenstein series $G_k(\tau)$ of
 $\mathrm{SL}_2(\mathbb{Z})$. Also defined for $\tau = i \infty$.
 """
-function modular_eisenstein(k::Int, x::acb)
+function modular_eisenstein_g(k::Int, x::acb)
   CC = parent(x)
 
   k <= 2 && error("Eisenstein series are not absolute convergent for k = $k")

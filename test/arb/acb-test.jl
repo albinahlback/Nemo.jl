@@ -389,17 +389,17 @@ end
                               "-0.0112661792743731125728666 +/- 5.88e-26"))
    @test overlaps(modular_delta(z), CC("-0.09012304519443574525631 +/- 1.43e-24",
                               "-0.052947827926836557643152 +/- 8.29e-25"))
-   @test overlaps(modular_eisenstein(4, z),
+   @test overlaps(modular_eisenstein_g(4, z),
                   CC("-90.182476999818759 +/- 7.47e-16",
                      "90.935041893602751 +/- 9.65e-16"))
-   @test overlaps(modular_eisenstein(6, z),
+   @test overlaps(modular_eisenstein_g(6, z),
                   CC("858.06399824810497 +/- 7.27e-15",
                      "349.06790091288318 +/- 4.64e-15"))
-   @test overlaps(modular_eisenstein(6, onei(CC)),
+   @test overlaps(modular_eisenstein_g(6, onei(CC)),
                   CC("0 +/- 2.19e-17"))
-   @test overlaps(modular_eisenstein(8, onei(CC)),
+   @test overlaps(modular_eisenstein_g(8, onei(CC)),
                   CC("4.2557730353651895 +/- 3.20e-17"))
-   @test overlaps(modular_eisenstein(10, onei(CC)),
+   @test overlaps(modular_eisenstein_g(10, onei(CC)),
                   CC("0 +/- 3.14e-17"))
 
    @test overlaps(ellipk(z), CC("1.63015510394171138472863 +/- 3.00e-24",
