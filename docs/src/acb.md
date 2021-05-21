@@ -538,7 +538,7 @@ erfi(::acb)
 ```
 
 ```@docs
-ei(::acb)
+exp_integral_ei(::acb)
 ```
 
 ```@docs

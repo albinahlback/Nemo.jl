@@ -18,7 +18,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        sinpi, cospi, tanpi, cotpi, sincos, sincospi, sinh, cosh, tanh, coth,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, risingfac,
        risingfac2, polylog, barnesg, logbarnesg, agm,
-       ei, si, ci, shi, chi, li, lioffset, expint, gamma,
+       exp_integral_ei, si, ci, shi, chi, li, lioffset, expint, gamma,
        hyp1f1, hyp1f1r, hyperu, hyp2f1,
        jtheta,
        modular_delta, modular_eta, modular_eisenstein_g, modular_j,
@@ -1149,11 +1149,11 @@ function erfc(x::acb)
 end
 
 @doc Markdown.doc"""
-    ei(x::acb)
+    exp_integral_ei(x::acb)
 
 Return the exponential integral evaluated at $x$.
 """
-function ei(x::acb)
+function exp_integral_ei(x::acb)
    z = parent(x)()
    ccall((:acb_hypgeom_ei, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z

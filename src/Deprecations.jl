@@ -37,3 +37,5 @@
 @deprecate modlambda(x::acb) modular_lambda(x)
 
 @deprecate moddelta(x::acb) modular_delta(x)
+
+@deprecate ei(x::acb) exp_integral_ei(x)
