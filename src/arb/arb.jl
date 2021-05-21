@@ -19,9 +19,10 @@ export ball, radius, midpoint, contains, contains_zero, contains_negative,
        sqrtpos, root, log, log1p, expm1, sin, cos, sinpi, cospi, tan, cot,
        tanpi, cotpi, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
        acosh, gamma, lgamma, rgamma, digamma, zeta, sincos, sincospi, sinhcosh,
-       atan2, agm, factorial, binomial, fibonacci, bernoulli, rising_factorial, rising_factorial2,
-       polylog, chebyshev_t, chebyshev_t2, chebyshev_u, chebyshev_u2, bell,
-       numpart, lindep, canonical_unit, simplest_rational_inside
+       atan2, agm, factorial, binomial, fibonacci, bernoulli, rising_factorial,
+       rising_factorial2, polylog, chebyshev_t, chebyshev_t2, chebyshev_u,
+       chebyshev_u2, bell, numpart, lindep, canonical_unit,
+       simplest_rational_inside
 
 ###############################################################################
 #
