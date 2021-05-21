@@ -12,7 +12,7 @@ import Base: real, imag, abs, conj, angle, log, log1p, sin, cos,
 
 
 export one, onei, real, imag, conj, abs, inv, angle, isreal, polygamma, erf,
-       erfi, erfc, bessel_j, besselk, besseli, bessel_y
+       erfi, erfc, bessel_j, besselk, bessel_i, bessel_y
 
 export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        sinpi, cospi, tanpi, cotpi, sincos, sincospi, sinh, cosh, tanh, coth,
@@ -1521,11 +1521,11 @@ function bessel_y(nu::acb, x::acb)
 end
 
 @doc Markdown.doc"""
-    besseli(nu::acb, x::acb)
+    bessel_i(nu::acb, x::acb)
 
 Return the Bessel function $I_{\nu}(x)$.
 """
-function besseli(nu::acb, x::acb)
+function bessel_i(nu::acb, x::acb)
   z = parent(x)()
   ccall((:acb_hypgeom_bessel_i, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, nu, x, parent(x).prec)

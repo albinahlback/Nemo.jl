@@ -659,7 +659,7 @@ bessel_y(::acb, ::acb)
 ```
 
 ```@docs
-besseli(::acb, ::acb)
+bessel_i(::acb, ::acb)
 ```
 
 ```@docs

@@ -77,3 +77,5 @@
 @deprecate besselj(nu::acb, x::acb) bessel_j(nu, x)
 
 @deprecate bessely(nu::acb, x::acb) bessel_y(nu, x)
+
+@deprecate besseli(nu::acb, x::acb) bessel_i(nu, x)
