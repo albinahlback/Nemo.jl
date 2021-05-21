@@ -550,7 +550,7 @@ cos_integral(::acb)
 ```
 
 ```@docs
-shi(::acb)
+sinh_integral(::acb)
 ```
 
 ```@docs
