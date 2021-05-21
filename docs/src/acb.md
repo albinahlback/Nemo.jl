@@ -554,7 +554,7 @@ sinh_integral(::acb)
 ```
 
 ```@docs
-chi(::acb)
+cosh_integral(::acb)
 ```
 
 ```@docs

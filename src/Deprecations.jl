@@ -45,3 +45,5 @@
 @deprecate ci(x::acb) cos_integral(x)
 
 @deprecate shi(x::acb) sinh_integral(x)
+
+@deprecate chi(x::acb) cosh_integral(x)

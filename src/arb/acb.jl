@@ -18,7 +18,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        sinpi, cospi, tanpi, cotpi, sincos, sincospi, sinh, cosh, tanh, coth,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, risingfac,
        risingfac2, polylog, barnesg, logbarnesg, agm,
-       exp_integral_ei, sin_integral, cos_integral, sinh_integral, chi, li, lioffset, expint, gamma,
+       exp_integral_ei, sin_integral, cos_integral, sinh_integral, cosh_integral, li, lioffset, expint, gamma,
        hyp1f1, hyp1f1r, hyperu, hyp2f1,
        jtheta,
        modular_delta, modular_eta, modular_eisenstein_g, modular_j,
@@ -1193,11 +1193,11 @@ function sinh_integral(x::acb)
 end
 
 @doc Markdown.doc"""
-    chi(x::acb)
+    cosh_integral(x::acb)
 
 Return the hyperbolic cosine integral evaluated at $x$.
 """
-function chi(x::acb)
+function cosh_integral(x::acb)
    z = parent(x)()
    ccall((:acb_hypgeom_chi, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
