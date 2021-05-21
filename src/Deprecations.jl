@@ -51,3 +51,5 @@
 @deprecate li(x::acb) log_integral(x)
 
 @deprecate expint(s::acb, x::acb) exp_integral_e(s, x)
+
+@deprecate lioffset(x::acb) log_integral_offset(x)

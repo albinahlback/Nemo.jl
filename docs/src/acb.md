@@ -639,7 +639,7 @@ log_integral(::acb)
 ```
 
 ```@docs
-lioffset(::acb)
+log_integral_offset(::acb)
 ```
 
 ```@docs
