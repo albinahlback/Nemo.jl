@@ -347,10 +347,10 @@ end
    @test overlaps(binomial(x, UInt(3)), RR("0.0641293851417059390703256 +/- 4.37e-26"))
    @test overlaps(binomial(UInt(10), UInt(3), RR), RR("120.0000000000000000000000"))
 
-   @test fib(ZZ(10), RR) == 55
-   @test fib(10, RR) == 55
-   @test fib(-10, RR) == -55
-   @test fib(UInt(10), RR) == 55
+   @test fibonacci(ZZ(10), RR) == 55
+   @test fibonacci(10, RR) == 55
+   @test fibonacci(-10, RR) == -55
+   @test fibonacci(UInt(10), RR) == 55
 
    @test gamma(ZZ(10), RR) == 362880
    @test overlaps(gamma(QQ(1,4), RR), RR("3.625609908221908311930685 +/- 1.75e-25"))

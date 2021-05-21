@@ -19,7 +19,7 @@ export ball, radius, midpoint, contains, contains_zero, contains_negative,
        sqrtpos, root, log, log1p, expm1, sin, cos, sinpi, cospi, tan, cot,
        tanpi, cotpi, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
        acosh, gamma, lgamma, rgamma, digamma, zeta, sincos, sincospi, sinhcosh,
-       atan2, agm, factorial, binomial, fib, bernoulli, rising_factorial, rising_factorial2,
+       atan2, agm, factorial, binomial, fibonacci, bernoulli, rising_factorial, rising_factorial2,
        polylog, chebyshev_t, chebyshev_t2, chebyshev_u, chebyshev_u2, bell,
        numpart, lindep, canonical_unit, simplest_rational_inside
 
@@ -1673,18 +1673,18 @@ function binomial(n::UInt, k::UInt, r::ArbField)
 end
 
 @doc Markdown.doc"""
-    fib(n::fmpz, r::ArbField)
+    fibonacci(n::fmpz, r::ArbField)
 
 Return the $n$-th Fibonacci number in the given Arb field.
 """
-function fib(n::fmpz, r::ArbField)
+function fibonacci(n::fmpz, r::ArbField)
   z = r()
   ccall((:arb_fib_fmpz, libarb), Nothing,
               (Ref{arb}, Ref{fmpz}, Int), z, n, r.prec)
   return z
 end
 
-function fib(n::UInt, r::ArbField)
+function fibonacci(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_fib_ui, libarb), Nothing,
               (Ref{arb}, UInt, Int), z, n, r.prec)
@@ -1692,11 +1692,11 @@ function fib(n::UInt, r::ArbField)
 end
 
 @doc Markdown.doc"""
-    fib(n::Int, r::ArbField)
+    fibonacci(n::Int, r::ArbField)
 
 Return the $n$-th Fibonacci number in the given Arb field.
 """
-fib(n::Int, r::ArbField) = n >= 0 ? fib(UInt(n), r) : fib(fmpz(n), r)
+fibonacci(n::Int, r::ArbField) = n >= 0 ? fibonacci(UInt(n), r) : fibonacci(fmpz(n), r)
 
 @doc Markdown.doc"""
     gamma(x::fmpz, r::ArbField)

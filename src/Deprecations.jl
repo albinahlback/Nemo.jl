@@ -109,3 +109,9 @@
 @deprecate fac(n::UInt, r::ArbField) factorial(n, r)
 
 @deprecate fac(n::Int, r::ArbField) factorial(n, r)
+
+@deprecate fib(n::fmpz, r::ArbField) fibonacci(n, r)
+
+@deprecate fib(n::UInt, r::ArbField) fibonacci(n, r)
+
+@deprecate fib(n::Int, r::ArbField) fibonacci(n, r)

@@ -618,11 +618,11 @@ binomial(::UInt, ::UInt, ::ArbField)
 ```
 
 ```@docs
-fib(::fmpz, ::ArbField)
+fibonacci(::fmpz, ::ArbField)
 ```
 
 ```@docs
-fib(::Int, ::ArbField)
+fibonacci(::Int, ::ArbField)
 ```
 
 ```@docs
