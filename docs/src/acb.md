@@ -655,7 +655,7 @@ bessel_j(::acb, ::acb)
 ```
 
 ```@docs
-bessely(::acb, ::acb)
+bessel_y(::acb, ::acb)
 ```
 
 ```@docs
