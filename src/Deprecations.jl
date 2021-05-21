@@ -69,3 +69,5 @@
 @deprecate ellipk(x::acb) elliptic_k(x)
 
 @deprecate ellipe(x::acb) elliptic_e(x)
+
+@deprecate barnesg(x::acb) barnes_g(x)

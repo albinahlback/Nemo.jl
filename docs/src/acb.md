@@ -522,7 +522,7 @@ zeta(::acb)
 ```
 
 ```@docs
-barnesg(::acb)
+barnes_g(::acb)
 ```
 
 ```@docs

@@ -17,7 +17,7 @@ export one, onei, real, imag, conj, abs, inv, angle, isreal, polygamma, erf,
 export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        sinpi, cospi, tanpi, cotpi, sincos, sincospi, sinh, cosh, tanh, coth,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, risingfac,
-       risingfac2, polylog, barnesg, logbarnesg, agm,
+       risingfac2, polylog, barnes_g, logbarnesg, agm,
        exp_integral_ei, sin_integral, cos_integral, sinh_integral, cosh_integral, log_integral, log_integral_offset, exp_integral_e, gamma,
        hypergeometric_1f1, hypergeometric_1f1_regularized, hypergeometric_u, hypergeometric_2f1,
        jacobi_theta,
@@ -1083,11 +1083,11 @@ function zeta(x::acb)
 end
 
 @doc Markdown.doc"""
-    barnesg(x::acb)
+    barnes_g(x::acb)
 
 Return the Barnes $G$-function, evaluated at $x$.
 """
-function barnesg(x::acb)
+function barnes_g(x::acb)
    z = parent(x)()
    ccall((:acb_barnes_g, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
