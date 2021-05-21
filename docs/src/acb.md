@@ -683,7 +683,7 @@ hypergeometric_2f1(::acb, ::acb, ::acb, ::acb)
 ```
 
 ```@docs
-jtheta(::acb, ::acb)
+jacobi_theta(::acb, ::acb)
 ```
 
 ```@docs

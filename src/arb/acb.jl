@@ -20,7 +20,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        risingfac2, polylog, barnesg, logbarnesg, agm,
        exp_integral_ei, sin_integral, cos_integral, sinh_integral, cosh_integral, log_integral, log_integral_offset, exp_integral_e, gamma,
        hypergeometric_1f1, hypergeometric_1f1_regularized, hypergeometric_u, hypergeometric_2f1,
-       jtheta,
+       jacobi_theta,
        modular_delta, modular_eta, modular_eisenstein_g, modular_j,
        modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
        ellipwp, ellipk, ellipe,
@@ -1594,12 +1594,12 @@ function hypergeometric_2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
 end
 
 @doc Markdown.doc"""
-    jtheta(z::acb, tau::acb)
+    jacobi_theta(z::acb, tau::acb)
 
 Return a tuple of four elements containing the Jacobi theta function values
 $\theta_1, \theta_2, \theta_3, \theta_4$ evaluated at $z, \tau$.
 """
-function jtheta(z::acb, tau::acb)
+function jacobi_theta(z::acb, tau::acb)
   t1 = parent(z)()
   t2 = parent(z)()
   t3 = parent(z)()

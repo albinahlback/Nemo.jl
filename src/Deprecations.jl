@@ -61,3 +61,5 @@
 @deprecate hyperu(a::acb, b::acb, x::acb) hypergeometric_u(a, b, x)
 
 @deprecate hyp2f1(a::acb, b::acb, c::acb, x::acb) hypergeometric_2f1(a, b, c, x)
+
+@deprecate jtheta(z::acb, tau::acb) jacobi_theta(z, tau)
