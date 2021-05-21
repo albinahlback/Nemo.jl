@@ -14,17 +14,17 @@ import Base: real, imag, abs, conj, angle, log, log1p, sin, cos,
 export one, onei, real, imag, conj, abs, inv, angle, isreal, polygamma, erf,
        erfi, erfc, bessel_j, bessel_k, bessel_i, bessel_y
 
-export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
-       sinpi, cospi, tanpi, cotpi, sincos, sincospi, sinh, cosh, tanh, coth,
-       sinhcosh, atan, log_sinpi, gamma, rgamma, lgamma, risingfac,
-       risingfac2, polylog, barnes_g, log_barnes_g, agm,
-       exp_integral_ei, sin_integral, cos_integral, sinh_integral, cosh_integral, log_integral, log_integral_offset, exp_integral_e, gamma,
-       hypergeometric_1f1, hypergeometric_1f1_regularized, hypergeometric_u, hypergeometric_2f1,
-       jacobi_theta,
-       modular_delta, modular_eta, modular_eisenstein_g, modular_j,
-       modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
-       weierstrass_p, elliptic_k, elliptic_e,
-       canonical_unit, root_of_unity
+export rsqrt, log, log1p, exppii, sin, cos, tan, cot, sinpi, cospi, tanpi,
+       cotpi, sincos, sincospi, sinh, cosh, tanh, coth, sinhcosh, atan,
+       log_sinpi, gamma, rgamma, lgamma, risingfac, risingfac2, polylog,
+       barnes_g, log_barnes_g, agm, exp_integral_ei, sin_integral,
+       cos_integral, sinh_integral, cosh_integral, log_integral,
+       log_integral_offset, exp_integral_e, gamma, hypergeometric_1f1,
+       hypergeometric_1f1_regularized, hypergeometric_u, hypergeometric_2f1,
+       jacobi_theta, modular_delta, modular_eta, modular_eisenstein_g,
+       modular_j, modular_lambda, modular_weber_f, modular_weber_f1,
+       modular_weber_f2, weierstrass_p, elliptic_k, elliptic_e, canonical_unit,
+       root_of_unity
 
 ###############################################################################
 #

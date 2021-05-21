@@ -9,23 +9,19 @@
 
 import Base: ceil
 
-export ball, radius, midpoint, contains, contains_zero,
-       contains_negative, contains_positive, contains_nonnegative,
-       contains_nonpositive, convert, iszero,
-       isnonzero, isexact, isint, ispositive, isfinite,
-       isnonnegative, isnegative, isnonpositive, add!, mul!,
-       sub!, div!, overlaps, unique_integer,
-       accuracy_bits, trim, ldexp, setunion, setintersection,
-       const_pi, const_e, const_log2, const_log10, const_euler,
-       const_catalan, const_khinchin, const_glaisher,
-       floor, ceil, hypot, rsqrt, sqrt1pm1, sqrtpos, root,
-       log, log1p, expm1, sin, cos, sinpi, cospi, tan, cot,
-       tanpi, cotpi, sinh, cosh, tanh, coth, atan, asin, acos,
-       atanh, asinh, acosh, gamma, lgamma, rgamma, digamma, zeta,
-       sincos, sincospi, sinhcosh, atan2,
-       agm, fac, binomial, fib, bernoulli, risingfac, risingfac2, polylog,
-       chebyshev_t, chebyshev_t2, chebyshev_u, chebyshev_u2, bell, numpart,
-       lindep, canonical_unit, simplest_rational_inside
+export ball, radius, midpoint, contains, contains_zero, contains_negative,
+       contains_positive, contains_nonnegative, contains_nonpositive, convert,
+       iszero, isnonzero, isexact, isint, ispositive, isfinite, isnonnegative,
+       isnegative, isnonpositive, add!, mul!, sub!, div!, overlaps,
+       unique_integer, accuracy_bits, trim, ldexp, setunion, setintersection,
+       const_pi, const_e, const_log2, const_log10, const_euler, const_catalan,
+       const_khinchin, const_glaisher, floor, ceil, hypot, rsqrt, sqrt1pm1,
+       sqrtpos, root, log, log1p, expm1, sin, cos, sinpi, cospi, tan, cot,
+       tanpi, cotpi, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
+       acosh, gamma, lgamma, rgamma, digamma, zeta, sincos, sincospi, sinhcosh,
+       atan2, agm, fac, binomial, fib, bernoulli, risingfac, risingfac2,
+       polylog, chebyshev_t, chebyshev_t2, chebyshev_u, chebyshev_u2, bell,
+       numpart, lindep, canonical_unit, simplest_rational_inside
 
 ###############################################################################
 #
