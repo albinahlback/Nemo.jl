@@ -66,4 +66,6 @@
 
 @deprecate ellipwp(z::acb, tau::acb) weierstrass_p(z, tau)
 
-@deprecate ellipk(z::acb, tau::acb) elliptic_k(z, tau)
+@deprecate ellipk(x::acb) elliptic_k(x)
+
+@deprecate ellipe(x::acb) elliptic_e(x)

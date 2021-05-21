@@ -594,7 +594,7 @@ elliptic_k(::acb)
 ```
 
 ```@docs
-ellipe(::acb)
+elliptic_e(::acb)
 ```
 
 ```@docs
