@@ -71,3 +71,5 @@
 @deprecate ellipe(x::acb) elliptic_e(x)
 
 @deprecate barnesg(x::acb) barnes_g(x)
+
+@deprecate logbarnesg(x::acb) log_barnes_g(x)

@@ -526,7 +526,7 @@ barnes_g(::acb)
 ```
 
 ```@docs
-logbarnesg(::acb)
+log_barnes_g(::acb)
 ```
 
 ```@docs
