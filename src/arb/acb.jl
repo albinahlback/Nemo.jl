@@ -1140,7 +1140,7 @@ end
 @doc Markdown.doc"""
     erfc(x::acb)
 
-Return the complex error function evaluated at $x$.
+Return the complementary error function evaluated at $x$.
 """
 function erfc(x::acb)
    z = parent(x)()
