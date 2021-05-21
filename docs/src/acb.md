@@ -546,7 +546,7 @@ sin_integral(::acb)
 ```
 
 ```@docs
-ci(::acb)
+cos_integral(::acb)
 ```
 
 ```@docs

@@ -41,3 +41,5 @@
 @deprecate ei(x::acb) exp_integral_ei(x)
 
 @deprecate si(x::acb) sin_integral(x)
+
+@deprecate ci(x::acb) cos_integral(x)
