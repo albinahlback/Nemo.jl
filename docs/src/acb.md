@@ -675,7 +675,7 @@ hypergeometric_1f1_regularized(::acb, ::acb, ::acb)
 ```
 
 ```@docs
-hyperu(::acb, ::acb, ::acb)
+hypergeometric_u(::acb, ::acb, ::acb)
 ```
 
 ```@docs

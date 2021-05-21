@@ -19,7 +19,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, risingfac,
        risingfac2, polylog, barnesg, logbarnesg, agm,
        exp_integral_ei, sin_integral, cos_integral, sinh_integral, cosh_integral, log_integral, log_integral_offset, exp_integral_e, gamma,
-       hypergeometric_1f1, hypergeometric_1f1_regularized, hyperu, hyp2f1,
+       hypergeometric_1f1, hypergeometric_1f1_regularized, hypergeometric_u, hyp2f1,
        jtheta,
        modular_delta, modular_eta, modular_eisenstein_g, modular_j,
        modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
@@ -1570,11 +1570,11 @@ function hypergeometric_1f1_regularized(a::acb, b::acb, x::acb)
 end
 
 @doc Markdown.doc"""
-    hyperu(a::acb, b::acb, x::acb)
+    hypergeometric_u(a::acb, b::acb, x::acb)
 
 Return the confluent hypergeometric function $U(a,b,x)$.
 """
-function hyperu(a::acb, b::acb, x::acb)
+function hypergeometric_u(a::acb, b::acb, x::acb)
   z = parent(x)()
   ccall((:acb_hypgeom_u, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int), z, a, b, x, parent(x).prec)
