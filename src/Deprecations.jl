@@ -59,3 +59,5 @@
 @deprecate hyp1f1r(a::acb, b::acb, x::acb) hypergeometric_1f1_regularized(a, b, x)
 
 @deprecate hyperu(a::acb, b::acb, x::acb) hypergeometric_u(a, b, x)
+
+@deprecate hyp2f1(a::acb, b::acb, c::acb, x::acb) hypergeometric_2f1(a, b, c, x)

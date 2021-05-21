@@ -19,7 +19,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, risingfac,
        risingfac2, polylog, barnesg, logbarnesg, agm,
        exp_integral_ei, sin_integral, cos_integral, sinh_integral, cosh_integral, log_integral, log_integral_offset, exp_integral_e, gamma,
-       hypergeometric_1f1, hypergeometric_1f1_regularized, hypergeometric_u, hyp2f1,
+       hypergeometric_1f1, hypergeometric_1f1_regularized, hypergeometric_u, hypergeometric_2f1,
        jtheta,
        modular_delta, modular_eta, modular_eisenstein_g, modular_j,
        modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
@@ -1582,11 +1582,11 @@ function hypergeometric_u(a::acb, b::acb, x::acb)
 end
 
 @doc Markdown.doc"""
-    hyp2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
+    hypergeometric_2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
 
 Return the Gauss hypergeometric function ${}_2F_1(a,b,c,x)$.
 """
-function hyp2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
+function hypergeometric_2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
   z = parent(x)()
   ccall((:acb_hypgeom_2f1, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, a, b, c, x, flags, parent(x).prec)

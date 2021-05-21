@@ -679,7 +679,7 @@ hypergeometric_u(::acb, ::acb, ::acb)
 ```
 
 ```@docs
-hyp2f1(::acb, ::acb, ::acb, ::acb)
+hypergeometric_2f1(::acb, ::acb, ::acb, ::acb)
 ```
 
 ```@docs
