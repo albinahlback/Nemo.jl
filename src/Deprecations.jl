@@ -47,3 +47,5 @@
 @deprecate shi(x::acb) sinh_integral(x)
 
 @deprecate chi(x::acb) cosh_integral(x)
+
+@deprecate li(x::acb) log_integral(x)

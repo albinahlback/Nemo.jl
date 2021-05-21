@@ -635,7 +635,7 @@ polylog(::Union{acb,Int}, ::acb)
 ```
 
 ```@docs
-li(::acb)
+log_integral(::acb)
 ```
 
 ```@docs

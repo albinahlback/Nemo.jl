@@ -18,7 +18,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        sinpi, cospi, tanpi, cotpi, sincos, sincospi, sinh, cosh, tanh, coth,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, risingfac,
        risingfac2, polylog, barnesg, logbarnesg, agm,
-       exp_integral_ei, sin_integral, cos_integral, sinh_integral, cosh_integral, li, lioffset, expint, gamma,
+       exp_integral_ei, sin_integral, cos_integral, sinh_integral, cosh_integral, log_integral, lioffset, expint, gamma,
        hyp1f1, hyp1f1r, hyperu, hyp2f1,
        jtheta,
        modular_delta, modular_eta, modular_eisenstein_g, modular_j,
@@ -1449,11 +1449,11 @@ Return the polylogarithm Li$_s(a)$.
 """ polylog(s::Union{acb,Int}, ::acb)
 
 @doc Markdown.doc"""
-    li(x::acb)
+    log_integral(x::acb)
 
 Return the logarithmic integral, evaluated at $x$.
 """
-function li(x::acb)
+function log_integral(x::acb)
   z = parent(x)()
   ccall((:acb_hypgeom_li, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Int, Int), z, x, 0, parent(x).prec)
