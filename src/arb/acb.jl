@@ -18,7 +18,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        sinpi, cospi, tanpi, cotpi, sincos, sincospi, sinh, cosh, tanh, coth,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, risingfac,
        risingfac2, polylog, barnesg, logbarnesg, agm,
-       exp_integral_ei, sin_integral, cos_integral, sinh_integral, cosh_integral, log_integral, lioffset, expint, gamma,
+       exp_integral_ei, sin_integral, cos_integral, sinh_integral, cosh_integral, log_integral, lioffset, exp_integral_e, gamma,
        hyp1f1, hyp1f1r, hyperu, hyp2f1,
        jtheta,
        modular_delta, modular_eta, modular_eisenstein_g, modular_j,
@@ -1473,11 +1473,11 @@ function lioffset(x::acb)
 end
 
 @doc Markdown.doc"""
-    expint(s::acb, x::acb)
+    exp_integral_e(s::acb, x::acb)
 
 Return the generalised exponential integral $E_s(x)$.
 """
-function expint(s::acb, x::acb)
+function exp_integral_e(s::acb, x::acb)
   z = parent(s)()
   ccall((:acb_hypgeom_expint, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Ref{acb}, Int), z, s, x, parent(s).prec)

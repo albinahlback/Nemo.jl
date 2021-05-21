@@ -643,7 +643,7 @@ lioffset(::acb)
 ```
 
 ```@docs
-expint(::acb, ::acb)
+exp_integral_e(::acb, ::acb)
 ```
 
 ```@docs

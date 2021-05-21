@@ -49,3 +49,5 @@
 @deprecate chi(x::acb) cosh_integral(x)
 
 @deprecate li(x::acb) log_integral(x)
+
+@deprecate expint(s::acb, x::acb) exp_integral_e(s, x)
