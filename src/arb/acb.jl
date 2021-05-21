@@ -23,7 +23,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        jacobi_theta,
        modular_delta, modular_eta, modular_eisenstein_g, modular_j,
        modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
-       weierstrass_p, ellipk, ellipe,
+       weierstrass_p, elliptic_k, ellipe,
        canonical_unit, root_of_unity
 
 ###############################################################################
@@ -1308,11 +1308,11 @@ function modular_eisenstein_g(k::Int, x::acb)
 end
 
 @doc Markdown.doc"""
-    ellipk(x::acb)
+    elliptic_k(x::acb)
 
 Return the complete elliptic integral $K(x)$.
 """
-function ellipk(x::acb)
+function elliptic_k(x::acb)
    z = parent(x)()
    ccall((:acb_modular_elliptic_k, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z

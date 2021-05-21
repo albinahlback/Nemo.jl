@@ -590,7 +590,7 @@ modular_eisenstein_g(::Int, ::acb)
 ```
 
 ```@docs
-ellipk(::acb)
+elliptic_k(::acb)
 ```
 
 ```@docs

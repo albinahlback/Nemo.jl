@@ -65,3 +65,5 @@
 @deprecate jtheta(z::acb, tau::acb) jacobi_theta(z, tau)
 
 @deprecate ellipwp(z::acb, tau::acb) weierstrass_p(z, tau)
+
+@deprecate ellipk(z::acb, tau::acb) elliptic_k(z, tau)
