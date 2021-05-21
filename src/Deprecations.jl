@@ -81,3 +81,5 @@
 @deprecate besseli(nu::acb, x::acb) bessel_i(nu, x)
 
 @deprecate besselk(nu::acb, x::acb) bessel_k(nu, x)
+
+@deprecate logsinpi(x::acb) log_sinpi(x)

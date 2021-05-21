@@ -498,7 +498,7 @@ atan(::acb)
 ```
 
 ```@docs
-logsinpi(::acb)
+log_sinpi(::acb)
 ```
 
 ```@docs
