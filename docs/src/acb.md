@@ -663,7 +663,7 @@ bessel_i(::acb, ::acb)
 ```
 
 ```@docs
-besselk(::acb, ::acb)
+bessel_k(::acb, ::acb)
 ```
 
 ```@docs
