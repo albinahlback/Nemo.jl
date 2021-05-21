@@ -23,7 +23,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        jacobi_theta,
        modular_delta, modular_eta, modular_eisenstein_g, modular_j,
        modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
-       ellipwp, ellipk, ellipe,
+       weierstrass_p, ellipk, ellipe,
        canonical_unit, root_of_unity
 
 ###############################################################################
@@ -1611,11 +1611,11 @@ function jacobi_theta(z::acb, tau::acb)
 end
 
 @doc Markdown.doc"""
-    ellipwp(z::acb, tau::acb)
+    weierstrass_p(z::acb, tau::acb)
 
 Return the Weierstrass elliptic function $\wp(z,\tau)$.
 """
-function ellipwp(z::acb, tau::acb)
+function weierstrass_p(z::acb, tau::acb)
   r = parent(z)()
   ccall((:acb_modular_elliptic_p, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Ref{acb}, Int), r, z, tau, parent(z).prec)

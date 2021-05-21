@@ -687,7 +687,7 @@ jacobi_theta(::acb, ::acb)
 ```
 
 ```@docs
-ellipwp(::acb, ::acb)
+weierstrass_p(::acb, ::acb)
 ```
 
 **Examples**
