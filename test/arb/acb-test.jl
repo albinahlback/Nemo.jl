@@ -381,25 +381,25 @@ end
    @test overlaps(t4, CC("-0.66921558151467044848961 +/- 8.59e-24",
                               "0.81845615591876140504609 +/- 7.86e-24"))
 
-   @test overlaps(modeta(z), CC("0.904816083881512590065651 +/- 9.09e-25",
+   @test overlaps(modular_eta(z), CC("0.904816083881512590065651 +/- 9.09e-25",
                               "-0.098804163349957225969484 +/- 4.88e-25"))
-   @test overlaps(modj(z), CC("-1923742.4647359951069761 +/- 8.10e-17",
+   @test overlaps(modular_j(z), CC("-1923742.4647359951069761 +/- 8.10e-17",
                               "-474343.2637224651049865 +/- 1.22e-17"))
-   @test overlaps(modlambda(z), CC("0.99856752116671778730590 +/- 4.18e-24",
+   @test overlaps(modular_lambda(z), CC("0.99856752116671778730590 +/- 4.18e-24",
                               "-0.0112661792743731125728666 +/- 5.88e-26"))
-   @test overlaps(moddelta(z), CC("-0.09012304519443574525631 +/- 1.43e-24",
+   @test overlaps(modular_delta(z), CC("-0.09012304519443574525631 +/- 1.43e-24",
                               "-0.052947827926836557643152 +/- 8.29e-25"))
-   @test overlaps(modeisenstein(z, 4),
+   @test overlaps(modular_eisenstein(4, z),
                   CC("-90.182476999818759 +/- 7.47e-16",
                      "90.935041893602751 +/- 9.65e-16"))
-   @test overlaps(modeisenstein(z, 6),
+   @test overlaps(modular_eisenstein(6, z),
                   CC("858.06399824810497 +/- 7.27e-15",
                      "349.06790091288318 +/- 4.64e-15"))
-   @test overlaps(modeisenstein(onei(CC), 6),
+   @test overlaps(modular_eisenstein(6, onei(CC)),
                   CC("0 +/- 2.19e-17"))
-   @test overlaps(modeisenstein(onei(CC), 8),
+   @test overlaps(modular_eisenstein(8, onei(CC)),
                   CC("4.2557730353651895 +/- 3.20e-17"))
-   @test overlaps(modeisenstein(onei(CC), 10),
+   @test overlaps(modular_eisenstein(10, onei(CC)),
                   CC("0 +/- 3.14e-17"))
 
    @test overlaps(ellipk(z), CC("1.63015510394171138472863 +/- 3.00e-24",
@@ -411,7 +411,7 @@ end
                               "-51.93347883199212591376 +/- 6.19e-21"))
 
    t = CC(rand(), abs(rand()) + eps())
-   prod_sqr = (modweber_f(t)*modweber_f1(t)*modweber_f2(t))^2
+   prod_sqr = (modular_weber_f(t)*modular_weber_f1(t)*modular_weber_f2(t))^2
    @test overlaps(prod_sqr, CC(2))
 end
 
@@ -419,7 +419,7 @@ end
    CC = ComplexField(512)
    tau1 = CC(1//3, 8//7)
    tau2 = CC(1//5, 9//8)
-   A1 = modweber_f1(tau1)^8; B1 = modweber_f1(2*tau1)^8
+   A1 = modular_weber_f1(tau1)^8; B1 = modular_weber_f1(2*tau1)^8
 
    vals1 = [A1^i*B1^j for i in 0:2 for j in 0:2];
    C = lindep(vals1, 150)
@@ -431,7 +431,7 @@ end
 
    @test Phi == x^2*y+16*x-y^2
 
-   A2 = modweber_f1(tau2)^8; B2 = modweber_f1(2*tau2)^8
+   A2 = modular_weber_f1(tau2)^8; B2 = modular_weber_f1(2*tau2)^8
    vals2 = [A2^i*B2^j for i in 0:2 for j in 0:2]
 
    vals = permutedims([vals1 vals2])
