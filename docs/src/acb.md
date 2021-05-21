@@ -542,7 +542,7 @@ exp_integral_ei(::acb)
 ```
 
 ```@docs
-si(::acb)
+sin_integral(::acb)
 ```
 
 ```@docs

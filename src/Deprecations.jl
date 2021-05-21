@@ -39,3 +39,5 @@
 @deprecate moddelta(x::acb) modular_delta(x)
 
 @deprecate ei(x::acb) exp_integral_ei(x)
+
+@deprecate si(x::acb) sin_integral(x)
