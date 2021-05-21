@@ -389,6 +389,18 @@ end
                               "-0.0112661792743731125728666 +/- 5.88e-26"))
    @test overlaps(moddelta(z), CC("-0.09012304519443574525631 +/- 1.43e-24",
                               "-0.052947827926836557643152 +/- 8.29e-25"))
+   @test overlaps(modeisenstein(z, 4),
+                  CC("-90.182476999818759 +/- 7.47e-16",
+                     "90.935041893602751 +/- 9.65e-16"))
+   @test overlaps(modeisenstein(z, 6),
+                  CC("858.06399824810497 +/- 7.27e-15",
+                     "349.06790091288318 +/- 4.64e-15"))
+   @test overlaps(modeisenstein(onei(CC), 6),
+                  CC("0 +/- 2.19e-17"))
+   @test overlaps(modeisenstein(onei(CC), 8),
+                  CC("4.2557730353651895 +/- 3.20e-17"))
+   @test overlaps(modeisenstein(onei(CC), 10),
+                  CC("0 +/- 3.14e-17"))
 
    @test overlaps(ellipk(z), CC("1.63015510394171138472863 +/- 3.00e-24",
                               "0.143703652492537358876625 +/- 4.78e-25"))

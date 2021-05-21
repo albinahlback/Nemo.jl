@@ -20,7 +20,8 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        risingfac2, polylog, barnesg, logbarnesg, agm,
        ei, si, ci, shi, chi, li, lioffset, expint, gamma,
        hyp1f1, hyp1f1r, hyperu, hyp2f1,
-       jtheta, modeta, modj, modlambda, moddelta, ellipwp, ellipk, ellipe,
+       jtheta, modeta, modeisenstein, modj, modlambda, moddelta,
+       ellipwp, ellipk, ellipe,
        modweber_f, modweber_f1, modweber_f2, canonical_unit, root_of_unity
 
 ###############################################################################
@@ -1279,6 +1280,29 @@ function moddelta(x::acb)
    z = parent(x)()
    ccall((:acb_modular_delta, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
+end
+
+@doc Markdown.doc"""
+    modeisenstein(x::acb, k::Int)
+
+Return the non-normalized Eisenstein series $G_k(\tau)$ of
+$\mathrm{SL}_2(\mathbb{Z})$. Also defined for $\tau = i \infty$.
+"""
+function modeisenstein(x::acb, k::Int)
+  CC = parent(x)
+
+  k <= 2 && error("Eisenstein series are not absolute convergent for k = $k")
+  imag(x) < 0 && error("x is not in upper half plane.")
+  isodd(k) && return zero(CC)
+  imag(x) == Inf && return 2 * zeta(CC(k))
+
+  len = k ÷ 2 - 1
+  vec = acb_vec(len)
+  ccall((:acb_modular_eisenstein, libarb), Nothing,
+        (Ptr{acb_struct}, Ref{acb}, Int, Int), vec, x, len, CC.prec)
+  z = array(CC, vec, len)
+  acb_vec_clear(vec, len)
+  return z[end]
 end
 
 @doc Markdown.doc"""

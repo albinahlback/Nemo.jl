@@ -586,6 +586,10 @@ moddelta(::acb)
 ```
 
 ```@docs
+modeisenstein(::acb, ::Int)
+```
+
+```@docs
 ellipk(::acb)
 ```
 
