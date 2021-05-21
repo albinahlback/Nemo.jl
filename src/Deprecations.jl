@@ -83,3 +83,29 @@
 @deprecate besselk(nu::acb, x::acb) bessel_k(nu, x)
 
 @deprecate logsinpi(x::acb) log_sinpi(x)
+
+@deprecate risingfac(x::acb, n::UInt) rising_factorial(x, n)
+
+@deprecate risingfac(x::acb, n::Int) rising_factorial(x, n)
+
+@deprecate risingfac2(x::acb, n::UInt) rising_factorial2(x, n)
+
+@deprecate risingfac2(x::acb, n::Int) rising_factorial2(x, n)
+
+@deprecate risingfac(x::arb, n::UInt) rising_factorial(x, n)
+
+@deprecate risingfac(x::arb, n::Int) rising_factorial(x, n)
+
+@deprecate risingfac(x::fmpq, n::UInt, r::ArbField) rising_factorial(x, n, r)
+
+@deprecate risingfac(x::fmpq, n::Int, r::ArbField) rising_factorial(x, n, r)
+
+@deprecate risingfac2(x::arb, n::UInt) rising_factorial2(x, n)
+
+@deprecate risingfac2(x::arb, n::Int) rising_factorial2(x, n)
+
+@deprecate fac(x::arb) factorial(x)
+
+@deprecate fac(n::UInt, r::ArbField) factorial(n, r)
+
+@deprecate fac(n::Int, r::ArbField) factorial(n, r)

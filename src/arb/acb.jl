@@ -16,7 +16,7 @@ export one, onei, real, imag, conj, abs, inv, angle, isreal, polygamma, erf,
 
 export rsqrt, log, log1p, exppii, sin, cos, tan, cot, sinpi, cospi, tanpi,
        cotpi, sincos, sincospi, sinh, cosh, tanh, coth, sinhcosh, atan,
-       log_sinpi, gamma, rgamma, lgamma, risingfac, risingfac2, polylog,
+       log_sinpi, gamma, rgamma, lgamma, rising_factorial, rising_factorial2, polylog,
        barnes_g, log_barnes_g, agm, exp_integral_ei, sin_integral,
        cos_integral, sinh_integral, cosh_integral, log_integral,
        log_integral_offset, exp_integral_e, gamma, hypergeometric_1f1,
@@ -1392,7 +1392,7 @@ function polygamma(s::acb, a::acb)
   return z
 end
 
-function risingfac(x::acb, n::UInt)
+function rising_factorial(x::acb, n::UInt)
   z = parent(x)()
   ccall((:acb_rising_ui, libarb), Nothing,
               (Ref{acb}, Ref{acb}, UInt, Int), z, x, n, parent(x).prec)
@@ -1400,16 +1400,16 @@ function risingfac(x::acb, n::UInt)
 end
 
 @doc Markdown.doc"""
-    risingfac(x::acb, n::Int)
+    rising_factorial(x::acb, n::Int)
 
 Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an Acb.
 """
-function risingfac(x::acb, n::Int)
+function rising_factorial(x::acb, n::Int)
   n < 0 && throw(DomainError(n, "Argument must be non-negative"))
-  return risingfac(x, UInt(n))
+  return rising_factorial(x, UInt(n))
 end
 
-function risingfac2(x::acb, n::UInt)
+function rising_factorial2(x::acb, n::UInt)
   z = parent(x)()
   w = parent(x)()
   ccall((:acb_rising2_ui, libarb), Nothing,
@@ -1418,14 +1418,14 @@ function risingfac2(x::acb, n::UInt)
 end
 
 @doc Markdown.doc"""
-    risingfac2(x::acb, n::Int)
+    rising_factorial2(x::acb, n::Int)
 
 Return a tuple containing the rising factorial $x(x + 1)\ldots (x + n - 1)$
 and its derivative.
 """
-function risingfac2(x::acb, n::Int)
+function rising_factorial2(x::acb, n::Int)
   n < 0 && throw(DomainError(n, "Argument must be non-negative"))
-  return risingfac2(x, UInt(n))
+  return rising_factorial2(x, UInt(n))
 end
 
 function polylog(s::acb, a::acb)

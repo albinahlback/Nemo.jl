@@ -623,11 +623,11 @@ zeta(::acb, ::acb)
 ```
 
 ```@docs
-risingfac(::acb, ::Int)
+rising_factorial(::acb, ::Int)
 ```
 
 ```@docs
-risingfac2(::acb, ::Int)
+rising_factorial2(::acb, ::Int)
 ```
 
 ```@docs

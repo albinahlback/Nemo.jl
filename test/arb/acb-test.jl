@@ -292,25 +292,25 @@ end
                               "-1.063052882456422220552361 +/- 4.43e-25"))
    @test overlaps(digamma(z), CC("-1.76424192368129752832045 +/- 6.55e-24",
                               "2.67409284892388122018449 +/- 5.36e-24"))
-   @test overlaps(risingfac(z,4), CC("0.362100000000000000000000 +/- 1.26e-25",
+   @test overlaps(rising_factorial(z,4), CC("0.362100000000000000000000 +/- 1.26e-25",
                               "3.162000000000000000000000 +/- 2.52e-25"))
-   @test overlaps(risingfac(z,UInt(4)), CC("0.362100000000000000000000 +/- 1.26e-25",
+   @test overlaps(rising_factorial(z,UInt(4)), CC("0.362100000000000000000000 +/- 1.26e-25",
                               "3.162000000000000000000000 +/- 2.52e-25"))
 
-   @test_throws DomainError risingfac(z, -1)
+   @test_throws DomainError rising_factorial(z, -1)
 
-   u, v = risingfac2(z,4)
+   u, v = rising_factorial2(z,4)
    @test overlaps(u, CC("0.362100000000000000000000 +/- 1.21e-25",
                               "3.162000000000000000000000 +/- 1.87e-25"))
    @test overlaps(v, CC("9.316000000000000000000000 +/- 3.71e-25",
                               "8.796000000000000000000000 +/- 5.03e-25"))
-   u, v = risingfac2(z,UInt(4))
+   u, v = rising_factorial2(z,UInt(4))
    @test overlaps(u, CC("0.362100000000000000000000 +/- 1.21e-25",
                               "3.162000000000000000000000 +/- 1.87e-25"))
    @test overlaps(v, CC("9.316000000000000000000000 +/- 3.71e-25",
                               "8.796000000000000000000000 +/- 5.03e-25"))
 
-   @test_throws DomainError risingfac2(z, -1)
+   @test_throws DomainError rising_factorial2(z, -1)
 
    @test overlaps(polygamma(a,z), CC("-0.7483922021557882137094 +/- 6.32e-23",
                               "11.8258968574291607559455 +/- 4.05e-23"))
