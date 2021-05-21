@@ -1298,7 +1298,7 @@ function modular_eisenstein_g(k::Int, x::acb)
   isodd(k) && return zero(CC)
   imag(x) == Inf && return 2 * zeta(CC(k))
 
-  len = k ÷ 2 - 1
+  len = div(k, 2) - 1
   vec = acb_vec(len)
   ccall((:acb_modular_eisenstein, libarb), Nothing,
         (Ptr{acb_struct}, Ref{acb}, Int, Int), vec, x, len, CC.prec)
