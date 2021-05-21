@@ -651,7 +651,7 @@ gamma(::acb, ::acb)
 ```
 
 ```@docs
-besselj(::acb, ::acb)
+bessel_j(::acb, ::acb)
 ```
 
 ```@docs
@@ -700,7 +700,7 @@ z = CC("1.23", "3.45")
 
 a = sin(z)^2 + cos(z)^2
 b = zeta(z)
-c = besselj(s, z)
+c = bessel_j(s, z)
 d = hypergeometric_1f1(s, s+1, z)
 ```
 

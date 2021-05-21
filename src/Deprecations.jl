@@ -73,3 +73,5 @@
 @deprecate barnesg(x::acb) barnes_g(x)
 
 @deprecate logbarnesg(x::acb) log_barnes_g(x)
+
+@deprecate besselj(nu::acb, x::acb) bessel_j(nu, x)
