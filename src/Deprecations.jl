@@ -55,3 +55,5 @@
 @deprecate lioffset(x::acb) log_integral_offset(x)
 
 @deprecate hyp1f1(a::acb, b::acb, x::acb) hypergeometric_1f1(a, b, x)
+
+@deprecate hyp1f1r(a::acb, b::acb, x::acb) hypergeometric_1f1_regularized(a, b, x)

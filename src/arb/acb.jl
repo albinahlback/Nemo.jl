@@ -19,7 +19,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, risingfac,
        risingfac2, polylog, barnesg, logbarnesg, agm,
        exp_integral_ei, sin_integral, cos_integral, sinh_integral, cosh_integral, log_integral, log_integral_offset, exp_integral_e, gamma,
-       hypergeometric_1f1, hyp1f1r, hyperu, hyp2f1,
+       hypergeometric_1f1, hypergeometric_1f1_regularized, hyperu, hyp2f1,
        jtheta,
        modular_delta, modular_eta, modular_eisenstein_g, modular_j,
        modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
@@ -1557,12 +1557,12 @@ function hypergeometric_1f1(a::acb, b::acb, x::acb)
 end
 
 @doc Markdown.doc"""
-    hyp1f1r(a::acb, b::acb, x::acb)
+    hypergeometric_1f1_regularized(a::acb, b::acb, x::acb)
 
 Return the regularized confluent hypergeometric function
 ${}_1F1(a,b,x) / \Gamma(b)$.
 """
-function hyp1f1r(a::acb, b::acb, x::acb)
+function hypergeometric_1f1_regularized(a::acb, b::acb, x::acb)
   z = parent(x)()
   ccall((:acb_hypgeom_m, libarb), Nothing,
               (Ref{acb}, Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, a, b, x, 1, parent(x).prec)
