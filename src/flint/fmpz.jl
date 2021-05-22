@@ -43,7 +43,7 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash,
        euler_phi, fibonacci, moebius_mu, primorial, rising_factorial,
        number_of_partitions, canonical_unit, isunit, isequal, addeq!, mul!,
        issquare, square_root, issquare_with_square_root,
-       iszero, rand, rand_bits, binomial, factorial, rand_bits_prime
+       iszero, rand, rand_bits, binomial, factorial, rand_bits_prime, randm
 
 ###############################################################################
 #
@@ -1974,6 +1974,19 @@ function rand_bits_prime(::FlintIntegerRing, n::Int, proved::Bool = true)
    ccall((:fmpz_randprime, libflint), Nothing,
 	 (Ref{fmpz}, Ptr{Cvoid}, Int, Cint),
 	  z, _flint_rand_states[Threads.threadid()].ptr, n, Cint(proved))
+   return z
+end
+
+@doc Markdown.doc"""
+    randm(a::fmpz)
+
+Return uniformly distributed random number in the range 0 to $a$, where $a$
+also can be negative.
+"""
+function randm(a::fmpz)
+   z = fmpz()
+   ccall((:fmpz_randm, libflint), Nothing,(Ref{fmpz}, Ptr{Cvoid}, Ref{fmpz}),
+         z, _flint_rand_states[Threads.threadid()].ptr, a)
    return z
 end
 

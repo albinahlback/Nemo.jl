@@ -51,7 +51,28 @@ end
    @test_throws DomainError rand_bits_prime(FlintZZ, 0)
    @test_throws DomainError rand_bits_prime(FlintZZ, 1)
 
-   # in a range
+   nn = 10000
+   RR = RealField(100)
+   for ia in ["-14627818", "-723", "-23", "2", "3", "71",
+              "1982", "112312321123928416"]
+      a = FlintZZ(ia)
+      ma, sa = RR(0), RR(0)
+      maideal = (RR(abs(a)) - 1) / 2
+      saideal = (RR(a)^2 - 1) / 12
+      for _ in 1:nn
+         xa = randm(a)
+         ma += RR(xa)
+         sa += (xa - sign(a) * maideal)^2
+      end
+      ma /= nn
+      sa /= nn
+      # 3% deviation from ideal mean
+      # 4% deviation from ideal variance
+      @test abs(ma - sign(a) * maideal) < .03 * maideal
+      @test abs(sa - saideal) < .04 * saideal
+   end
+
+   in a range
    for e in [0, 1, 2, 3, 32, 64, 65, 100, 129, 500]
       for b in [fmpz(2) .^ e ; fmpz(2) .^ e .+ e;]
          for r in [fmpz(1):fmpz(1):b, fmpz(3):fmpz(1):b, fmpz(1):fmpz(3):b]
