@@ -472,6 +472,10 @@ combit!(a, 2)
 ### Random generation
 
 ```@docs
+randm(::fmpz)
+```
+
+```@docs
 rand_bits(::FlintIntegerRing, ::Int)
 ```
 
@@ -481,6 +485,12 @@ rand_bits_prime(::FlintIntegerRing, ::Int, ::Bool)
 
 **Examples**
 
+For random generation of `fmpz`, one can also use the standard function `rand`
+for generating uniformly distributed random numbers, like
+```julia
+a = rand(ZZ(0):ZZ(100))
+```
+which generates a number in the interval $[0, 100]$. Other examples include:
 ```julia
 a = rand_bits(ZZ, 23)
 b = rand_bits_prime(ZZ, 7)
