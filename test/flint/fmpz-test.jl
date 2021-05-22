@@ -72,7 +72,7 @@ end
       @test abs(sa - saideal) < .04 * saideal
    end
 
-   in a range
+   # in a range
    for e in [0, 1, 2, 3, 32, 64, 65, 100, 129, 500]
       for b in [fmpz(2) .^ e ; fmpz(2) .^ e .+ e;]
          for r in [fmpz(1):fmpz(1):b, fmpz(3):fmpz(1):b, fmpz(1):fmpz(3):b]
