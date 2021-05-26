@@ -132,6 +132,26 @@ function convert(::Type{Float64}, x::arb)
     return Float64(x)
 end
 
+@doc Markdown.doc"""
+    fmpz(x::arb)
+
+Return $x$ as an `fmpz` if it represents an unique integer, else throws an
+error.
+"""
+function fmpz(x::arb)
+  !isexact(x) && error("Argument must represent a unique integer")
+  (b, n) = unique_integer(x)
+  !b ? error("Argument must represent a unique integer") : return n
+end
+
+BigInt(x::arb) = BigInt(fmpz(x))
+
+function (::Type{T})(x::arb) where {T <: Integer}
+  typemin(T) <= x <= typemax(T) ||
+      error("Argument does not fit inside datatype.")
+  return T(fmpz(x))
+end
+
 ################################################################################
 #
 #  String I/O
@@ -1122,8 +1142,7 @@ end
 @doc Markdown.doc"""
     floor(x::arb)
 
-Compute the floor of $x$, i.e. the greatest integer not exceeding $x$, as an
-Arb.
+Return floor of $x$, i.e. the greatest integer not exceeding $x$, as an Arb.
 """
 function floor(x::arb)
    z = parent(x)()
@@ -1132,16 +1151,33 @@ function floor(x::arb)
 end
 
 @doc Markdown.doc"""
+    floor(::Type{T}, x::arb) where {T <: Union{arb, fmpz, Integer}
+
+Return floor of $x$ as an element of type `T`.
+"""
+floor(::Type{arb}, x::arb) = floor(x)
+floor(::Type{fmpz}, x::arb) = fmpz(floor(x))
+floor(::Type{T}, x::arb) where {T <: Integer} = T(floor(x))
+
+@doc Markdown.doc"""
     ceil(x::arb)
 
-Return the ceiling of $x$, i.e. the least integer not less than $x$, as an
-Arb.
+Return ceiling of $x$, i.e. the least integer not less than $x$, as an Arb.
 """
 function ceil(x::arb)
    z = parent(x)()
    ccall((:arb_ceil, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
+
+@doc Markdown.doc"""
+    ceil(::Type{T}, x::arb) where {T <: Union{arb, fmpz, Integer}
+
+Return ceiling of $x$ as an element of type `T`.
+"""
+ceil(::Type{arb}, x::arb) = ceil(x)
+ceil(::Type{fmpz}, x::arb) = fmpz(ceil(x))
+ceil(::Type{T}, x::arb) where {T <: Integer} = T(ceil(x))
 
 @doc Markdown.doc"""
     sqrt(x::arb)
