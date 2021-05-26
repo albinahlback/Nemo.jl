@@ -32,7 +32,7 @@
 
 @deprecate modweber_f2(x::acb) modular_weber_f2(x)
 
-@deprecate modj(x::acb) modular_j(x)
+@deprecate modj(x::acb) j_invariant(x)
 
 @deprecate modlambda(x::acb) modular_lambda(x)
 

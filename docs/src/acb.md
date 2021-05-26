@@ -574,7 +574,7 @@ modular_weber_f2(::acb)
 ```
 
 ```@docs
-modular_j(::acb)
+j_invariant(::acb)
 ```
 
 ```@docs

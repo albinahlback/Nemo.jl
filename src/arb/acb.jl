@@ -22,7 +22,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot, sinpi, cospi, tanpi,
        log_integral_offset, exp_integral_e, gamma, hypergeometric_1f1,
        hypergeometric_1f1_regularized, hypergeometric_u, hypergeometric_2f1,
        jacobi_theta, modular_delta, dedekind_eta, eisenstein_g,
-       modular_j, modular_lambda, modular_weber_f, modular_weber_f1,
+       j_invariant, modular_lambda, modular_weber_f, modular_weber_f1,
        modular_weber_f2, weierstrass_p, elliptic_k, elliptic_e, canonical_unit,
        root_of_unity
 
@@ -1252,11 +1252,11 @@ function modular_weber_f2(x::acb)
 end
 
 @doc Markdown.doc"""
-    modular_j(x::acb)
+    j_invariant(x::acb)
 
 Return the $j$-invariant $j(\tau)$ at $\tau = x$.
 """
-function modular_j(x::acb)
+function j_invariant(x::acb)
    z = parent(x)()
    ccall((:acb_modular_j, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
