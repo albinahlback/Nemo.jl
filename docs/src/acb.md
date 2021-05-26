@@ -586,7 +586,7 @@ modular_delta(::acb)
 ```
 
 ```@docs
-modular_eisenstein_g(::Int, ::acb)
+eisenstein_g(::Int, ::acb)
 ```
 
 ```@docs
