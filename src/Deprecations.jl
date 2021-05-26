@@ -24,7 +24,7 @@
 
 # Deprecated in 0.23.*
 
-@deprecate modeta(x::acb) modular_eta(x)
+@deprecate modeta(x::acb) dedekind_eta(x)
 
 @deprecate modweber_f(x::acb) modular_weber_f(x)
 

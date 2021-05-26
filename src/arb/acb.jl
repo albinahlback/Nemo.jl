@@ -21,7 +21,7 @@ export rsqrt, log, log1p, exppii, sin, cos, tan, cot, sinpi, cospi, tanpi,
        cos_integral, sinh_integral, cosh_integral, log_integral,
        log_integral_offset, exp_integral_e, gamma, hypergeometric_1f1,
        hypergeometric_1f1_regularized, hypergeometric_u, hypergeometric_2f1,
-       jacobi_theta, modular_delta, modular_eta, modular_eisenstein_g,
+       jacobi_theta, modular_delta, dedekind_eta, modular_eisenstein_g,
        modular_j, modular_lambda, modular_weber_f, modular_weber_f1,
        modular_weber_f2, weierstrass_p, elliptic_k, elliptic_e, canonical_unit,
        root_of_unity
@@ -1204,11 +1204,11 @@ function cosh_integral(x::acb)
 end
 
 @doc Markdown.doc"""
-    modular_eta(x::acb)
+    dedekind_eta(x::acb)
 
 Return the Dedekind eta function $\eta(\tau)$ at $\tau = x$.
 """
-function modular_eta(x::acb)
+function dedekind_eta(x::acb)
    z = parent(x)()
    ccall((:acb_modular_eta, libarb), Nothing, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z
@@ -1224,7 +1224,7 @@ at $x$ in the complex upper half plane.
 function modular_weber_f(x::acb)
    x_on_2 = divexact(x, 2)
    x_times_2 = 2*x
-   return divexact(modular_eta(x)^2, modular_eta(x_on_2)*modular_eta(x_times_2))
+   return divexact(dedekind_eta(x)^2, dedekind_eta(x_on_2)*dedekind_eta(x_times_2))
 end
 
 @doc Markdown.doc"""
@@ -1236,7 +1236,7 @@ at $x$ in the complex upper half plane.
 """
 function modular_weber_f1(x::acb)
    x_on_2 = divexact(x, 2)
-   return divexact(modular_eta(x_on_2), modular_eta(x))
+   return divexact(dedekind_eta(x_on_2), dedekind_eta(x))
 end
 
 @doc Markdown.doc"""
@@ -1248,7 +1248,7 @@ at $x$ in the complex upper half plane.
 """
 function modular_weber_f2(x::acb)
    x_times_2 = x*2
-   return divexact(modular_eta(x_times_2), modular_eta(x))*sqrt(parent(x)(2))
+   return divexact(dedekind_eta(x_times_2), dedekind_eta(x))*sqrt(parent(x)(2))
 end
 
 @doc Markdown.doc"""

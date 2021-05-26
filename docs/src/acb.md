@@ -558,7 +558,7 @@ cosh_integral(::acb)
 ```
 
 ```@docs
-modular_eta(::acb)
+dedekind_eta(::acb)
 ```
 
 ```@docs
