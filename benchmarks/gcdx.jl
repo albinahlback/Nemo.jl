@@ -28,10 +28,9 @@ function benchmark_gcdx()
   print("benchmark_gcdx ...\n")
 
   # small size
-  sp = Random.Sampler(Random.MersenneTwister(),
-                      ZZ(0):ZZ(2)^(Sys.WORD_SIZE - 2) - 1)
-  x = [rand(sp) for _ in 1:100]
-  y = [rand(sp) for _ in 1:100]
+  range = ZZ(0):ZZ(2)^(Sys.WORD_SIZE - 2) - 1
+  x = [rand(range) for _ in 1:100]
+  y = [rand(range) for _ in 1:100]
 
   tt = @elapsed run_gcdx_bigint(x, y)
   println("Small sized integers for BigInt-solution: $tt")
@@ -39,10 +38,9 @@ function benchmark_gcdx()
   println("Small sized integers for fmpz-solution:   $tt")
 
   # mixed integers
-  sp = Random.Sampler(Random.MersenneTwister(),
-                      ZZ(0):ZZ(2)^Sys.WORD_SIZE)
-  x = [rand(sp) for _ in 1:100]
-  y = [rand(sp) for _ in 1:100]
+  range = ZZ(0):ZZ(2)^Sys.WORD_SIZE
+  x = [rand(range) for _ in 1:100]
+  y = [rand(range) for _ in 1:100]
 
   tt = @elapsed run_gcdx_bigint(x, y)
   println("Mixed sized integers for BigInt-solution: $tt")
@@ -50,10 +48,9 @@ function benchmark_gcdx()
   println("Mixed sized integers for fmpz-solution:   $tt")
 
   # big integers
-  sp = Random.Sampler(Random.MersenneTwister(),
-                      ZZ(0):ZZ(2)^512)
-  x = [rand(sp) for _ in 1:100]
-  y = [rand(sp) for _ in 1:100]
+  range = ZZ(0):ZZ(2)^512
+  x = [rand(range) for _ in 1:100]
+  y = [rand(range) for _ in 1:100]
 
   tt = @elapsed run_gcdx_bigint(x, y)
   println("Large sized integers for BigInt-solution: $tt")
