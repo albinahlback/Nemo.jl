@@ -18,8 +18,9 @@ export ball, radius, midpoint, contains, contains_zero, contains_negative,
        const_khinchin, const_glaisher, floor, ceil, hypot, rsqrt, sqrt1pm1,
        sqrtpos, root, log, log1p, expm1, sin, cos, sinpi, cospi, tan, cot,
        tanpi, cotpi, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
-       acosh, gamma, lgamma, rgamma, digamma, zeta, sincos, sincospi, sinhcosh,
-       atan2, agm, factorial, binomial, fibonacci, bernoulli, rising_factorial,
+       acosh, gamma, lgamma, rgamma, digamma, gamma_regularized, gamma_lower,
+       gamma_lower_regularized, zeta, sincos, sincospi, sinhcosh, atan2, agm,
+       factorial, binomial, fibonacci, bernoulli, rising_factorial,
        rising_factorial2, polylog, chebyshev_t, chebyshev_t2, chebyshev_u,
        chebyshev_u2, bell, numpart, lindep, canonical_unit,
        simplest_rational_inside
@@ -1511,6 +1512,57 @@ function digamma(x::arb)
    ccall((:arb_digamma, libarb), Nothing, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
 end
+
+@doc Markdown.doc"""
+    gamma(s::arb, x::arb)
+
+Return the upper incomplete gamma function $\Gamma(s,x)$.
+"""
+function gamma(s::arb, x::arb)
+  z = parent(s)()
+  ccall((:arb_hypgeom_gamma_upper, libarb), Nothing,
+        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 0, parent(s).prec)
+  return z
+end
+
+@doc Markdown.doc"""
+    gamma_regularized(s::arb, x::arb)
+
+Return the regularized upper incomplete gamma function
+$\Gamma(s,x) / \Gamma(s)$.
+"""
+function gamma_regularized(s::arb, x::arb)
+  z = parent(s)()
+  ccall((:arb_hypgeom_gamma_upper, libarb), Nothing,
+        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 1, parent(s).prec)
+  return z
+end
+
+@doc Markdown.doc"""
+    gamma_lower(s::arb, x::arb)
+
+Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
+"""
+function gamma_lower(s::arb, x::arb)
+  z = parent(s)()
+  ccall((:arb_hypgeom_gamma_lower, libarb), Nothing,
+        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 0, parent(s).prec)
+  return z
+end
+
+@doc Markdown.doc"""
+    gamma_lower_regularized(s::arb, x::arb)
+
+Return the regularized lower incomplete gamma function
+$\gamma(s,x) / \Gamma(s)$.
+"""
+function gamma_lower_regularized(s::arb, x::arb)
+  z = parent(s)()
+  ccall((:arb_hypgeom_gamma_lower, libarb), Nothing,
+        (Ref{arb}, Ref{arb}, Ref{arb}, Int, Int), z, s, x, 1, parent(s).prec)
+  return z
+end
+
 
 @doc Markdown.doc"""
     zeta(x::arb)

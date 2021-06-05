@@ -16,15 +16,15 @@ export one, onei, real, imag, conj, abs, inv, angle, isreal, polygamma, erf,
 
 export rsqrt, log, log1p, exppii, sin, cos, tan, cot, sinpi, cospi, tanpi,
        cotpi, sincos, sincospi, sinh, cosh, tanh, coth, sinhcosh, atan,
-       log_sinpi, gamma, rgamma, lgamma, rising_factorial, rising_factorial2,
-       polylog, barnes_g, log_barnes_g, agm, exp_integral_ei, sin_integral,
+       log_sinpi, gamma, rgamma, lgamma, gamma_regularized, gamma_lower,
+       gamma_lower_regularized, rising_factorial, rising_factorial2, polylog,
+       barnes_g, log_barnes_g, agm, exp_integral_ei, sin_integral,
        cos_integral, sinh_integral, cosh_integral, log_integral,
        log_integral_offset, exp_integral_e, gamma, hypergeometric_1f1,
        hypergeometric_1f1_regularized, hypergeometric_u, hypergeometric_2f1,
-       jacobi_theta, modular_delta, dedekind_eta, eisenstein_g,
-       j_invariant, modular_lambda, modular_weber_f, modular_weber_f1,
-       modular_weber_f2, weierstrass_p, elliptic_k, elliptic_e, canonical_unit,
-       root_of_unity
+       jacobi_theta, modular_delta, dedekind_eta, eisenstein_g, j_invariant,
+       modular_lambda, modular_weber_f, modular_weber_f1, modular_weber_f2,
+       weierstrass_p, elliptic_k, elliptic_e, canonical_unit, root_of_unity
 
 ###############################################################################
 #
@@ -1492,7 +1492,45 @@ Return the upper incomplete gamma function $\Gamma(s,x)$.
 function gamma(s::acb, x::acb)
   z = parent(s)()
   ccall((:acb_hypgeom_gamma_upper, libarb), Nothing,
-              (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 0, parent(s).prec)
+        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 0, parent(s).prec)
+  return z
+end
+
+@doc Markdown.doc"""
+    gamma_regularized(s::acb, x::acb)
+
+Return the regularized upper incomplete gamma function
+$\Gamma(s,x) / \Gamma(s)$.
+"""
+function gamma_regularized(s::acb, x::acb)
+  z = parent(s)()
+  ccall((:acb_hypgeom_gamma_upper, libarb), Nothing,
+        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 1, parent(s).prec)
+  return z
+end
+
+@doc Markdown.doc"""
+    gamma_lower(s::acb, x::acb)
+
+Return the lower incomplete gamma function $\gamma(s,x) / \Gamma(s)$.
+"""
+function gamma_lower(s::acb, x::acb)
+  z = parent(s)()
+  ccall((:acb_hypgeom_gamma_lower, libarb), Nothing,
+        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 0, parent(s).prec)
+  return z
+end
+
+@doc Markdown.doc"""
+    gamma_lower_regularized(s::acb, x::acb)
+
+Return the regularized lower incomplete gamma function
+$\gamma(s,x) / \Gamma(s)$.
+"""
+function gamma_lower_regularized(s::acb, x::acb)
+  z = parent(s)()
+  ccall((:acb_hypgeom_gamma_lower, libarb), Nothing,
+        (Ref{acb}, Ref{acb}, Ref{acb}, Int, Int), z, s, x, 1, parent(s).prec)
   return z
 end
 

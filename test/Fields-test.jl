@@ -11,3 +11,7 @@ include("antic/nf_elem-test.jl")
 
 include("arb/arb-test.jl")
 include("arb/acb-test.jl")
+
+include("calcium/ca-test.jl")
+include("calcium/qqbar-test.jl")
+

@@ -651,6 +651,18 @@ gamma(::acb, ::acb)
 ```
 
 ```@docs
+gamma_regularized(::acb, ::acb)
+```
+
+```@docs
+gamma_lower(::acb, ::acb)
+```
+
+```@docs
+gamma_lower_regularized(::acb, ::acb)
+```
+
+```@docs
 bessel_j(::acb, ::acb)
 ```
 
