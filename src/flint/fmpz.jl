@@ -1056,7 +1056,7 @@ function gcdx(a::fmpz, b::fmpz)
   d = FlintZZ()
   x = FlintZZ()
   y = FlintZZ()
-  ccall((:fmpz_xgcd_canonical_bezout, :libflint), Nothing,
+  ccall((:fmpz_xgcd_canonical_bezout, libflint), Nothing,
         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), d, x, y, a, b)
   return d, x, y
 end

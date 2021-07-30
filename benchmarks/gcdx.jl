@@ -7,7 +7,7 @@ function gcdx_fmpz(a::fmpz, b::fmpz)
   d = ZZ()
   x = ZZ()
   y = ZZ()
-  ccall((:fmpz_xgcd_canonical_bezout, :libflint), Nothing,
+  ccall((:fmpz_xgcd_canonical_bezout, libflint), Nothing,
         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), d, x, y, a, b)
   return d, x, y
 end
