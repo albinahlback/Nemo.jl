@@ -9,21 +9,22 @@
 
 import Base: ceil
 
-export ball, radius, midpoint, contains, contains_zero, contains_negative,
-       contains_positive, contains_nonnegative, contains_nonpositive, convert,
-       iszero, isnonzero, isexact, isint, ispositive, isfinite, isnonnegative,
-       isnegative, isnonpositive, add!, mul!, sub!, div!, overlaps,
-       unique_integer, accuracy_bits, trim, ldexp, setunion, setintersection,
-       const_pi, const_e, const_log2, const_log10, const_euler, const_catalan,
-       const_khinchin, const_glaisher, floor, ceil, hypot, rsqrt, sqrt1pm1,
-       sqrtpos, root, log, log1p, expm1, sin, cos, sinpi, cospi, tan, cot,
-       tanpi, cotpi, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
-       acosh, gamma, lgamma, rgamma, digamma, gamma_regularized, gamma_lower,
-       gamma_lower_regularized, zeta, sincos, sincospi, sinhcosh, atan2, agm,
-       factorial, binomial, fibonacci, bernoulli, rising_factorial,
-       rising_factorial2, polylog, chebyshev_t, chebyshev_t2, chebyshev_u,
-       chebyshev_u2, bell, numpart, lindep, airy_ai, airy_bi, airy_ai_prime,
-       airy_bi_prime, canonical_unit, simplest_rational_inside
+export add_error!, ball, radius, midpoint, contains, contains_zero,
+       contains_negative, contains_positive, contains_nonnegative,
+       contains_nonpositive, convert, iszero, isnonzero, isexact, isint,
+       ispositive, isfinite, isnonnegative, isnegative, isnonpositive, add!,
+       mul!, sub!, div!, overlaps, unique_integer, accuracy_bits, trim, ldexp,
+       setunion, setintersection, const_pi, const_e, const_log2, const_log10,
+       const_euler, const_catalan, const_khinchin, const_glaisher, floor, ceil,
+       hypot, rsqrt, sqrt1pm1, sqrtpos, root, log, log1p, expm1, sin, cos,
+       sinpi, cospi, tan, cot, tanpi, cotpi, sinh, cosh, tanh, coth, atan,
+       asin, acos, atanh, asinh, acosh, gamma, lgamma, rgamma, digamma,
+       gamma_regularized, gamma_lower, gamma_lower_regularized, zeta, sincos,
+       sincospi, sinhcosh, atan2, agm, factorial, binomial, fibonacci,
+       bernoulli, rising_factorial, rising_factorial2, polylog, chebyshev_t,
+       chebyshev_t2, chebyshev_u, chebyshev_u2, bell, numpart, lindep, airy_ai,
+       airy_bi, airy_ai_prime, airy_bi_prime, canonical_unit,
+       simplest_rational_inside
 
 ###############################################################################
 #
@@ -581,6 +582,15 @@ function midpoint(x::arb)
   z = parent(x)()
   ccall((:arb_get_mid_arb, libarb), Nothing, (Ref{arb}, Ref{arb}), z, x)
   return z
+end
+
+@doc Markdown.doc"""
+    add_error!(x::arb, y::arb)
+
+Adds the absolute values of the midpoint and radius of $y$ to the radius of $x$.
+"""
+function add_error!(x::arb, y::arb)
+  ccall((:arb_add_error, libarb), Nothing, (Ref{arb}, Ref{arb}), x, y)
 end
 
 ################################################################################
