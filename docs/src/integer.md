@@ -376,9 +376,7 @@ kronecker_symbol(::Int, ::Int)
 ```
 
 ```@docs
-divisor_sigma(::Int, ::Int)
-divisor_sigma(::fmpz, ::Int)
-divisor_sigma(::fmpz, ::fmpz)
+divisor_sigma(::Int, ::fmpz)
 ```
 
 ```@docs

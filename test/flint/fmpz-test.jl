@@ -861,9 +861,9 @@ end
 
    @test factorial(ZZ(100)) == fmpz("93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000")
 
-   @test divisor_sigma(fmpz(128), 10) == fmpz("1181745669222511412225")
+   @test divisor_sigma(10, fmpz(128)) == fmpz("1181745669222511412225")
 
-   @test_throws DomainError divisor_sigma(fmpz(1), -1)
+   @test_throws DomainError divisor_sigma(-1, fmpz(1))
 
    @test euler_phi(fmpz(12480)) == 3072
 

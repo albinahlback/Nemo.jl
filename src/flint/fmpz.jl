@@ -1823,35 +1823,24 @@ function kronecker_symbol(x::fmpz, y::fmpz)
 end
 
 @doc Markdown.doc"""
-    divisor_sigma(x::fmpz, y::Int)
+    divisor_sigma(x::Int, n::fmpz)
+    divisor_sigma(x::fmpz, n::fmpz)
+    divisor_sigma(x::Int, n::Int)
 
-Return the value of the sigma function, i.e. $\sum_{0 < d \;| x} d^y$. If
-$x \leq 0$ or $y < 0$ we throw a `DomainError()`.
+Return the divisor function $\sigma_{x}(n) = \sum_{0 < d \;| n} d^x$. If
+$x < 0$ or $n \le 0$ a `DomainError()` is thrown.
 """
-function divisor_sigma(x::fmpz, y::Int)
-   x <= 0 && throw(DomainError(x, "Argument must be positive"))
-   y < 0 && throw(DomainError(y, "Power must be non-negative"))
+function divisor_sigma(x::Int, n::fmpz)
+   x < 0 && throw(DomainError(x, "Power must be non-negative"))
+   n <= 0 && throw(DomainError(n, "Argument must be positive"))
    z = fmpz()
    ccall((:fmpz_divisor_sigma, libflint), Nothing,
-         (Ref{fmpz}, Ref{fmpz}, Int), z, x, y)
+         (Ref{fmpz}, Int, Ref{fmpz}), z, x, n)
    return z
 end
 
-@doc Markdown.doc"""
-    divisor_sigma(x::fmpz, y::fmpz)
-
-Return the value of the sigma function, i.e. $\sum_{0 < d \;| x} d^y$. If
-$x \leq 0$ or $y < 0$ we throw a `DomainError()`.
-"""
-divisor_sigma(x::fmpz, y::fmpz) = divisor_sigma(x, Int(y))
-
-@doc Markdown.doc"""
-    divisor_sigma(x::Int, y::Int)
-
-Return the value of the sigma function, i.e. $\sum_{0 < d \;| x} d^y$. If
-$x \leq 0$ or $y < 0$ we throw a `DomainError()`.
-"""
-divisor_sigma(x::Int, y::Int) = Int(divisor_sigma(fmpz(x), y))
+divisor_sigma(x::fmpz, n::fmpz) = divisor_sigma(x, Int(n))
+divisor_sigma(x::Int, n::Int) = Int(divisor_sigma(fmpz(x), n))
 
 @doc Markdown.doc"""
     euler_phi(x::fmpz)
