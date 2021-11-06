@@ -2248,6 +2248,18 @@ function submul!(z::fmpz, a::fmpz, b::fmpz)
    return z
 end
 
+function fmma!(r::fmpz, a::fmpz, b::fmpz, c::fmpz, d::fmpz)
+   ccall((:fmpz_fmma, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), r, a, b, c, d)
+   return r
+end
+
+function fmms!(r::fmpz, a::fmpz, b::fmpz, c::fmpz, d::fmpz)
+   ccall((:fmpz_fmms, libflint), Nothing,
+         (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), r, a, b, c, d)
+   return r
+end
+
 function divexact!(z::fmpz, a::fmpz, b::fmpz)
    ccall((:fmpz_divexact, libflint), Nothing,
          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}),
