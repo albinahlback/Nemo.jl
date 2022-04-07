@@ -12,9 +12,9 @@
 
 @attributes mutable struct AnticNumberField <: SimpleNumField{fmpq}
    pol_coeffs::Ptr{Nothing}
-   pol_den::Int
    pol_alloc::Int
    pol_length::Int
+   pol_den::Int
    pinv_dinv::Ptr{Nothing}
    pinv_n::Int
    pinv_norm::Int
