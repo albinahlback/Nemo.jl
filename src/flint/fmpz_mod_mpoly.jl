@@ -51,7 +51,7 @@ modulus(f::($etype)) = modulus(base_ring(parent(f)))
 
 function ordering(a::($rtype))
    b = a.ord
-#   b = ccall((:nmod_mpoly_ctx_ord, libflint), Cint, (Ref{zzModMPolyRing}, ), a)
+#   b = ccall((:fmpz_mod_mpoly_ctx_ord, libflint), Cint, (Ref{zzModMPolyRing}, ), a)
    return flint_orderings[b + 1]
 end
 
@@ -86,7 +86,7 @@ function is_gen(a::($etype), i::Int)
 end
 
 function is_gen(a::($etype))
-   return Bool(ccall((:nmod_mpoly_is_gen, libflint), Cint,
+   return Bool(ccall((:fmpz_mod_mpoly_is_gen, libflint), Cint,
                      (Ref{($etype)}, Int, Ref{($rtype)}),
                      a, -1, parent(a)))
 end
@@ -534,7 +534,7 @@ end
 function factor_squarefree(a::($etype))
    R = parent(a)
    fac = ($ftype)(R)
-   ok = ccall((:nmod_mpoly_factor_squarefree, libflint), Cint,
+   ok = ccall((:fmpz_mod_mpoly_factor_squarefree, libflint), Cint,
               (Ref{($ftype)}, Ref{($etype)}, Ref{($rtype)}),
               fac, a, R)
    iszero(ok) && error("unable to compute factorization")
