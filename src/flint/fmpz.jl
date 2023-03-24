@@ -274,7 +274,7 @@ canonical_unit(x::ZZRingElem) = x < 0 ? ZZRingElem(-1) : ZZRingElem(1)
 
 function -(x::ZZRingElem)
     z = ZZRingElem()
-    ccall((:__fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), z, x)
+    ccall((:fmpz_neg, libflint), Nothing, (Ref{ZZRingElem}, Ref{ZZRingElem}), z, x)
     return z
 end
 
@@ -449,7 +449,7 @@ function -(c::Int, x::ZZRingElem)
        ccall((:fmpz_add_ui, libflint), Nothing,
              (Ref{ZZRingElem}, Ref{ZZRingElem}, Int), z, x, -c)
     end
-    ccall((:__fmpz_neg, libflint), Nothing,
+    ccall((:fmpz_neg, libflint), Nothing,
           (Ref{ZZRingElem}, Ref{ZZRingElem}), z, z)
     return z
 end
