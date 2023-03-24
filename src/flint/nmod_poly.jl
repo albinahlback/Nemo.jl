@@ -751,7 +751,7 @@ function _factor(x::zzModPolyRingElem)
   res = Dict{zzModPolyRingElem,Int}()
   for i in 1:fac.num
     f = parent(x)()
-    ccall((:nmod_poly_factor_get_nmod_poly, libflint), Nothing,
+    ccall((:nmod_poly_factor_get_poly, libflint), Nothing,
             (Ref{zzModPolyRingElem}, Ref{nmod_poly_factor}, Int), f, fac, i-1)
     e = unsafe_load(fac.exp,i)
     res[f] = e
@@ -771,7 +771,7 @@ function _factor_squarefree(x::zzModPolyRingElem)
   res = Dict{zzModPolyRingElem,Int}()
   for i in 1:fac.num
     f = parent(x)()
-    ccall((:nmod_poly_factor_get_nmod_poly, libflint), Nothing,
+    ccall((:nmod_poly_factor_get_poly, libflint), Nothing,
             (Ref{zzModPolyRingElem}, Ref{nmod_poly_factor}, Int), f, fac, i-1)
     e = unsafe_load(fac.exp,i)
     res[f] = e
@@ -796,7 +796,7 @@ function factor_distinct_deg(x::zzModPolyRingElem)
   res = Dict{Int,zzModPolyRingElem}()
   for i in 1:fac.num
     f = parent(x)()
-    ccall((:nmod_poly_factor_get_nmod_poly, libflint), Nothing,
+    ccall((:nmod_poly_factor_get_poly, libflint), Nothing,
             (Ref{zzModPolyRingElem}, Ref{nmod_poly_factor}, Int), f, fac, i-1)
     res[degs[i]] = f
   end
@@ -840,7 +840,7 @@ function roots(a::zzModPolyRingElem)
   f = R()
   res = zzModRingElem[]
   for i in 1:fac.num
-    ccall((:nmod_poly_factor_get_nmod_poly, libflint), Nothing,
+    ccall((:nmod_poly_factor_get_poly, libflint), Nothing,
           (Ref{zzModPolyRingElem}, Ref{nmod_poly_factor}, Int),
           f, fac, i - 1)
     @assert isone(coeff(f, 1))
