@@ -23,7 +23,7 @@ dense_matrix_type(::Type{FpFieldElem}) = FpMatrix
 ###############################################################################
 
 function similar(::MatElem, R::FpField, r::Int, c::Int)
-   z = FpMatrix(r, c, R.n)
+   z = FpMatrix(r, c, R.ninv)
    z.base_ring = R
    return z
 end
@@ -49,7 +49,8 @@ end
 @inline function getindex_raw(a::FpMatrix, i::Int, j::Int)
   u = ZZRingElem()
   ccall((:fmpz_mod_mat_get_entry, libflint), Nothing,
-                 (Ref{ZZRingElem}, Ref{FpMatrix}, Int, Int), u, a, i - 1, j - 1)
+        (Ref{ZZRingElem}, Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}),
+        u, a, i - 1, j - 1, base_ring(a).ninv)
   return u
 end
 
@@ -77,7 +78,8 @@ end
 # as per setindex! but no reduction mod n and no bounds checking
 @inline function setindex_raw!(a::FpMatrix, u::ZZRingElem, i::Int, j::Int)
   ccall((:fmpz_mod_mat_set_entry, libflint), Nothing,
-        (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), a, i - 1, j - 1, u)
+        (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}, Ref{Nothing}),
+        a, i - 1, j - 1, u, C_NULL) # ctx is not needed here
 end
 
 function setindex!(a::FpMatrix, b::FpMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
@@ -85,16 +87,17 @@ function setindex!(a::FpMatrix, b::FpMatrix, r::UnitRange{Int64}, c::UnitRange{I
   size(b) == (length(r), length(c)) || throw(DimensionMismatch("tried to assign a $(size(b, 1))x$(size(b, 2)) matrix to a $(length(r))x$(length(c)) destination"))
   A = view(a, r, c)
   ccall((:fmpz_mod_mat_set, libflint), Nothing,
-        (Ref{FpMatrix}, Ref{FpMatrix}), A, b)
+        (Ref{FpMatrix}, Ref{FpMatrix}, Ref{Nothing}), A, b, C_NULL)
 end
 
 function deepcopy_internal(a::FpMatrix, dict::IdDict)
-  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)))
+  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv)
   if isdefined(a, :base_ring)
     z.base_ring = a.base_ring
   end
   ccall((:fmpz_mod_mat_set, libflint), Nothing,
-        (Ref{FpMatrix}, Ref{FpMatrix}), z, a)
+        (Ref{FpMatrix}, Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}),
+        z, a, base_ring(a).ninv)
   return z
 end
 
@@ -117,12 +120,14 @@ zero(a::FpMatrixSpace) = a()
 function one(a::FpMatrixSpace)
   (nrows(a) != ncols(a)) && error("Matrices must be square")
   z = a()
-  ccall((:fmpz_mod_mat_one, libflint), Nothing, (Ref{FpMatrix}, ), z)
+  ccall((:fmpz_mod_mat_one, libflint), Nothing,
+        (Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}), z, base_ring(a).ninv)
   return z
 end
 
 function iszero(a::FpMatrix)
-  r = ccall((:fmpz_mod_mat_is_zero, libflint), Cint, (Ref{FpMatrix}, ), a)
+  r = ccall((:fmpz_mod_mat_is_zero, libflint), Cint,
+            (Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}), a, base_ring(a).ninv)
   return Bool(r)
 end
 
@@ -175,7 +180,8 @@ function tr(a::FpMatrix)
   R = base_ring(a)
   r = ZZRingElem()
   ccall((:fmpz_mod_mat_trace, libflint), Nothing,
-        (Ref{ZZRingElem}, Ref{FpMatrix}), r, a)
+        (Ref{ZZRingElem}, Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}),
+        r, a, base_ring(a).ninv)
   return FpFieldElem(r, R)
 end
 
@@ -207,14 +213,15 @@ function Base.view(x::FpMatrix, r1::Int, c1::Int, r2::Int, c2::Int)
   z.base_ring = x.base_ring
   z.view_parent = x
   ccall((:fmpz_mod_mat_window_init, libflint), Nothing,
-        (Ref{FpMatrix}, Ref{FpMatrix}, Int, Int, Int, Int),
-        z, x, r1 - 1, c1 - 1, r2, c2)
+        (Ref{FpMatrix}, Ref{FpMatrix}, Int, Int, Int, Int, Ref{fmpz_mod_ctx_struct}),
+        z, x, r1 - 1, c1 - 1, r2, c2, base_ring(x).ninv)
   finalizer(_gfp_fmpz_mat_window_clear_fn, z)
   return z
 end
 
 function _gfp_fmpz_mat_window_clear_fn(a::FpMatrix)
-  ccall((:fmpz_mod_mat_window_clear, libflint), Nothing, (Ref{FpMatrix}, ), a)
+  ccall((:fmpz_mod_mat_window_clear, libflint), Nothing,
+        (Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}), a, base_ring(a).ninv)
 end
 
 
@@ -256,7 +263,8 @@ function inv(a::FpMatrix)
   !is_square(a) && error("Matrix must be a square matrix")
   z = similar(a)
   r = ccall((:fmpz_mod_mat_inv, libflint), Int,
-          (Ref{FpMatrix}, Ref{FpMatrix}), z, a)
+          (Ref{FpMatrix}, Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}),
+          z, a, base_ring(a).ninv)
   !Bool(r) && error("Matrix not invertible")
   return z
 end
@@ -268,7 +276,7 @@ end
 ################################################################################
 
 function (a::FpMatrixSpace)()
-  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)))
+  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv)
   z.base_ring = a.base_ring
   return z
 end
@@ -292,42 +300,42 @@ end
 
 function (a::FpMatrixSpace)(arr::AbstractMatrix{BigInt}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
+  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::FpMatrixSpace)(arr::AbstractVector{BigInt})
   _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
+  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::FpMatrixSpace)(arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
+  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::FpMatrixSpace)(arr::AbstractVector{ZZRingElem})
   _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
+  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::FpMatrixSpace)(arr::AbstractMatrix{Int}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
-  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
+  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
 
 function (a::FpMatrixSpace)(arr::AbstractVector{Int})
   _check_dim(nrows(a), ncols(a), arr)
-  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
+  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
   z.base_ring = a.base_ring
   return z
 end
@@ -335,7 +343,7 @@ end
 function (a::FpMatrixSpace)(arr::AbstractMatrix{FpFieldElem}, transpose::Bool = false)
   _check_dim(nrows(a), ncols(a), arr, transpose)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr, transpose)
+  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr, transpose)
   z.base_ring = a.base_ring
   return z
 end
@@ -343,7 +351,7 @@ end
 function (a::FpMatrixSpace)(arr::AbstractVector{FpFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  z = FpMatrix(nrows(a), ncols(a), modulus(base_ring(a)), arr)
+  z = FpMatrix(nrows(a), ncols(a), base_ring(a).ninv, arr)
   z.base_ring = a.base_ring
   return z
 end
@@ -355,14 +363,14 @@ end
 ###############################################################################
 
 function matrix(R::FpField, arr::AbstractMatrix{<: Union{FpFieldElem, ZZRingElem, Integer}})
-   z = FpMatrix(size(arr, 1), size(arr, 2), R.n, arr)
+   z = FpMatrix(size(arr, 1), size(arr, 2), R.ninv, arr)
    z.base_ring = R
    return z
 end
 
 function matrix(R::FpField, r::Int, c::Int, arr::AbstractVector{<: Union{FpFieldElem, ZZRingElem, Integer}})
    _check_dim(r, c, arr)
-   z = FpMatrix(r, c, R.n, arr)
+   z = FpMatrix(r, c, R.ninv, arr)
    z.base_ring = R
    return z
 end
@@ -377,7 +385,7 @@ function zero_matrix(R::FpField, r::Int, c::Int)
    if r < 0 || c < 0
      error("dimensions must not be negative")
    end
-   z = FpMatrix(r, c, R.n)
+   z = FpMatrix(r, c, R.ninv)
    z.base_ring = R
    return z
 end
@@ -417,7 +425,7 @@ end
 function nullspace(M::FpMatrix)
   N = similar(M, ncols(M), ncols(M))
   nullity = ccall((:fmpz_mod_mat_nullspace, libflint), Int,
-                  (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FpField}), N, M, base_ring(M))
+                  (Ref{FpMatrix}, Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}), N, M, base_ring(M).ninv)
   return nullity, view(N, 1:nrows(N), 1:nullity)
 end
 
@@ -436,7 +444,7 @@ function Solve._can_solve_internal_no_check(A::FpMatrix, b::FpMatrix, task::Symb
 
    x = similar(A, ncols(A), ncols(b))
    fl = ccall((:fmpz_mod_mat_can_solve, libflint), Cint,
-              (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FpMatrix}), x, A, b)
+              (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FpMatrix}, Ref{fmpz_mod_ctx_struct}), x, A, b, base_ring(x).ninv)
    if task === :only_check || task === :with_solution
      return Bool(fl), x, zero(A, 0, 0)
    end
@@ -447,15 +455,15 @@ end
 # different matrix types
 function _solve_tril_right_flint!(x::FpMatrix, L::FpMatrix, B::FpMatrix, unit::Bool)
    ccall((:fmpz_mod_mat_solve_tril, libflint), Nothing,
-         (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FpMatrix}, Cint),
-         x, L, B, Cint(unit))
+         (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FpMatrix}, Cint, Ref{fmpz_mod_ctx_struct}),
+         x, L, B, Cint(unit), base_ring(x).ninv)
    return nothing
 end
 
 function _solve_triu_right_flint!(x::FpMatrix, U::FpMatrix, B::FpMatrix, unit::Bool)
    ccall((:fmpz_mod_mat_solve_triu, libflint), Nothing,
-         (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FpMatrix}, Cint),
-         x, U, B, Cint(unit))
+         (Ref{FpMatrix}, Ref{FpMatrix}, Ref{FpMatrix}, Cint, Ref{fmpz_mod_ctx_struct}),
+         x, U, B, Cint(unit), base_ring(x).ninv)
    return nothing
 end
 
@@ -469,8 +477,8 @@ function lu!(P::Generic.Perm, x::FpMatrix)
    P.d .-= 1
 
    rank = ccall((:fmpz_mod_mat_lu, libflint), Int,
-                (Ptr{Int}, Ref{FpMatrix}, Cint),
-                P.d, x, Cint(false))
+                (Ptr{Int}, Ref{FpMatrix}, Cint, Ref{fmpz_mod_ctx_struct}),
+                P.d, x, Cint(false), base_ring(x).ninv)
 
    P.d .+= 1
 

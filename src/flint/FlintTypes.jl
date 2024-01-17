@@ -2202,10 +2202,9 @@ A finite field. Implemented as $\mathbb F_p[t]/f$ for the prime $p$ being an [`I
 See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyRepFieldElem`](@ref) for elements.
 """
 @attributes mutable struct fqPolyRepField <: FinField
-   p :: Int
-   n :: Int
-   ninv :: Int
-   norm :: Int
+   n :: UInt
+   ninv :: UInt
+   norm :: UInt
    sparse_modulus :: Cint
    is_conway :: Cint
    a :: Ptr{Nothing}
@@ -2229,17 +2228,21 @@ See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyR
    overfields :: Dict{Int, Vector{FinFieldMorphism}}
    subfields :: Dict{Int, Vector{FinFieldMorphism}}
 
-   function fqPolyRepField(c::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
+   function fqPolyRepField(c::UInt, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
       check && !is_prime(c) &&
          throw(DomainError(c, "the characteristic must be a prime"))
       return get_cached!(FqNmodFiniteFieldID, (c, deg, s), cached) do
          d = new()
-         ccall((:fq_nmod_ctx_init, libflint), Nothing,
-               (Ref{fqPolyRepField}, Ref{ZZRingElem}, Int, Ptr{UInt8}),
-			    d, c, deg, string(s))
+         ccall((:fq_nmod_ctx_init_ui, libflint), Nothing,
+               (Ref{fqPolyRepField}, UInt, Int, Ptr{UInt8}),
+               d, c, deg, string(s))
          finalizer(_FqNmodFiniteField_clear_fn, d)
          return d
       end
+   end
+
+   function fqPolyRepField(c::T, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true) where T <: Union{Int, ZZRingElem}
+       return fqPolyRepField(UInt(c), deg, s, cached, check = check)
    end
 
    function fqPolyRepField(f::zzModPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
@@ -2269,7 +2272,7 @@ See [`FqPolyRepField`](@ref) for $p$ being a [`ZZRingElem`](@ref). See [`fqPolyR
 
 end
 
-const FqNmodFiniteFieldID = CacheDictType{Tuple{ZZRingElem, Int, Symbol}, fqPolyRepField}()
+const FqNmodFiniteFieldID = CacheDictType{Tuple{UInt, Int, Symbol}, fqPolyRepField}()
 
 const FqNmodFiniteFieldIDNmodPol = CacheDictType{Tuple{zzModPolyRing, zzModPolyRingElem, Symbol},
                                     fqPolyRepField}()
@@ -2364,8 +2367,12 @@ end
 A finite field. The constructor automatically determines a fast implementation.
 """
 @attributes mutable struct FqField <: FinField
-   # fq_default_ctx_struct is 208 bytes on 64 bit machine
-   opaque::NTuple{208, Int8}
+   # gr_ctx_struct
+   data::NTuple{6 * sizeof(UInt), Int8}
+   which_ring::UInt
+   sizeof_elem::Int
+   methods::Ptr{Nothing}
+   size_limit::UInt
    # end of flint struct
 
    var::String
@@ -2566,152 +2573,77 @@ end
 #
 ###############################################################################
 
-if NEW_FLINT
-  @doc raw"""
-      FqPolyRepField <: FinField
+@doc raw"""
+    FqPolyRepField <: FinField
 
-  A finite field. Implemented as $\mathbb F_p[t]/f$ for the prime $p$ being a [`ZZRingElem`](@ref).
-  See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFieldElem`](@ref) for elements.
-  """
-  @attributes mutable struct FqPolyRepField <: FinField
-     p::Int # fmpz_t
-     add_fxn::Ptr{Nothing}
-     sub_fxn::Ptr{Nothing}
-     mul_fxn::Ptr{Nothing}
-     n2::UInt
-     ninv::UInt
-     norm::UInt
-     n_limbs::Tuple{UInt, UInt, UInt}
-     ninv_limbs::Tuple{UInt, UInt, UInt}
-     ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
+A finite field. Implemented as $\mathbb F_p[t]/f$ for the prime $p$ being a [`ZZRingElem`](@ref).
+See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFieldElem`](@ref) for elements.
+"""
+@attributes mutable struct FqPolyRepField <: FinField
+   p::Int # fmpz_t
+   add_fxn::Ptr{Nothing}
+   sub_fxn::Ptr{Nothing}
+   mul_fxn::Ptr{Nothing}
+   n2::UInt
+   ninv::UInt
+   norm::UInt
+   n_limbs::Tuple{UInt, UInt, UInt}
+   ninv_limbs::Tuple{UInt, UInt, UInt}
+   ninv_huge::Ptr{Nothing} # fmpz_preinvn_struct
 
-     sparse_modulus :: Cint
-     is_conway :: Cint
-     a::Ptr{Nothing}
-     j::Ptr{Nothing}
-     len::Int
-     mod_coeffs::Ptr{Nothing}
-     mod_alloc::Int
-     mod_length::Int
-     inv_coeffs::Ptr{Nothing}
-     inv_alloc::Int
-     inv_length::Int
-     var::Ptr{Nothing}
-     # end of flint struct
+   sparse_modulus :: Cint
+   is_conway :: Cint
+   a::Ptr{Nothing}
+   j::Ptr{Nothing}
+   len::Int
+   mod_coeffs::Ptr{Nothing}
+   mod_alloc::Int
+   mod_length::Int
+   inv_coeffs::Ptr{Nothing}
+   inv_alloc::Int
+   inv_length::Int
+   var::Ptr{Nothing}
+   # end of flint struct
 
-     overfields :: Dict{Int, Vector{FinFieldMorphism}}
-     subfields :: Dict{Int, Vector{FinFieldMorphism}}
+   overfields :: Dict{Int, Vector{FinFieldMorphism}}
+   subfields :: Dict{Int, Vector{FinFieldMorphism}}
 
-     function FqPolyRepField(char::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
-        check && !is_probable_prime(char) &&
-          throw(DomainError(char, "the characteristic must be a prime"))
-        return get_cached!(FqFiniteFieldID, (char, deg, s), cached) do
-           d = new()
-           finalizer(_FqFiniteField_clear_fn, d)
-           ccall((:fq_ctx_init, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{ZZRingElem}, Int, Ptr{UInt8}),
-                    d, char, deg, string(s))
-           return d
-        end
-     end
+   function FqPolyRepField(char::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
+      check && !is_probable_prime(char) &&
+        throw(DomainError(char, "the characteristic must be a prime"))
+      return get_cached!(FqFiniteFieldID, (char, deg, s), cached) do
+         d = new()
+         finalizer(_FqFiniteField_clear_fn, d)
+         ccall((:fq_ctx_init, libflint), Nothing,
+               (Ref{FqPolyRepField}, Ref{ZZRingElem}, Int, Ptr{UInt8}),
+                  d, char, deg, string(s))
+         return d
+      end
+   end
 
-     function FqPolyRepField(f::ZZModPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
-        check && !is_probable_prime(modulus(f)) &&
-           throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
-        return get_cached!(FqFiniteFieldIDFmpzPol, (f, s), cached) do
-           z = new()
-           ccall((:fq_ctx_init_modulus, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                    z, f, base_ring(parent(f)).ninv, string(s))
-           finalizer(_FqFiniteField_clear_fn, z)
-           return z
-        end
-     end
+   function FqPolyRepField(f::ZZModPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
+      check && !is_probable_prime(modulus(f)) &&
+         throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
+      return get_cached!(FqFiniteFieldIDFmpzPol, (f, s), cached) do
+         z = new()
+         ccall((:fq_ctx_init_modulus, libflint), Nothing,
+               (Ref{FqPolyRepField}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
+                  z, f, base_ring(parent(f)).ninv, string(s))
+         finalizer(_FqFiniteField_clear_fn, z)
+         return z
+      end
+   end
 
-     function FqPolyRepField(f::FpPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
-        # check ignored
-        return get_cached!(FqFiniteFieldIDGFPPol, (f, s), cached) do
-           z = new()
-           ccall((:fq_ctx_init_modulus, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                    z, f, base_ring(parent(f)).ninv, string(s))
-           finalizer(_FqFiniteField_clear_fn, z)
-           return z
-        end
-     end
-  end
-else
-  @doc raw"""
-      FqPolyRepField <: FinField
-
-  A finite field. Implemented as $\mathbb F_p[t]/f$ for the prime $p$ being a [`ZZRingElem`](@ref).
-  See [`fqPolyRepField`](@ref) for $p$ being an [`Int`](@ref). See [`FqPolyRepFieldElem`](@ref) for elements.
-  """
-  @attributes mutable struct FqPolyRepField <: FinField
-     p::Int # fmpz_t
-     add_fxn::Ptr{Nothing}
-     sub_fxn::Ptr{Nothing}
-     mul_fxn::Ptr{Nothing}
-     n2::UInt
-     ninv::UInt
-     norm::UInt
-     n_limbs::Tuple{UInt, UInt, UInt}
-     ninv_limbs::Tuple{UInt, UInt, UInt}
-
-     sparse_modulus :: Cint
-     is_conway :: Cint
-     a::Ptr{Nothing}
-     j::Ptr{Nothing}
-     len::Int
-     mod_coeffs::Ptr{Nothing}
-     mod_alloc::Int
-     mod_length::Int
-     inv_coeffs::Ptr{Nothing}
-     inv_alloc::Int
-     inv_length::Int
-     var::Ptr{Nothing}
-     # end of flint struct
-
-     overfields :: Dict{Int, Vector{FinFieldMorphism}}
-     subfields :: Dict{Int, Vector{FinFieldMorphism}}
-
-     function FqPolyRepField(char::ZZRingElem, deg::Int, s::Symbol, cached::Bool = true; check::Bool = true)
-        check && !is_probable_prime(char) &&
-          throw(DomainError(char, "the characteristic must be a prime"))
-        return get_cached!(FqFiniteFieldID, (char, deg, s), cached) do
-           d = new()
-           finalizer(_FqFiniteField_clear_fn, d)
-           ccall((:fq_ctx_init, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{ZZRingElem}, Int, Ptr{UInt8}),
-                    d, char, deg, string(s))
-           return d
-        end
-     end
-
-     function FqPolyRepField(f::ZZModPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
-        check && !is_probable_prime(modulus(f)) &&
-           throw(DomainError(base_ring(f), "the base ring of the polynomial must be a field"))
-        return get_cached!(FqFiniteFieldIDFmpzPol, (f, s), cached) do
-           z = new()
-           ccall((:fq_ctx_init_modulus, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{ZZModPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                    z, f, base_ring(parent(f)).ninv, string(s))
-           finalizer(_FqFiniteField_clear_fn, z)
-           return z
-        end
-     end
-
-     function FqPolyRepField(f::FpPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
-        # check ignored
-        return get_cached!(FqFiniteFieldIDGFPPol, (f, s), cached) do
-           z = new()
-           ccall((:fq_ctx_init_modulus, libflint), Nothing,
-                 (Ref{FqPolyRepField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
-                    z, f, base_ring(parent(f)).ninv, string(s))
-           finalizer(_FqFiniteField_clear_fn, z)
-           return z
-        end
-     end
+   function FqPolyRepField(f::FpPolyRingElem, s::Symbol, cached::Bool = true; check::Bool = true)
+      # check ignored
+      return get_cached!(FqFiniteFieldIDGFPPol, (f, s), cached) do
+         z = new()
+         ccall((:fq_ctx_init_modulus, libflint), Nothing,
+               (Ref{FqPolyRepField}, Ref{FpPolyRingElem}, Ref{fmpz_mod_ctx_struct}, Ptr{UInt8}),
+                  z, f, base_ring(parent(f)).ninv, string(s))
+         finalizer(_FqFiniteField_clear_fn, z)
+         return z
+      end
    end
 end
 
@@ -5301,7 +5233,6 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
    r::Int
    c::Int
    rows::Ptr{Nothing}
-   mod::Int              # ZZRingElem
    # end flint struct
 
    base_ring::ZZModRing
@@ -5313,50 +5244,63 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem)
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-            (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
-    z = new()
-    ccall((:fmpz_mod_mat_init, libflint), Nothing,
-            (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
-    finalizer(_fmpz_mod_mat_clear_fn, z)
-    if transpose
-       arr = Base.transpose(arr)
-    end
-    for i = 1:r
-      for j = 1:c
-         setindex_raw!(z, mod(arr[i, j], n), i, j)
-      end
-    end
-    return z
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing)
+      ZZModMatrix(r, c, R.ninv)
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-	  (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     if transpose
        arr = Base.transpose(arr)
     end
     for i = 1:r
       for j = 1:c
-         setindex_raw!(z, mod(ZZRingElem(arr[i, j]), n), i, j)
+        setindex_raw!(z, _reduce(arr[i, j], ctx), i, j)
       end
     end
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{ZZModRingElem}, transpose::Bool = false)
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+      ZZModMatrix(r, c, R.ninv, arr, transpose)
+  end
+
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-	  (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
+    finalizer(_fmpz_mod_mat_clear_fn, z)
+    if transpose
+       arr = Base.transpose(arr)
+    end
+    for i = 1:r
+      for j = 1:c
+        setindex_raw!(z, _reduce(ZZRingElem(arr[i, j]), ctx), i, j)
+      end
+    end
+    return z
+  end
+
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
+      ZZModMatrix(r, c, R.ninv, arr, transpose)
+  end
+
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZModRingElem}, transpose::Bool = false)
+    # FIXME: Check compatibility between ctx and arr?
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     if transpose
        arr = Base.transpose(arr)
@@ -5369,36 +5313,49 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{ZZRingElem})
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractMatrix{ZZModRingElem}, transpose::Bool = false)
+      ZZModMatrix(r, c, R, arr, transpose)
+  end
+
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{ZZRingElem})
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-            (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     for i = 1:r
       for j = 1:c
-        setindex_raw!(z, mod(arr[(i - 1)*c + j], n), i, j)
+        setindex_raw!(z, _reduce(arr[(i - 1)*c + j], ctx), i, j)
       end
     end
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{T}) where T <: Integer
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractVector{ZZRingElem})
+      ZZModMatrix(r, c, R.ninv, arr)
+  end
+
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{T}) where T <: Integer
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     for i = 1:r
        for j = 1:c
-          setindex_raw!(z, mod(ZZRingElem(arr[(i - 1)*c + j]), n), i, j)
+          setindex_raw!(z, _reduce(ZZRingElem(arr[(i - 1)*c + j]), ctx), i, j)
        end
     end
     return z
   end
 
-  function ZZModMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{ZZModRingElem})
+  function ZZModMatrix(r::Int, c::Int, R::ZZModRing, arr::AbstractVector{T}) where T <: Integer
+      ZZModMatrix(r, c, R.ninv, arr)
+  end
+
+  function ZZModMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{ZZModRingElem})
+    # FIXME: Check compatibility between ctx and arr?
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-	  (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     for i = 1:r
        for j = 1:c
@@ -5419,12 +5376,14 @@ mutable struct ZZModMatrix <: MatElem{ZZModRingElem}
   function ZZModMatrix(n::ZZRingElem, b::ZZMatrix)
     (n < 2) && error("Modulus must be >= 2")
     z = new()
+    R = ZZModRing(n)
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-            (Ref{ZZModMatrix}, Int, Int, Ref{ZZRingElem}), z, b.r, b.c, n)
+          (Ref{ZZModMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}),
+          z, b.r, b.c, R.ninv)
     finalizer(_fmpz_mod_mat_clear_fn, z)
     for i = 1:b.r
        for j = 1:b.c
-         setindex_raw!(z, mod(ZZRingElem(b[i,j]), n), i, j)
+         setindex_raw!(z, _reduce(b[i,j], R.ninv), i, j)
        end
     end
     return z
@@ -5433,7 +5392,8 @@ end
 
 
 function _fmpz_mod_mat_clear_fn(mat::ZZModMatrix)
-  ccall((:fmpz_mod_mat_clear, libflint), Nothing, (Ref{ZZModMatrix}, ), mat)
+  ccall((:fmpz_mod_mat_clear, libflint), Nothing,
+        (Ref{ZZModMatrix}, Ref{Nothing}), mat, C_NULL) # Hack
 end
 
 ###############################################################################
@@ -5460,7 +5420,6 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
    r::Int
    c::Int
    rows::Ptr{Nothing}
-   mod::Int              # ZZRingElem
    # end flint struct
 
    base_ring::FpField
@@ -5472,50 +5431,51 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem)
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-            (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{ZZRingElem}, transpose::Bool = false)
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
-    finalizer(_gfp_fmpz_mat_clear_fn, z)
-    if transpose
-       arr = Base.transpose(arr)
-    end
-    for i = 1:r
-      for j = 1:c
-         setindex_raw!(z, mod(arr[i, j], n), i, j)
-      end
-    end
-    return z
-  end
-
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
-    z = new()
-    ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     if transpose
        arr = Base.transpose(arr)
     end
     for i = 1:r
       for j = 1:c
-         setindex_raw!(z, mod(ZZRingElem(arr[i, j]), n), i, j)
+        setindex_raw!(z, _reduce(arr[i, j], ctx), i, j)
       end
     end
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractMatrix{FpFieldElem}, transpose::Bool = false)
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{T}, transpose::Bool = false) where T <: Integer
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
+    finalizer(_gfp_fmpz_mat_clear_fn, z)
+    if transpose
+       arr = Base.transpose(arr)
+    end
+    for i = 1:r
+      for j = 1:c
+        setindex_raw!(z, _reduce(ZZRingElem(arr[i, j]), ctx), i, j)
+      end
+    end
+    return z
+  end
+
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractMatrix{FpFieldElem}, transpose::Bool = false)
+    # FIXME: Check compatibility between ctx and arr?
+    z = new()
+    ccall((:fmpz_mod_mat_init, libflint), Nothing,
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     if transpose
        arr = Base.transpose(arr)
@@ -5528,36 +5488,37 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{ZZRingElem})
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{ZZRingElem})
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     for i = 1:r
       for j = 1:c
-        setindex_raw!(z, mod(arr[(i - 1)*c + j], n), i, j)
+        setindex_raw!(z, _reduce(arr[(i - 1)*c + j], ctx), i, j)
       end
     end
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{T}) where T <: Integer
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{T}) where T <: Integer
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     for i = 1:r
        for j = 1:c
-          setindex_raw!(z, mod(ZZRingElem(arr[(i - 1)*c + j]), n), i, j)
+          setindex_raw!(z, _reduce(ZZRingElem(arr[(i - 1)*c + j]), ctx), i, j)
        end
     end
     return z
   end
 
-  function FpMatrix(r::Int, c::Int, n::ZZRingElem, arr::AbstractVector{FpFieldElem})
+  function FpMatrix(r::Int, c::Int, ctx::fmpz_mod_ctx_struct, arr::AbstractVector{FpFieldElem})
+    # FIXME: Check compatibility between ctx and arr?
     z = new()
     ccall((:fmpz_mod_mat_init, libflint), Nothing,
-          (Ref{FpMatrix}, Int, Int, Ref{ZZRingElem}), z, r, c, n)
+          (Ref{FpMatrix}, Int, Int, Ref{fmpz_mod_ctx_struct}), z, r, c, ctx)
     finalizer(_gfp_fmpz_mat_clear_fn, z)
     for i = 1:r
        for j = 1:c
@@ -5569,7 +5530,8 @@ mutable struct FpMatrix <: MatElem{FpFieldElem}
 end
 
 function _gfp_fmpz_mat_clear_fn(mat::FpMatrix)
-  ccall((:fmpz_mod_mat_clear, libflint), Nothing, (Ref{FpMatrix}, ), mat)
+    ccall((:fmpz_mod_mat_clear, libflint), Nothing,
+          (Ref{FpMatrix}, Ref{Nothing}), mat, C_NULL) # Hack
 end
 
 ################################################################################
