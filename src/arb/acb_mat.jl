@@ -46,9 +46,9 @@ end
 
 function getindex!(z::AcbFieldElem, x::AcbMatrix, r::Int, c::Int)
   GC.@preserve x begin
-    v = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
+    v = ccall((:acb_mat_entry_ptr, libflint), Ptr{AcbFieldElem},
                 (Ref{AcbMatrix}, Int, Int), x, r - 1, c - 1)
-    ccall((:acb_set, libarb), Nothing, (Ref{AcbFieldElem}, Ptr{AcbFieldElem}), z, v)
+    ccall((:acb_set, libflint), Nothing, (Ref{AcbFieldElem}, Ptr{AcbFieldElem}), z, v)
   end
   return z
 end
@@ -58,9 +58,9 @@ end
 
   z = base_ring(x)()
   GC.@preserve x begin
-     v = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
+     v = ccall((:acb_mat_entry_ptr, libflint), Ptr{AcbFieldElem},
                (Ref{AcbMatrix}, Int, Int), x, r - 1, c - 1)
-     ccall((:acb_set, libarb), Nothing, (Ref{AcbFieldElem}, Ptr{AcbFieldElem}), z, v)
+     ccall((:acb_set, libflint), Nothing, (Ref{AcbFieldElem}, Ptr{AcbFieldElem}), z, v)
   end
   return z
 end
@@ -71,7 +71,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, Acb
          @boundscheck Generic._checkbounds(x, r, c)
 
          GC.@preserve x begin
-            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
+            z = ccall((:acb_mat_entry_ptr, libflint), Ptr{AcbFieldElem},
                       (Ref{AcbMatrix}, Int, Int), x, r - 1, c - 1)
             _acb_set(z, y, precision(base_ring(x)))
          end
@@ -89,7 +89,7 @@ for T in [Integer, Float64, ZZRingElem, QQFieldElem, ArbFieldElem, BigFloat, Abs
          @boundscheck Generic._checkbounds(x, r, c)
 
          GC.@preserve x begin
-            z = ccall((:acb_mat_entry_ptr, libarb), Ptr{AcbFieldElem},
+            z = ccall((:acb_mat_entry_ptr, libflint), Ptr{AcbFieldElem},
                       (Ref{AcbMatrix}, Int, Int), x, r - 1, c - 1)
             _acb_set(z, y[1], y[2], precision(base_ring(x)))
          end
@@ -104,7 +104,7 @@ zero(x::AcbMatSpace) = x()
 
 function one(x::AcbMatSpace)
   z = x()
-  ccall((:acb_mat_one, libarb), Nothing, (Ref{AcbMatrix}, ), z)
+  ccall((:acb_mat_one, libflint), Nothing, (Ref{AcbMatrix}, ), z)
   return z
 end
 
@@ -118,7 +118,7 @@ number_of_columns(a::AcbMatSpace) = a.ncols
 
 function deepcopy_internal(x::AcbMatrix, dict::IdDict)
   z = similar(x)
-  ccall((:acb_mat_set, libarb), Nothing, (Ref{AcbMatrix}, Ref{AcbMatrix}), z, x)
+  ccall((:acb_mat_set, libflint), Nothing, (Ref{AcbMatrix}, Ref{AcbMatrix}), z, x)
   return z
 end
 
@@ -130,7 +130,7 @@ end
 
 function -(x::AcbMatrix)
   z = similar(x)
-  ccall((:acb_mat_neg, libarb), Nothing, (Ref{AcbMatrix}, Ref{AcbMatrix}), z, x)
+  ccall((:acb_mat_neg, libflint), Nothing, (Ref{AcbMatrix}, Ref{AcbMatrix}), z, x)
   return z
 end
 
@@ -142,7 +142,7 @@ end
 
 function transpose(x::AcbMatrix)
   z = similar(x, ncols(x), nrows(x))
-  ccall((:acb_mat_transpose, libarb), Nothing,
+  ccall((:acb_mat_transpose, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}), z, x)
   return z
 end
@@ -156,7 +156,7 @@ end
 function +(x::AcbMatrix, y::AcbMatrix)
   check_parent(x, y)
   z = similar(x)
-  ccall((:acb_mat_add, libarb), Nothing,
+  ccall((:acb_mat_add, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -165,7 +165,7 @@ end
 function -(x::AcbMatrix, y::AcbMatrix)
   check_parent(x, y)
   z = similar(x)
-  ccall((:acb_mat_sub, libarb), Nothing,
+  ccall((:acb_mat_sub, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -174,7 +174,7 @@ end
 function *(x::AcbMatrix, y::AcbMatrix)
   ncols(x) != nrows(y) && error("Matrices have wrong dimensions")
   z = similar(x, nrows(x), ncols(y))
-  ccall((:acb_mat_mul, libarb), Nothing,
+  ccall((:acb_mat_mul, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -189,7 +189,7 @@ end
 function ^(x::AcbMatrix, y::UInt)
   nrows(x) != ncols(x) && error("Matrix must be square")
   z = similar(x)
-  ccall((:acb_mat_pow_ui, libarb), Nothing,
+  ccall((:acb_mat_pow_ui, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, UInt, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -197,7 +197,7 @@ end
 
 function *(x::AcbMatrix, y::Int)
   z = similar(x)
-  ccall((:acb_mat_scalar_mul_si, libarb), Nothing,
+  ccall((:acb_mat_scalar_mul_si, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Int, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -207,7 +207,7 @@ end
 
 function *(x::AcbMatrix, y::ZZRingElem)
   z = similar(x)
-  ccall((:acb_mat_scalar_mul_fmpz, libarb), Nothing,
+  ccall((:acb_mat_scalar_mul_fmpz, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{ZZRingElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -217,7 +217,7 @@ end
 
 function *(x::AcbMatrix, y::ArbFieldElem)
   z = similar(x)
-  ccall((:acb_mat_scalar_mul_arb, libarb), Nothing,
+  ccall((:acb_mat_scalar_mul_arb, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{ArbFieldElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -227,7 +227,7 @@ end
 
 function *(x::AcbMatrix, y::AcbFieldElem)
   z = similar(x)
-  ccall((:acb_mat_scalar_mul_acb, libarb), Nothing,
+  ccall((:acb_mat_scalar_mul_acb, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbFieldElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -319,7 +319,7 @@ end
 
 function ldexp(x::AcbMatrix, y::Int)
   z = similar(x)
-  ccall((:acb_mat_scalar_mul_2exp_si, libarb), Nothing,
+  ccall((:acb_mat_scalar_mul_2exp_si, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Int), z, x, y)
   return z
 end
@@ -337,7 +337,7 @@ Return `true` if the matrices of balls $x$ and $y$ are precisely equal,
 i.e. if all matrix entries have the same midpoints and radii.
 """
 function isequal(x::AcbMatrix, y::AcbMatrix)
-  r = ccall((:acb_mat_equal, libarb), Cint,
+  r = ccall((:acb_mat_equal, libflint), Cint,
               (Ref{AcbMatrix}, Ref{AcbMatrix}), x, y)
   return Bool(r)
 end
@@ -345,12 +345,12 @@ end
 function ==(x::AcbMatrix, y::AcbMatrix)
   fl = check_parent(x, y, false)
   !fl && return false
-  r = ccall((:acb_mat_eq, libarb), Cint, (Ref{AcbMatrix}, Ref{AcbMatrix}), x, y)
+  r = ccall((:acb_mat_eq, libflint), Cint, (Ref{AcbMatrix}, Ref{AcbMatrix}), x, y)
   return Bool(r)
 end
 
 function !=(x::AcbMatrix, y::AcbMatrix)
-  r = ccall((:acb_mat_ne, libarb), Cint, (Ref{AcbMatrix}, Ref{AcbMatrix}), x, y)
+  r = ccall((:acb_mat_ne, libflint), Cint, (Ref{AcbMatrix}, Ref{AcbMatrix}), x, y)
   return Bool(r)
 end
 
@@ -361,7 +361,7 @@ Returns `true` if all entries of $x$ overlap with the corresponding entry of
 $y$, otherwise return `false`.
 """
 function overlaps(x::AcbMatrix, y::AcbMatrix)
-  r = ccall((:acb_mat_overlaps, libarb), Cint,
+  r = ccall((:acb_mat_overlaps, libflint), Cint,
               (Ref{AcbMatrix}, Ref{AcbMatrix}), x, y)
   return Bool(r)
 end
@@ -373,7 +373,7 @@ Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
 function contains(x::AcbMatrix, y::AcbMatrix)
-  r = ccall((:acb_mat_contains, libarb), Cint,
+  r = ccall((:acb_mat_contains, libflint), Cint,
               (Ref{AcbMatrix}, Ref{AcbMatrix}), x, y)
   return Bool(r)
 end
@@ -391,7 +391,7 @@ Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
 function contains(x::AcbMatrix, y::ZZMatrix)
-  r = ccall((:acb_mat_contains_fmpz_mat, libarb), Cint,
+  r = ccall((:acb_mat_contains_fmpz_mat, libflint), Cint,
               (Ref{AcbMatrix}, Ref{ZZMatrix}), x, y)
   return Bool(r)
 end
@@ -403,7 +403,7 @@ Returns `true` if all entries of $x$ contain the corresponding entry of
 $y$, otherwise return `false`.
 """
 function contains(x::AcbMatrix, y::QQMatrix)
-  r = ccall((:acb_mat_contains_fmpq_mat, libarb), Cint,
+  r = ccall((:acb_mat_contains_fmpq_mat, libflint), Cint,
               (Ref{AcbMatrix}, Ref{QQMatrix}), x, y)
   return Bool(r)
 end
@@ -423,7 +423,7 @@ end
 ################################################################################
 
 isreal(x::AcbMatrix) =
-            Bool(ccall((:acb_mat_is_real, libarb), Cint, (Ref{AcbMatrix}, ), x))
+            Bool(ccall((:acb_mat_is_real, libflint), Cint, (Ref{AcbMatrix}, ), x))
 
 ###############################################################################
 #
@@ -447,7 +447,7 @@ end
 function is_invertible_with_inverse(x::AcbMatrix)
   ncols(x) != nrows(x) && return false, x
   z = similar(x)
-  r = ccall((:acb_mat_inv, libarb), Cint,
+  r = ccall((:acb_mat_inv, libflint), Cint,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Int), z, x, precision(base_ring(x)))
   return Bool(r), z
 end
@@ -472,7 +472,7 @@ end
 function divexact(x::AcbMatrix, y::Int; check::Bool=true)
   y == 0 && throw(DivideError())
   z = similar(x)
-  ccall((:acb_mat_scalar_div_si, libarb), Nothing,
+  ccall((:acb_mat_scalar_div_si, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Int, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -480,7 +480,7 @@ end
 
 function divexact(x::AcbMatrix, y::ZZRingElem; check::Bool=true)
   z = similar(x)
-  ccall((:acb_mat_scalar_div_fmpz, libarb), Nothing,
+  ccall((:acb_mat_scalar_div_fmpz, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{ZZRingElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -488,7 +488,7 @@ end
 
 function divexact(x::AcbMatrix, y::ArbFieldElem; check::Bool=true)
   z = similar(x)
-  ccall((:acb_mat_scalar_div_arb, libarb), Nothing,
+  ccall((:acb_mat_scalar_div_arb, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{ArbFieldElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -496,7 +496,7 @@ end
 
 function divexact(x::AcbMatrix, y::AcbFieldElem; check::Bool=true)
   z = similar(x)
-  ccall((:acb_mat_scalar_div_acb, libarb), Nothing,
+  ccall((:acb_mat_scalar_div_acb, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbFieldElem}, Int),
               z, x, y, precision(base_ring(x)))
   return z
@@ -519,7 +519,7 @@ divexact(x::AcbMatrix, y::Rational{T}; check::Bool=true) where T <: Union{Int, B
 function charpoly(x::AcbPolyRing, y::AcbMatrix)
   base_ring(x) != base_ring(y) && error("Base rings must coincide")
   z = x()
-  ccall((:acb_mat_charpoly, libarb), Nothing,
+  ccall((:acb_mat_charpoly, libflint), Nothing,
               (Ref{AcbPolyRingElem}, Ref{AcbMatrix}, Int), z, y, precision(base_ring(y)))
   return z
 end
@@ -533,7 +533,7 @@ end
 function det(x::AcbMatrix)
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = base_ring(x)()
-  ccall((:acb_mat_det, libarb), Nothing,
+  ccall((:acb_mat_det, libflint), Nothing,
               (Ref{AcbFieldElem}, Ref{AcbMatrix}, Int), z, x, precision(base_ring(x)))
   return z
 end
@@ -547,7 +547,7 @@ end
 function Base.exp(x::AcbMatrix)
   ncols(x) != nrows(x) && error("Matrix must be square")
   z = similar(x)
-  ccall((:acb_mat_exp, libarb), Nothing,
+  ccall((:acb_mat_exp, libflint), Nothing,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Int), z, x, precision(base_ring(x)))
   return z
 end
@@ -560,7 +560,7 @@ end
 
 function lu!(P::Generic.Perm, x::AcbMatrix)
   P.d .-= 1
-  r = ccall((:acb_mat_lu, libarb), Cint,
+  r = ccall((:acb_mat_lu, libflint), Cint,
               (Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
               P.d, x, x, precision(base_ring(x)))
   r == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
@@ -570,7 +570,7 @@ function lu!(P::Generic.Perm, x::AcbMatrix)
 end
 
 function _solve!(z::AcbMatrix, x::AcbMatrix, y::AcbMatrix)
-  r = ccall((:acb_mat_solve, libarb), Cint,
+  r = ccall((:acb_mat_solve, libflint), Cint,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
               z, x, y, precision(base_ring(x)))
   r == 0 && error("Matrix cannot be inverted numerically")
@@ -579,7 +579,7 @@ end
 
 function _solve_lu_precomp!(z::AcbMatrix, P::Generic.Perm, LU::AcbMatrix, y::AcbMatrix)
   Q = inv(P)
-  ccall((:acb_mat_solve_lu_precomp, libarb), Nothing,
+  ccall((:acb_mat_solve_lu_precomp, libflint), Nothing,
               (Ref{AcbMatrix}, Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
               z, Q.d .- 1, LU, y, precision(base_ring(LU)))
   nothing
@@ -600,7 +600,7 @@ function Solve._can_solve_internal_no_check(A::AcbMatrix, b::AcbMatrix, task::Sy
    end
 
    x = similar(A, ncols(A), ncols(b))
-   fl = ccall((:acb_mat_solve, libarb), Cint,
+   fl = ccall((:acb_mat_solve, libflint), Cint,
               (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
               x, A, b, precision(base_ring(A)))
    fl == 0 && error("Matrix cannot be inverted numerically")
@@ -632,7 +632,7 @@ function Solve._init_reduce(C::Solve.SolveCtx{AcbFieldElem})
    P = Generic.Perm(nrows(C))
    x = similar(A, nrows(A), ncols(A))
    P.d .-= 1
-   fl = ccall((:acb_mat_lu, libarb), Cint,
+   fl = ccall((:acb_mat_lu, libflint), Cint,
                (Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
                P.d, x, A, precision(base_ring(A)))
    fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
@@ -655,7 +655,7 @@ function Solve._init_reduce_transpose(C::Solve.SolveCtx{AcbFieldElem})
    P = Generic.Perm(nrows(C))
    x = similar(A, nrows(A), ncols(A))
    P.d .-= 1
-   fl = ccall((:acb_mat_lu, libarb), Cint,
+   fl = ccall((:acb_mat_lu, libflint), Cint,
                (Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
                P.d, x, A, precision(base_ring(A)))
    fl == 0 && error("Could not find $(nrows(x)) invertible pivot elements")
@@ -678,7 +678,7 @@ function Solve._can_solve_internal_no_check(C::Solve.SolveCtx{AcbFieldElem}, b::
    end
 
    x = similar(b, ncols(C), ncols(b))
-   ccall((:acb_mat_solve_lu_precomp, libarb), Nothing,
+   ccall((:acb_mat_solve_lu_precomp, libflint), Nothing,
          (Ref{AcbMatrix}, Ptr{Int}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
          x, inv(p).d .- 1, LU, b, precision(base_ring(LU)))
 
@@ -712,7 +712,7 @@ function swap_rows(x::AcbMatrix, i::Int, j::Int)
 end
 
 function swap_rows!(x::AcbMatrix, i::Int, j::Int)
-  ccall((:acb_mat_swap_rows, libarb), Nothing,
+  ccall((:acb_mat_swap_rows, libflint), Nothing,
               (Ref{AcbMatrix}, Ptr{Nothing}, Int, Int),
               x, C_NULL, i - 1, j - 1)
 end
@@ -732,13 +732,13 @@ bound for the infinity norm for every matrix in $x$
 function bound_inf_norm(x::AcbMatrix)
   z = ArbFieldElem()
   GC.@preserve x z begin
-     t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
-     ccall((:acb_mat_bound_inf_norm, libarb), Nothing,
+     t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
+     ccall((:acb_mat_bound_inf_norm, libflint), Nothing,
                  (Ptr{mag_struct}, Ref{AcbMatrix}), t, x)
-     s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{ArbFieldElem}, ), z)
-     ccall((:arf_set_mag, libarb), Nothing,
+     s = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{ArbFieldElem}, ), z)
+     ccall((:arf_set_mag, libflint), Nothing,
                  (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
-     ccall((:mag_zero, libarb), Nothing,
+     ccall((:mag_zero, libflint), Nothing,
                  (Ptr{mag_struct},), t)
   end
   return ArbField(precision(base_ring(x)))(z)
@@ -754,7 +754,7 @@ for (s,f) in (("add!","acb_mat_add"), ("mul!","acb_mat_mul"),
               ("sub!","acb_mat_sub"))
   @eval begin
     function ($(Symbol(s)))(z::AcbMatrix, x::AcbMatrix, y::AcbMatrix)
-      ccall(($f, libarb), Nothing,
+      ccall(($f, libflint), Nothing,
                   (Ref{AcbMatrix}, Ref{AcbMatrix}, Ref{AcbMatrix}, Int),
                   z, x, y, precision(base_ring(x)))
       return z
@@ -931,7 +931,7 @@ function identity_matrix(R::AcbField, n::Int)
      error("dimension must not be negative")
    end
    z = AcbMatrix(n, n)
-   ccall((:acb_mat_one, libarb), Nothing, (Ref{AcbMatrix}, ), z)
+   ccall((:acb_mat_one, libflint), Nothing, (Ref{AcbMatrix}, ), z)
    z.base_ring = R
    return z
 end
@@ -968,7 +968,7 @@ promote_rule(::Type{AcbMatrix}, ::Type{ArbMatrix}) = AcbMatrix
 
 function __approx_eig_qr!(v::Ptr{acb_struct}, R::AcbMatrix, A::AcbMatrix)
   n = nrows(A)
-  ccall((:acb_mat_approx_eig_qr, libarb), Cint,
+  ccall((:acb_mat_approx_eig_qr, libflint), Cint,
         (Ptr{acb_struct}, Ptr{Nothing}, Ref{AcbMatrix},
         Ref{AcbMatrix}, Ptr{Nothing}, Int, Int),
         v, C_NULL, R, A, C_NULL, 0, precision(parent(A)))
@@ -991,7 +991,7 @@ function _eig_multiple(A::AcbMatrix, check::Bool = true)
   v_approx = acb_vec(n)
   R = zero_matrix(base_ring(A), n, n)
   __approx_eig_qr!(v, R, A)
-  b = ccall((:acb_mat_eig_multiple, libarb), Cint,
+  b = ccall((:acb_mat_eig_multiple, libflint), Cint,
             (Ptr{acb_struct}, Ref{AcbMatrix}, Ptr{acb_struct}, Ref{AcbMatrix}, Int),
              v_approx, A, v, R, precision(base_ring(A)))
   check && b == 0 && error("Could not isolate eigenvalues of matrix $A")
@@ -1025,17 +1025,17 @@ function _eig_simple(A::AcbMatrix; check::Bool = true, algorithm::Symbol = :defa
   R = zero_matrix(base_ring(A), n, n)
   __approx_eig_qr!(v, Rapprox, A)
   if algorithm == :vdhoeven_mourrain
-      b = ccall((:acb_mat_eig_simple_vdhoeven_mourrain, libarb), Cint,
+      b = ccall((:acb_mat_eig_simple_vdhoeven_mourrain, libflint), Cint,
                 (Ptr{acb_struct}, Ref{AcbMatrix}, Ref{AcbMatrix},
                  Ref{AcbMatrix}, Ptr{acb_struct}, Ref{AcbMatrix}, Int),
                  v_approx, L, R, A, v, Rapprox, precision(base_ring(A)))
   elseif algorithm == :rump
-      b = ccall((:acb_mat_eig_simple_rump, libarb), Cint,
+      b = ccall((:acb_mat_eig_simple_rump, libflint), Cint,
                 (Ptr{acb_struct}, Ref{AcbMatrix}, Ref{AcbMatrix},
                  Ref{AcbMatrix}, Ptr{acb_struct}, Ref{AcbMatrix}, Int),
                  v_approx, L, R, A, v, Rapprox, precision(base_ring(A)))
   elseif algorithm == :default
-      b = ccall((:acb_mat_eig_simple, libarb), Cint,
+      b = ccall((:acb_mat_eig_simple, libflint), Cint,
                 (Ptr{acb_struct}, Ref{AcbMatrix}, Ref{AcbMatrix},
                  Ref{AcbMatrix}, Ptr{acb_struct}, Ref{AcbMatrix}, Int),
                  v_approx, L, R, A, v, Rapprox, precision(base_ring(A)))

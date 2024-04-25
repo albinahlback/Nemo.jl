@@ -212,22 +212,6 @@ function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
 
-# check whether we are using flint version >= 3.0 (or some recent enough dev version),
-# which changed the layout of some structs
-_ptr = Libdl.dlopen(libflint)
-if Libdl.dlsym(_ptr, :_fmpz_mod_vec_set_fmpz_vec_threaded; throw_error = false) !== nothing
-  const NEW_FLINT = true
-  const libantic = libflint
-  const libarb = libflint
-  const libcalcium = libflint
-else
-  const NEW_FLINT = false
-  using Arb_jll: libarb
-  using Antic_jll: libantic
-  using Calcium_jll: libcalcium
-end
-Libdl.dlclose(_ptr)
-
 ################################################################################
 #
 #  Debugging tools for allocation tracking

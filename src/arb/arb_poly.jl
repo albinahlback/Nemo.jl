@@ -16,11 +16,11 @@ elem_type(::Type{ArbPolyRing}) = ArbPolyRingElem
 
 dense_poly_type(::Type{ArbFieldElem}) = ArbPolyRingElem
 
-length(x::ArbPolyRingElem) = ccall((:arb_poly_length, libarb), Int,
+length(x::ArbPolyRingElem) = ccall((:arb_poly_length, libflint), Int,
                                    (Ref{ArbPolyRingElem},), x)
 
 function set_length!(x::ArbPolyRingElem, n::Int)
-   ccall((:_arb_poly_set_length, libarb), Nothing,
+   ccall((:_arb_poly_set_length, libflint), Nothing,
                                    (Ref{ArbPolyRingElem}, Int), x, n)
    return x
 end
@@ -30,7 +30,7 @@ degree(x::ArbPolyRingElem) = length(x) - 1
 function coeff(a::ArbPolyRingElem, n::Int)
   n < 0 && throw(DomainError(n, "Index must be non-negative"))
   t = parent(a).base_ring()
-  ccall((:arb_poly_get_coeff_arb, libarb), Nothing,
+  ccall((:arb_poly_get_coeff_arb, libflint), Nothing,
               (Ref{ArbFieldElem}, Ref{ArbPolyRingElem}, Int), t, a, n)
   return t
 end
@@ -41,7 +41,7 @@ one(a::ArbPolyRing) = a(1)
 
 function gen(a::ArbPolyRing)
    z = ArbPolyRingElem()
-   ccall((:arb_poly_set_coeff_si, libarb), Nothing,
+   ccall((:arb_poly_set_coeff_si, libflint), Nothing,
         (Ref{ArbPolyRingElem}, Int, Int), z, 1, 1)
    z.parent = a
    return z
@@ -112,7 +112,7 @@ end
 ###############################################################################
 
 function isequal(x::ArbPolyRingElem, y::ArbPolyRingElem)
-   return ccall((:arb_poly_equal, libarb), Bool,
+   return ccall((:arb_poly_equal, libflint), Bool,
                                       (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}), x, y)
 end
 
@@ -123,7 +123,7 @@ Return `true` if the coefficient balls of $x$ overlap the coefficient balls
 of $y$, otherwise return `false`.
 """
 function overlaps(x::ArbPolyRingElem, y::ArbPolyRingElem)
-   return ccall((:arb_poly_overlaps, libarb), Bool,
+   return ccall((:arb_poly_overlaps, libflint), Bool,
                                       (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}), x, y)
 end
 
@@ -134,7 +134,7 @@ Return `true` if the coefficient balls of $x$ contain the corresponding
 coefficient balls of $y$, otherwise return `false`.
 """
 function contains(x::ArbPolyRingElem, y::ArbPolyRingElem)
-   return ccall((:arb_poly_contains, libarb), Bool,
+   return ccall((:arb_poly_contains, libflint), Bool,
                                       (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}), x, y)
 end
 
@@ -145,7 +145,7 @@ Return `true` if the coefficient balls of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::ArbPolyRingElem, y::ZZPolyRingElem)
-   return ccall((:arb_poly_contains_fmpz_poly, libarb), Bool,
+   return ccall((:arb_poly_contains_fmpz_poly, libflint), Bool,
                                       (Ref{ArbPolyRingElem}, Ref{ZZPolyRingElem}), x, y)
 end
 
@@ -156,7 +156,7 @@ Return `true` if the coefficient balls of $x$ contain the corresponding
 exact coefficients of $y$, otherwise return `false`.
 """
 function contains(x::ArbPolyRingElem, y::QQPolyRingElem)
-   return ccall((:arb_poly_contains_fmpq_poly, libarb), Bool,
+   return ccall((:arb_poly_contains_fmpq_poly, libflint), Bool,
                                       (Ref{ArbPolyRingElem}, Ref{QQPolyRingElem}), x, y)
 end
 
@@ -190,7 +190,7 @@ In the former case, $z$ is set to the integer polynomial.
 """
 function unique_integer(x::ArbPolyRingElem)
   z = ZZPolyRing(ZZ, var(parent(x)))()
-  unique = ccall((:arb_poly_get_unique_fmpz_poly, libarb), Int,
+  unique = ccall((:arb_poly_get_unique_fmpz_poly, libflint), Int,
     (Ref{ZZPolyRingElem}, Ref{ArbPolyRingElem}), z, x)
   return (unique != 0, z)
 end
@@ -204,7 +204,7 @@ end
 function shift_left(x::ArbPolyRingElem, len::Int)
   len < 0 && throw(DomainError(len, "Shift must be non-negative"))
    z = parent(x)()
-   ccall((:arb_poly_shift_left, libarb), Nothing,
+   ccall((:arb_poly_shift_left, libflint), Nothing,
       (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int), z, x, len)
    return z
 end
@@ -212,7 +212,7 @@ end
 function shift_right(x::ArbPolyRingElem, len::Int)
    len < 0 && throw(DomainError(len, "Shift must be non-negative"))
    z = parent(x)()
-   ccall((:arb_poly_shift_right, libarb), Nothing,
+   ccall((:arb_poly_shift_right, libflint), Nothing,
        (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int), z, x, len)
    return z
 end
@@ -225,7 +225,7 @@ end
 
 function -(x::ArbPolyRingElem)
   z = parent(x)()
-  ccall((:arb_poly_neg, libarb), Nothing, (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}), z, x)
+  ccall((:arb_poly_neg, libflint), Nothing, (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}), z, x)
   return z
 end
 
@@ -237,7 +237,7 @@ end
 
 function +(x::ArbPolyRingElem, y::ArbPolyRingElem)
   z = parent(x)()
-  ccall((:arb_poly_add, libarb), Nothing,
+  ccall((:arb_poly_add, libflint), Nothing,
               (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
               z, x, y, precision(parent(x)))
   return z
@@ -245,7 +245,7 @@ end
 
 function *(x::ArbPolyRingElem, y::ArbPolyRingElem)
   z = parent(x)()
-  ccall((:arb_poly_mul, libarb), Nothing,
+  ccall((:arb_poly_mul, libflint), Nothing,
               (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
               z, x, y, precision(parent(x)))
   return z
@@ -253,7 +253,7 @@ end
 
 function -(x::ArbPolyRingElem, y::ArbPolyRingElem)
   z = parent(x)()
-  ccall((:arb_poly_sub, libarb), Nothing,
+  ccall((:arb_poly_sub, libflint), Nothing,
               (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
               z, x, y, precision(parent(x)))
   return z
@@ -262,7 +262,7 @@ end
 function ^(x::ArbPolyRingElem, y::Int)
   y < 0 && throw(DomainError(y, "Exponent must be non-negative"))
   z = parent(x)()
-  ccall((:arb_poly_pow_ui, libarb), Nothing,
+  ccall((:arb_poly_pow_ui, libflint), Nothing,
               (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, UInt, Int),
               z, x, y, precision(parent(x)))
   return z
@@ -318,7 +318,7 @@ function Base.divrem(x::ArbPolyRingElem, y::ArbPolyRingElem)
    iszero(y) && throw(DivideError())
    q = parent(x)()
    r = parent(x)()
-   if (ccall((:arb_poly_divrem, libarb), Int,
+   if (ccall((:arb_poly_divrem, libflint), Int,
          (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
                q, r, x, y, precision(parent(x))) == 1)
       return (q, r)
@@ -348,7 +348,7 @@ function truncate(a::ArbPolyRingElem, n::Int)
    end
    # todo: implement set_trunc in ArbFieldElem
    z = deepcopy(a)
-   ccall((:arb_poly_truncate, libarb), Nothing,
+   ccall((:arb_poly_truncate, libflint), Nothing,
                 (Ref{ArbPolyRingElem}, Int), z, n)
    return z
 end
@@ -356,7 +356,7 @@ end
 function mullow(x::ArbPolyRingElem, y::ArbPolyRingElem, n::Int)
    n < 0 && throw(DomainError(n, "Index must be non-negative"))
    z = parent(x)()
-   ccall((:arb_poly_mullow, libarb), Nothing,
+   ccall((:arb_poly_mullow, libflint), Nothing,
          (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int, Int),
             z, x, y, n, precision(parent(x)))
    return z
@@ -371,7 +371,7 @@ end
 #function reverse(x::ArbPolyRingElem, len::Int)
 #   len < 0 && throw(DomainError())
 #   z = parent(x)()
-#   ccall((:arb_poly_reverse, libarb), Nothing,
+#   ccall((:arb_poly_reverse, libflint), Nothing,
 #                (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int), z, x, len)
 #   return z
 #end
@@ -384,7 +384,7 @@ end
 
 function evaluate(x::ArbPolyRingElem, y::ArbFieldElem)
    z = parent(y)()
-   ccall((:arb_poly_evaluate, libarb), Nothing,
+   ccall((:arb_poly_evaluate, libflint), Nothing,
                 (Ref{ArbFieldElem}, Ref{ArbPolyRingElem}, Ref{ArbFieldElem}, Int),
                 z, x, y, precision(parent(y)))
    return z
@@ -392,7 +392,7 @@ end
 
 function evaluate(x::ArbPolyRingElem, y::AcbFieldElem)
    z = parent(y)()
-   ccall((:arb_poly_evaluate_acb, libarb), Nothing,
+   ccall((:arb_poly_evaluate_acb, libflint), Nothing,
                 (Ref{AcbFieldElem}, Ref{ArbPolyRingElem}, Ref{AcbFieldElem}, Int),
                 z, x, y, precision(parent(y)))
    return z
@@ -413,7 +413,7 @@ its derivative evaluated at $y$.
 function evaluate2(x::ArbPolyRingElem, y::ArbFieldElem)
    z = parent(y)()
    w = parent(y)()
-   ccall((:arb_poly_evaluate2, libarb), Nothing,
+   ccall((:arb_poly_evaluate2, libflint), Nothing,
                 (Ref{ArbFieldElem}, Ref{ArbFieldElem}, Ref{ArbPolyRingElem}, Ref{ArbFieldElem}, Int),
                 z, w, x, y, precision(parent(y)))
    return z, w
@@ -422,7 +422,7 @@ end
 function evaluate2(x::ArbPolyRingElem, y::AcbFieldElem)
    z = parent(y)()
    w = parent(y)()
-   ccall((:arb_poly_evaluate2_acb, libarb), Nothing,
+   ccall((:arb_poly_evaluate2_acb, libflint), Nothing,
                 (Ref{AcbFieldElem}, Ref{AcbFieldElem}, Ref{ArbPolyRingElem}, Ref{AcbFieldElem}, Int),
                 z, w, x, y, precision(parent(y)))
    return z, w
@@ -438,7 +438,7 @@ evaluate2(x::ArbPolyRingElem, y::Any) = evaluate2(x, base_ring(parent(x))(y))
 
 function AbstractAlgebra._compose_right(x::ArbPolyRingElem, y::ArbPolyRingElem)
    z = parent(x)()
-   ccall((:arb_poly_compose, libarb), Nothing,
+   ccall((:arb_poly_compose, libflint), Nothing,
                 (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
                 z, x, y, precision(parent(x)))
    return z
@@ -452,14 +452,14 @@ end
 
 function derivative(x::ArbPolyRingElem)
    z = parent(x)()
-   ccall((:arb_poly_derivative, libarb), Nothing,
+   ccall((:arb_poly_derivative, libflint), Nothing,
                 (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int), z, x, precision(parent(x)))
    return z
 end
 
 function integral(x::ArbPolyRingElem)
    z = parent(x)()
-   ccall((:arb_poly_integral, libarb), Nothing,
+   ccall((:arb_poly_integral, libflint), Nothing,
                 (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int), z, x, precision(parent(x)))
    return z
 end
@@ -471,9 +471,9 @@ end
 ###############################################################################
 
 function arb_vec(b::Vector{ArbFieldElem})
-   v = ccall((:_arb_vec_init, libarb), Ptr{arb_struct}, (Int,), length(b))
+   v = ccall((:_arb_vec_init, libflint), Ptr{arb_struct}, (Int,), length(b))
    for i=1:length(b)
-       ccall((:arb_set, libarb), Nothing, (Ptr{arb_struct}, Ref{ArbFieldElem}),
+       ccall((:arb_set, libflint), Nothing, (Ptr{arb_struct}, Ref{ArbFieldElem}),
            v + (i-1)*sizeof(arb_struct), b[i])
    end
    return v
@@ -483,7 +483,7 @@ function array(R::ArbField, v::Ptr{arb_struct}, n::Int)
    r = Vector{ArbFieldElem}(undef, n)
    for i=1:n
        r[i] = R()
-       ccall((:arb_set, libarb), Nothing, (Ref{ArbFieldElem}, Ptr{arb_struct}),
+       ccall((:arb_set, libflint), Nothing, (Ref{ArbFieldElem}, Ptr{arb_struct}),
            r[i], v + (i-1)*sizeof(arb_struct))
    end
    return r
@@ -497,7 +497,7 @@ Construct a polynomial in the given polynomial ring from a list of its roots.
 function from_roots(R::ArbPolyRing, b::Vector{ArbFieldElem})
    z = R()
    tmp = arb_vec(b)
-   ccall((:arb_poly_product_roots, libarb), Nothing,
+   ccall((:arb_poly_product_roots, libflint), Nothing,
                 (Ref{ArbPolyRingElem}, Ptr{arb_struct}, Int, Int), z, tmp, length(b), precision(R))
    arb_vec_clear(tmp, length(b))
    return z
@@ -509,7 +509,7 @@ end
 
 function evaluate_fast(x::ArbPolyRingElem, b::Vector{ArbFieldElem})
    tmp = arb_vec(b)
-   ccall((:arb_poly_evaluate_vec_fast, libarb), Nothing,
+   ccall((:arb_poly_evaluate_vec_fast, libflint), Nothing,
                 (Ptr{arb_struct}, Ref{ArbPolyRingElem}, Ptr{arb_struct}, Int, Int),
             tmp, x, tmp, length(b), precision(parent(x)))
    res = array(base_ring(parent(x)), tmp, length(b))
@@ -522,7 +522,7 @@ function interpolate_newton(R::ArbPolyRing, xs::Vector{ArbFieldElem}, ys::Vector
    z = R()
    xsv = arb_vec(xs)
    ysv = arb_vec(ys)
-   ccall((:arb_poly_interpolate_newton, libarb), Nothing,
+   ccall((:arb_poly_interpolate_newton, libflint), Nothing,
                 (Ref{ArbPolyRingElem}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
             z, xsv, ysv, length(xs), precision(R))
    arb_vec_clear(xsv, length(xs))
@@ -535,7 +535,7 @@ function interpolate_barycentric(R::ArbPolyRing, xs::Vector{ArbFieldElem}, ys::V
    z = R()
    xsv = arb_vec(xs)
    ysv = arb_vec(ys)
-   ccall((:arb_poly_interpolate_barycentric, libarb), Nothing,
+   ccall((:arb_poly_interpolate_barycentric, libflint), Nothing,
                 (Ref{ArbPolyRingElem}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
             z, xsv, ysv, length(xs), precision(R))
    arb_vec_clear(xsv, length(xs))
@@ -548,7 +548,7 @@ function interpolate_fast(R::ArbPolyRing, xs::Vector{ArbFieldElem}, ys::Vector{A
    z = R()
    xsv = arb_vec(xs)
    ysv = arb_vec(ys)
-   ccall((:arb_poly_interpolate_fast, libarb), Nothing,
+   ccall((:arb_poly_interpolate_fast, libflint), Nothing,
                 (Ref{ArbPolyRingElem}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
             z, xsv, ysv, length(xs), precision(R))
    arb_vec_clear(xsv, length(xs))
@@ -581,14 +581,14 @@ function roots_upper_bound(x::ArbPolyRingElem)
    z = base_ring(x)()
    p = precision(base_ring(x))
    GC.@preserve x z begin
-      t = ccall((:arb_rad_ptr, libarb), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
-      ccall((:arb_poly_root_bound_fujiwara, libarb), Nothing,
+      t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
+      ccall((:arb_poly_root_bound_fujiwara, libflint), Nothing,
             (Ptr{mag_struct}, Ref{ArbPolyRingElem}), t, x)
-      s = ccall((:arb_mid_ptr, libarb), Ptr{arf_struct}, (Ref{ArbFieldElem}, ), z)
-      ccall((:arf_set_mag, libarb), Nothing, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
-      ccall((:arf_set_round, libarb), Nothing,
+      s = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{ArbFieldElem}, ), z)
+      ccall((:arf_set_mag, libflint), Nothing, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
+      ccall((:arf_set_round, libflint), Nothing,
             (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
-      ccall((:mag_zero, libarb), Nothing, (Ptr{mag_struct},), t)
+      ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct},), t)
    end
    return z
 end
@@ -600,45 +600,45 @@ end
 ###############################################################################
 
 function zero!(z::ArbPolyRingElem)
-   ccall((:arb_poly_zero, libarb), Nothing,
+   ccall((:arb_poly_zero, libflint), Nothing,
                     (Ref{ArbPolyRingElem}, ), z)
    return z
 end
 
 function fit!(z::ArbPolyRingElem, n::Int)
-   ccall((:arb_poly_fit_length, libarb), Nothing,
+   ccall((:arb_poly_fit_length, libflint), Nothing,
                     (Ref{ArbPolyRingElem}, Int), z, n)
    return nothing
 end
 
 function setcoeff!(z::ArbPolyRingElem, n::Int, x::ZZRingElem)
-   ccall((:arb_poly_set_coeff_fmpz, libarb), Nothing,
+   ccall((:arb_poly_set_coeff_fmpz, libflint), Nothing,
                     (Ref{ArbPolyRingElem}, Int, Ref{ZZRingElem}), z, n, x)
    return z
 end
 
 function setcoeff!(z::ArbPolyRingElem, n::Int, x::ArbFieldElem)
-   ccall((:arb_poly_set_coeff_arb, libarb), Nothing,
+   ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
                     (Ref{ArbPolyRingElem}, Int, Ref{ArbFieldElem}), z, n, x)
    return z
 end
 
 function mul!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ArbPolyRingElem)
-   ccall((:arb_poly_mul, libarb), Nothing,
+   ccall((:arb_poly_mul, libflint), Nothing,
                 (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
                     z, x, y, precision(parent(z)))
    return z
 end
 
 function addeq!(z::ArbPolyRingElem, x::ArbPolyRingElem)
-   ccall((:arb_poly_add, libarb), Nothing,
+   ccall((:arb_poly_add, libflint), Nothing,
                 (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
                     z, z, x, precision(parent(z)))
    return z
 end
 
 function add!(z::ArbPolyRingElem, x::ArbPolyRingElem, y::ArbPolyRingElem)
-   ccall((:arb_poly_add, libarb), Nothing,
+   ccall((:arb_poly_add, libflint), Nothing,
                 (Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Ref{ArbPolyRingElem}, Int),
                     z, x, y, precision(parent(z)))
    return z
