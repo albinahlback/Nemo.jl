@@ -102,7 +102,7 @@ is_unit(a::fqPolyRepFieldElem) = ccall((:fq_nmod_is_invertible, libflint), Bool,
                      (Ref{fqPolyRepFieldElem}, Ref{fqPolyRepField}), a, a.parent)
 
 function characteristic(a::fqPolyRepField)
-   return a.n
+   return ZZ(a.n)
 end
 
 function order(a::fqPolyRepField)
