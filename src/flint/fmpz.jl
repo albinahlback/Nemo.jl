@@ -1275,8 +1275,10 @@ Return a tuple $g, s, t$ such that $g$ is the greatest common divisor of $a$
 and $b$ and integers $s$ and $t$ such that $g = as + bt$.
 """
 function gcdx(a::ZZRingElem, b::ZZRingElem)
-  # Just to conform with Julia's definition
-  a == b == 0 && return zero(ZZ), one(ZZ), zero(ZZ)
+  @static if VERSION < v"1.12.0-DEV.410"
+    # Just to conform with Julia's definition
+    a == b == 0 && return zero(ZZ), one(ZZ), zero(ZZ)
+  end
 
   d = ZZ()
   x = ZZ()
