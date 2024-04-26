@@ -284,12 +284,12 @@ end
 
 function _get_raw_type(::Type{fpField}, F::FqField)
   @assert _fq_default_ctx_type(F) == 4
-  return Native.GF(UInt(order(F)))
+  return Native.GF(UInt(order(F)), cached = false)
 end
 
 function _get_raw_type(::Type{FpField}, F::FqField)
   @assert _fq_default_ctx_type(F) == 5
-  return Native.GF(order(F))
+  return Native.GF(order(F), cached = false)
 end
 
 # image/preimage
