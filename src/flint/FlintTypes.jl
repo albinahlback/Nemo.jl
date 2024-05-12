@@ -6657,22 +6657,40 @@ end
 #
 ################################################################################
 
-mutable struct rand_ctx
-   ptr::Ptr{Cvoid}
+if NEW_FLINT
+  mutable struct rand_ctx
+    gmp_state::Ptr{Cvoid}
+    randval::UInt
+    randval2::UInt
 
-   function rand_ctx()
-      z = new()
-      z.ptr = ccall((:flint_rand_alloc, libflint), Ptr{Cvoid}, ( ))
-      ccall((:flint_randinit, libflint), Cvoid, (Ptr{Cvoid}, ), z.ptr)
-      finalizer(_rand_ctx_clear_fn, z)
-      return z
-   end
-end
+    function rand_ctx()
+      a = new()
+      ccall((:flint_rand_init, libflint), Cvoid, (Ref{rand_ctx},), a)
+      finalizer(_rand_ctx_clear_fn, a)
+      return a
+    end
+  end
 
-function _rand_ctx_clear_fn(a::rand_ctx)
-   ccall((:flint_randclear, libflint), Cvoid, (Ptr{Cvoid}, ), a.ptr)
-   ccall((:flint_rand_free, libflint), Cvoid, (Ptr{Cvoid}, ), a.ptr)
-   nothing
+  function _rand_ctx_clear_fn(a::rand_ctx)
+    ccall((:flint_rand_clear, libflint), Cvoid, (Ref{rand_ctx},), a)
+    nothing
+  end
+else
+  mutable struct rand_ctx
+    data::NTuple{56, Int8}
+
+    function rand_ctx()
+      a = new()
+      ccall((:flint_randinit, libflint), Cvoid, (Ref{rand_ctx},), a)
+      finalizer(_rand_ctx_clear_fn, a)
+      return a
+    end
+  end
+
+  function _rand_ctx_clear_fn(a::rand_ctx)
+    ccall((:flint_randclear, libflint), Cvoid, (Ref{rand_ctx},), a)
+    nothing
+  end
 end
 
 ################################################################################

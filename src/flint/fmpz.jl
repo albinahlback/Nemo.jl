@@ -1499,8 +1499,8 @@ function _ecm(a::ZZRingElem, B1::UInt, B2::UInt, ncrv::UInt,
              rnd = _flint_rand_states[Threads.threadid()])
   f = ZZRingElem()
   r = ccall((:fmpz_factor_ecm, libflint), Int32,
-            (Ref{ZZRingElem}, UInt, UInt, UInt, Ptr{Cvoid}, Ref{ZZRingElem}),
-            f, ncrv, B1, B2, rnd.ptr, a)
+            (Ref{ZZRingElem}, UInt, UInt, UInt, Ref{rand_ctx}, Ref{ZZRingElem}),
+            f, ncrv, B1, B2, rnd, a)
   return r, f
 end
 
@@ -2741,8 +2741,8 @@ Return a random signed integer whose absolute value has $b$ bits.
 function rand_bits(::ZZRing, b::Int)
    b >= 0 || throw(DomainError(b, "Bit count must be non-negative"))
    z = ZZRingElem()
-   ccall((:fmpz_randbits, libflint), Nothing,(Ref{ZZRingElem}, Ptr{Cvoid}, Int),
-         z, _flint_rand_states[Threads.threadid()].ptr, b)
+   ccall((:fmpz_randbits, libflint), Nothing,(Ref{ZZRingElem}, Ref{rand_ctx}, Int),
+         z, _flint_rand_states[Threads.threadid()], b)
    return z
 end
 
@@ -2756,8 +2756,8 @@ function rand_bits_prime(::ZZRing, n::Int, proved::Bool = true)
    n < 2 && throw(DomainError(n, "No primes with that many bits"))
    z = ZZRingElem()
    ccall((:fmpz_randprime, libflint), Nothing,
-	 (Ref{ZZRingElem}, Ptr{Cvoid}, Int, Cint),
-	  z, _flint_rand_states[Threads.threadid()].ptr, n, Cint(proved))
+	 (Ref{ZZRingElem}, Ref{rand_ctx}, Int, Cint),
+	  z, _flint_rand_states[Threads.threadid()], n, Cint(proved))
    return z
 end
 

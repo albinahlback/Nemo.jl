@@ -139,16 +139,16 @@ function rand(C::CalciumField; depth::Int, bits::Int,
 
    if randtype == :null
       ccall((:ca_randtest, libflint), Nothing,
-          (Ref{CalciumFieldElem}, Ptr{Cvoid}, Int, Int, Ref{CalciumField}),
-                x, state.ptr, depth, bits, C)
+          (Ref{CalciumFieldElem}, Ref{rand_ctx}, Int, Int, Ref{CalciumField}),
+                x, state, depth, bits, C)
    elseif randtype == :rational
       ccall((:ca_randtest_rational, libflint), Nothing,
-          (Ref{CalciumFieldElem}, Ptr{Cvoid}, Int, Ref{CalciumField}),
-                x, state.ptr, bits, C)
+          (Ref{CalciumFieldElem}, Ref{rand_ctx}, Int, Ref{CalciumField}),
+                x, state, bits, C)
    elseif randtype == :special
       ccall((:ca_randtest_special, libflint), Nothing,
-          (Ref{CalciumFieldElem}, Ptr{Cvoid}, Int, Int, Ref{CalciumField}),
-                x, state.ptr, depth, bits, C)
+          (Ref{CalciumFieldElem}, Ref{rand_ctx}, Int, Int, Ref{CalciumField}),
+                x, state, depth, bits, C)
    else
       error("randtype not defined")
    end

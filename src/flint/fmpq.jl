@@ -1155,8 +1155,8 @@ denominator can be smaller than $b$ bits.
 function rand_bits(::QQField, b::Int)
    b > 0 || throw(DomainError(b, "Bit count must be positive"))
    z = QQFieldElem()
-   ccall((:fmpq_randbits, libflint), Nothing, (Ref{QQFieldElem}, Ptr{Cvoid}, Int),
-         z, _flint_rand_states[Threads.threadid()].ptr, b)
+   ccall((:fmpq_randbits, libflint), Nothing, (Ref{QQFieldElem}, Ref{rand_ctx}, Int),
+         z, _flint_rand_states[Threads.threadid()], b)
    return z
 end
 

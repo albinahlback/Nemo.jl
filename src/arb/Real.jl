@@ -2108,22 +2108,22 @@ function rand(r::RealField, prec::Int = precision(Balls); randtype::Symbol=:uran
 
   if randtype == :urandom
     ccall((:arb_urandom, libflint), Nothing,
-          (Ref{RealFieldElem}, Ptr{Cvoid}, Int), x, state.ptr, prec)
+          (Ref{RealFieldElem}, Ref{rand_ctx}, Int), x, state, prec)
   elseif randtype == :randtest
     ccall((:arb_randtest, libflint), Nothing,
-          (Ref{RealFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, prec, 30)
+          (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
   elseif randtype == :randtest_exact
     ccall((:arb_randtest_exact, libflint), Nothing,
-          (Ref{RealFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, prec, 30)
+          (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
   elseif randtype == :randtest_precise
     ccall((:arb_randtest_precise, libflint), Nothing,
-          (Ref{RealFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, prec, 30)
+          (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
   elseif randtype == :randtest_wide
     ccall((:arb_randtest_wide, libflint), Nothing,
-          (Ref{RealFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, prec, 30)
+          (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
   elseif randtype == :randtest_special
     ccall((:arb_randtest_special, libflint), Nothing,
-          (Ref{RealFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, prec, 30)
+          (Ref{RealFieldElem}, Ref{rand_ctx}, Int, Int), x, state, prec, 30)
   else
     error("Arb random generation `" * String(randtype) * "` is not defined")
   end

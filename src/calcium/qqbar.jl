@@ -341,14 +341,14 @@ function rand(R::QQBarField; degree::Int, bits::Int,
 
    if randtype == :null
       ccall((:qqbar_randtest, libflint), Nothing,
-          (Ref{QQBarFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, degree, bits)
+          (Ref{QQBarFieldElem}, Ref{rand_ctx}, Int, Int), x, state, degree, bits)
    elseif randtype == :real
       ccall((:qqbar_randtest_real, libflint), Nothing,
-          (Ref{QQBarFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, degree, bits)
+          (Ref{QQBarFieldElem}, Ref{rand_ctx}, Int, Int), x, state, degree, bits)
    elseif randtype == :nonreal
       degree < 2 && error("nonreal requires degree >= 2")
       ccall((:qqbar_randtest_nonreal, libflint), Nothing,
-          (Ref{QQBarFieldElem}, Ptr{Cvoid}, Int, Int), x, state.ptr, degree, bits)
+          (Ref{QQBarFieldElem}, Ref{rand_ctx}, Int, Int), x, state, degree, bits)
    else
       error("randtype not defined")
    end

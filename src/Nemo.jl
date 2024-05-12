@@ -214,6 +214,14 @@ function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
 
+_ptr = Libdl.dlopen(libflint)
+if Libdl.dlsym(_ptr, :flint_rand_init; throw_error = false) !== nothing
+  const NEW_FLINT = true
+else
+  const NEW_FLINT = false
+end
+Libdl.dlclose(_ptr)
+
 ################################################################################
 #
 #  Debugging tools for allocation tracking
@@ -525,14 +533,27 @@ end
 
 Random.seed!(a::rand_ctx, s::Nothing=nothing) = Random.seed!(a, rand(UInt128))
 
-flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
-   ccall((:flint_randseed, libflint), Cvoid, (Ptr{Cvoid}, UInt, UInt), a.ptr, seed1, seed2)
+if NEW_FLINT
+  flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
+    ccall((:flint_rand_set_seed, libflint), Cvoid, (Ref{rand_ctx}, UInt, UInt), a, seed1, seed2)
 
-function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
-   ccall((:_flint_rand_init_gmp, libflint), Cvoid, (Ptr{Cvoid},), a.ptr)
-   ccall((:__gmp_randseed, :libgmp), Cvoid, (Ptr{Cvoid}, Ref{BigInt}),
-         a.ptr, # gmp_state is the first field of a.ptr (cf. flint.h)
-         seed)
+  function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
+    if a.gmp_state == C_NULL
+      # gmp_state needs to be initialised
+      ccall((:_flint_rand_init_gmp_state, libflint), Cvoid, (Ref{rand_ctx},), a)
+    end
+    ccall((:__gmp_randseed, :libgmp), Cvoid, (Ptr{Cvoid}, Ref{BigInt}), a.gmp_state, seed)
+  end
+else
+  flint_randseed!(a::rand_ctx, seed1::UInt, seed2::UInt) =
+    ccall((:flint_randseed, libflint), Cvoid, (Ref{rand_ctx}, UInt, UInt), a, seed1, seed2)
+
+  function flint_gmp_randseed!(a::rand_ctx, seed::BigInt)
+    ccall((:_flint_rand_init_gmp, libflint), Cvoid, (Ref{rand_ctx},), a)
+    ccall((:__gmp_randseed, :libgmp), Cvoid, (Ref{rand_ctx}, Ref{BigInt}),
+          a, # gmp_state is the first field of flint_rand_s
+          seed)
+  end
 end
 
 ################################################################################
