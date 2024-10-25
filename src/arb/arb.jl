@@ -56,6 +56,9 @@ end
 
 characteristic(::ArbField) = 0
 
+_mid_ptr(x::ArbFieldElemOrPtr) = @ccall libflint.arb_mid_ptr(x::Ref{ArbFieldElem})::Ptr{arf_struct}
+_rad_ptr(x::ArbFieldElemOrPtr) = @ccall libflint.arb_rad_ptr(x::Ref{ArbFieldElem})::Ptr{mag_struct}
+
 ################################################################################
 #
 #  Conversions
@@ -91,9 +94,7 @@ end
 function _arb_get_arf(x::ArbFieldElem, ::RoundingMode{:Nearest})
   t = arf_struct()
   GC.@preserve x begin
-    t1 = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct},
-               (Ref{ArbFieldElem}, ),
-               x)
+    t1 = _mid_ptr(x)
     ccall((:arf_set, libflint), Nothing,
           (Ref{arf_struct}, Ptr{arf_struct}),
           t, t1)
@@ -2021,18 +2022,16 @@ for (typeofx, passtoc) in ((ArbFieldElem, Ref{ArbFieldElem}), (Ptr{ArbFieldElem}
     end
 
     function _arb_set(x::($typeofx), y::BigFloat)
-      m = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct},
-                (($passtoc), ), x)
-      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct},
-                (($passtoc), ), x)
+      m = _mid_ptr(x)
+      r = _rad_ptr(x)
       ccall((:arf_set_mpfr, libflint), Nothing,
             (Ptr{arf_struct}, Ref{BigFloat}), m, y)
       ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)
     end
 
     function _arb_set(x::($typeofx), y::BigFloat, p::Int)
-      m = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (($passtoc), ), x)
-      r = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (($passtoc), ), x)
+      m = _mid_ptr(x)
+      r = _rad_ptr(x)
       ccall((:arf_set_mpfr, libflint), Nothing,
             (Ptr{arf_struct}, Ref{BigFloat}), m, y)
       ccall((:mag_zero, libflint), Nothing, (Ptr{mag_struct}, ), r)

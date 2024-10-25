@@ -593,12 +593,10 @@ function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0,
       ok = true
       if target > 0
         for i = 0 : deg-1
-          re = ccall((:acb_real_ptr, libflint), Ptr{arb_struct},
-                     (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
-          im = ccall((:acb_imag_ptr, libflint), Ptr{arb_struct},
-                     (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
-          t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), re)
-          u = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ptr{ArbFieldElem}, ), im)
+          re = _real_ptr(roots + i * sizeof(acb_struct))
+          im = _imag_ptr(roots + i * sizeof(acb_struct))
+          t = _rad_ptr(re)
+          u = _rad_ptr(im)
           ok = ok && (ccall((:mag_cmp_2exp_si, libflint), Cint,
                             (Ptr{mag_struct}, Int), t, -target) <= 0)
           ok = ok && (ccall((:mag_cmp_2exp_si, libflint), Cint,
@@ -616,10 +614,9 @@ function roots(x::AcbPolyRingElem; target=0, isolate_real=false, initial_prec=0,
 
         if real_ok
           for i = 0 : deg - 1
-            im = ccall((:acb_imag_ptr, libflint), Ptr{ArbFieldElem},
-                       (Ptr{AcbFieldElem}, ), roots + i * sizeof(acb_struct))
-            if ccall((:arb_contains_zero, libflint), Bool, (Ptr{ArbFieldElem}, ), im)
-              zero!(im)
+            im = _imag_ptr(roots + i * sizeof(acb_struct))
+            if ccall((:arb_contains_zero, libflint), Bool, (Ptr{arb_struct}, ), im)
+              ccall((:arb_zero, libflint), Nothing, (Ptr{arb_struct}, ), im)
             end
           end
         end
@@ -665,10 +662,10 @@ function roots_upper_bound(x::AcbPolyRingElem)
   z = ArbField(precision(base_ring(x)))()
   p = precision(base_ring(x))
   GC.@preserve x z begin
-    t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
+    t = _rad_ptr(z)
     ccall((:acb_poly_root_bound_fujiwara, libflint), Nothing,
           (Ptr{mag_struct}, Ref{AcbPolyRingElem}), t, x)
-    s = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{ArbFieldElem}, ), z)
+    s = _mid_ptr(z)
     ccall((:arf_set_mag, libflint), Nothing, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
     ccall((:arf_set_round, libflint), Nothing,
           (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)

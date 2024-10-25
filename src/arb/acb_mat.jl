@@ -688,10 +688,10 @@ bound for the infinity norm for every matrix in $x$
 function bound_inf_norm(x::AcbMatrix)
   z = ArbFieldElem()
   GC.@preserve x z begin
-    t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
+    t = _rad_ptr(z)
     ccall((:acb_mat_bound_inf_norm, libflint), Nothing,
           (Ptr{mag_struct}, Ref{AcbMatrix}), t, x)
-    s = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{ArbFieldElem}, ), z)
+    s = _mid_ptr(z)
     ccall((:arf_set_mag, libflint), Nothing,
           (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
     ccall((:mag_zero, libflint), Nothing,

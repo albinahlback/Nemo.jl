@@ -569,10 +569,10 @@ function roots_upper_bound(x::ArbPolyRingElem)
   z = base_ring(x)()
   p = precision(base_ring(x))
   GC.@preserve x z begin
-    t = ccall((:arb_rad_ptr, libflint), Ptr{mag_struct}, (Ref{ArbFieldElem}, ), z)
+    t = _rad_ptr(z)
     ccall((:arb_poly_root_bound_fujiwara, libflint), Nothing,
           (Ptr{mag_struct}, Ref{ArbPolyRingElem}), t, x)
-    s = ccall((:arb_mid_ptr, libflint), Ptr{arf_struct}, (Ref{ArbFieldElem}, ), z)
+    s = _mid_ptr(z)
     ccall((:arf_set_mag, libflint), Nothing, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
     ccall((:arf_set_round, libflint), Nothing,
           (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
