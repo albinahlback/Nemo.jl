@@ -47,11 +47,11 @@ end
   return z
 end
 
-@inline function setindex!(a::FqPolyRepMatrix, u::FqPolyRepFieldElem, i::Int, j::Int)
+@inline function setindex!(a::FqPolyRepMatrix, u::FqPolyRepFieldElemOrPtr, i::Int, j::Int)
   @boundscheck _checkbounds(a, i, j)
-  ccall((:fq_mat_entry_set, libflint), Nothing,
-        (Ref{FqPolyRepMatrix}, Int, Int, Ref{FqPolyRepFieldElem}, Ref{FqPolyRepField}),
-        a, i - 1, j - 1, u, base_ring(a))
+  @ccall libflint.fq_mat_entry_set(
+    a::Ref{FqPolyRepMatrix}, (i-1)::Int, (j-1)::Int, u::Ref{FqPolyRepFieldElem}, base_ring(a)::Ref{FqPolyRepField}
+  )::Nothing
 end
 
 @inline function setindex!(a::FqPolyRepMatrix, u::ZZRingElem, i::Int, j::Int)
@@ -63,8 +63,7 @@ end
   end
 end
 
-setindex!(a::FqPolyRepMatrix, u::Integer, i::Int, j::Int) =
-setindex!(a, base_ring(a)(u), i, j)
+setindex!(a::FqPolyRepMatrix, u::Integer, i::Int, j::Int) = setindex!(a, base_ring(a)(u), i, j)
 
 function setindex!(a::FqPolyRepMatrix, b::FqPolyRepMatrix, r::UnitRange{Int64}, c::UnitRange{Int64})
   _checkbounds(a, r, c)
@@ -668,22 +667,12 @@ function (a::FqPolyRepMatrixSpace)(b::FqPolyRepFieldElem)
   return FqPolyRepMatrix(nrows(a), ncols(a), b)
 end
 
-function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{T}) where {T <: Integer}
+function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{<:IntegerUnion})
   _check_dim(nrows(a), ncols(a), arr)
-  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
+  return FqPolyRepMatrix(arr, base_ring(a))
 end
 
-function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{T}) where {T <: Integer}
-  _check_dim(nrows(a), ncols(a), arr)
-  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
-end
-
-function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{ZZRingElem})
-  _check_dim(nrows(a), ncols(a), arr)
-  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
-end
-
-function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{ZZRingElem})
+function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{<:IntegerUnion})
   _check_dim(nrows(a), ncols(a), arr)
   return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
 end
@@ -691,7 +680,7 @@ end
 function (a::FqPolyRepMatrixSpace)(arr::AbstractMatrix{FqPolyRepFieldElem})
   _check_dim(nrows(a), ncols(a), arr)
   (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
-  return FqPolyRepMatrix(nrows(a), ncols(a), arr, base_ring(a))
+  return FqPolyRepMatrix(arr, base_ring(a))
 end
 
 function (a::FqPolyRepMatrixSpace)(arr::AbstractVector{FqPolyRepFieldElem})
@@ -712,7 +701,8 @@ end
 ###############################################################################
 
 function matrix(R::FqPolyRepField, arr::AbstractMatrix{<: Union{FqPolyRepFieldElem, ZZRingElem, Integer}})
-  z = FqPolyRepMatrix(size(arr, 1), size(arr, 2), arr, R)
+  Base.require_one_based_indexing(arr)
+  z = FqPolyRepMatrix(arr, R)
   return z
 end
 
