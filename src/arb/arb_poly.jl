@@ -41,8 +41,7 @@ one(a::ArbPolyRing) = one!(a())
 
 function gen(a::ArbPolyRing)
   z = ArbPolyRingElem()
-  ccall((:arb_poly_set_coeff_si, libflint), Nothing,
-        (Ref{ArbPolyRingElem}, Int, Int), z, 1, 1)
+  setcoeff!(z, 1, 1)
   z.parent = a
   return z
 end
@@ -608,17 +607,23 @@ function fit!(z::ArbPolyRingElem, n::Int)
   return nothing
 end
 
-function setcoeff!(z::ArbPolyRingElem, n::Int, x::ZZRingElem)
-  ccall((:arb_poly_set_coeff_fmpz, libflint), Nothing,
-        (Ref{ArbPolyRingElem}, Int, Ref{ZZRingElem}), z, n, x)
-  return z
-end
-
 function setcoeff!(z::ArbPolyRingElem, n::Int, x::ArbFieldElem)
   ccall((:arb_poly_set_coeff_arb, libflint), Nothing,
         (Ref{ArbPolyRingElem}, Int, Ref{ArbFieldElem}), z, n, x)
   return z
 end
+
+function setcoeff!(z::ArbPolyRingElem, n::Int, x::Int)
+  ccall((:arb_poly_set_coeff_si, libflint), Nothing,
+        (Ref{ArbPolyRingElem}, Int, Int), z, n, x)
+  return z
+end
+
+function setcoeff!(z::ArbPolyRingElem, n::Int, x::ZZRingElem)
+  return setcoeff!(z, n, base_ring(z)(x))
+end
+
+setcoeff!(z::ArbPolyRingElem, n::Int, x::Integer) = setcoeff!(z, n, flintify(x))
 
 #
 
