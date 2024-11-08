@@ -3,7 +3,8 @@
 struct ZZiRing <: Ring
 end
 
-const FlintZZi = ZZiRing()
+const ZZi = ZZiRing()
+GaussianIntegers() = ZZi
 
 struct ZZiRingElem <: RingElem
   x::ZZRingElem
@@ -13,7 +14,8 @@ end
 struct QQiField <: Field
 end
 
-const FlintQQi = QQiField()
+const QQi = QQiField()
+GaussianRationals() = QQi
 
 struct QQiFieldElem <: FieldElem
   num::ZZiRingElem

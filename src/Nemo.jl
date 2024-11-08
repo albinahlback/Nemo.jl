@@ -585,14 +585,9 @@ const FlintZZ = ZZ
 @doc qq_field_doc
 const FlintQQ = QQ
 
-###############################################################################
-#
-#   Set domain for RR, CC to Arb
-#
-###############################################################################
+const FlintZZi = ZZi
 
-GaussianIntegers() = FlintZZi
-GaussianRationals() = FlintQQi
+const FlintQQi = QQi
 
 ###############################################################################
 #
