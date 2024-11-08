@@ -172,8 +172,7 @@ end
 
 function *(x::T, y::UInt) where T <: Zmodn_poly
   z = parent(x)()
-  @ccall libflint.nmod_poly_scalar_mul_nmod(z::Ref{T}, x::Ref{T}, y::UInt)::Nothing
-  return z
+  return mul!(z, x, y % modulus(x))
 end
 
 *(x::UInt, y::T) where T <: Zmodn_poly = y*x
@@ -202,6 +201,7 @@ end
 
 function +(x::T, y::UInt) where T <: Zmodn_poly
   z = parent(x)()
+  y %= modulus(x)
   @ccall libflint.nmod_poly_add_ui(z::Ref{T}, x::Ref{T}, y::UInt)::Nothing
   return z
 end
@@ -232,6 +232,7 @@ end
 
 function -(x::T, y::UInt) where T <: Zmodn_poly
   z = parent(x)()
+  y %= modulus(x)
   @ccall libflint.nmod_poly_sub_ui(z::Ref{T}, x::Ref{T}, y::UInt)::Nothing
   return z
 end
@@ -467,10 +468,14 @@ end
 ################################################################################
 
 function invmod(x::T, y::T) where T <: Zmodn_poly
-  length(y) == 0 && error("Second argument must not be 0")
+  is_zero(y) && error("Second argument must not be 0")
   check_parent(x,y)
   if length(y) == 1
-    return parent(x)(inv(evaluate(x, coeff(y, 0))))
+    t = evaluate(x, coeff(y, 0))
+    if !is_zero(t)
+      t = inv!(t)
+    end
+    return parent(x)(t)
   end
   z = parent(x)()
   r = @ccall libflint.nmod_poly_invmod(z::Ref{T}, x::Ref{T}, y::Ref{T})::Int32

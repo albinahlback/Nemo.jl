@@ -223,15 +223,6 @@ function gcdx(x::fpPolyRingElem, y::fpPolyRingElem)
   return g,s,t
 end
 
-function gcdinv(x::fpPolyRingElem, y::fpPolyRingElem)
-  check_parent(x,y)
-  length(y) <= 1 && error("Length of second argument must be >= 2")
-  g = parent(x)()
-  s = parent(x)()
-  @ccall libflint.nmod_poly_gcdinv(g::Ref{fpPolyRingElem}, s::Ref{fpPolyRingElem}, x::Ref{fpPolyRingElem}, y::Ref{fpPolyRingElem})::Nothing
-  return g,s
-end
-
 ################################################################################
 #
 #  Resultant

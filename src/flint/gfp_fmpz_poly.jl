@@ -94,7 +94,7 @@ end
 
 +(x::FpPolyRingElem, y::Integer) = x + ZZRingElem(y)
 
-+(x::Integer, y::FpPolyRingElem) = ZZRingElem(y) + x 
++(x::Integer, y::FpPolyRingElem) = ZZRingElem(x) + y
 
 function +(x::FpPolyRingElem, y::FpFieldElem)
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
@@ -233,15 +233,6 @@ function gcdx(x::FpPolyRingElem, y::FpPolyRingElem)
   t = parent(x)()
   @ccall libflint.fmpz_mod_poly_xgcd(g::Ref{FpPolyRingElem}, s::Ref{FpPolyRingElem}, t::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{FpPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
   return g, s, t
-end
-
-function gcdinv(x::FpPolyRingElem, y::FpPolyRingElem)
-  check_parent(x,y)
-  length(y) >= 2 || error("Length of second argument must be >= 2")
-  g = parent(x)()
-  s = parent(x)()
-  @ccall libflint.fmpz_mod_poly_gcdinv(g::Ref{FpPolyRingElem}, s::Ref{FpPolyRingElem}, x::Ref{FpPolyRingElem}, y::Ref{FpPolyRingElem}, x.parent.base_ring.ninv::Ref{fmpz_mod_ctx_struct})::Nothing
-  return g, s
 end
 
 ################################################################################
