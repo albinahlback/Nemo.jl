@@ -15,8 +15,8 @@
   # trivial case: input is 1
   F1 = factor(1)
   F1_ZZ = factor(ZZ(1))
-  @test length(F1.fac) == 0
-  @test length(F1_ZZ.fac) == 0
+  @test length(F1) == 0
+  @test length(F1_ZZ) == 0
   @test unit(F1) == 1
   @test unit(F1_ZZ) == 1
 
@@ -55,5 +55,18 @@
   @test length(F_minus1_ZZ) == 0
   @test unit(F_minus1) == -1
   @test unit(F_minus1_ZZ) == -1
+
+  for T in [ Int8,  Int16,  Int32,  Int64,  Int128,  UInt8,  UInt16,  UInt32,  UInt64,  UInt128,  BigInt,  ZZRingElem ]
+    @test_throws ArgumentError factor(T(0))
+    fac99 = factor(T(99))
+    @test  unit(fac99) == 1
+    @test  typeof(unit(fac99)) == T
+    @test  length(fac99) == 2
+    @test  issetequal([a  for (a,_) in fac99], [3, 11])
+    @test  issetequal([e  for (_,e) in fac99], [2, 1])
+    for (a,_) in fac99
+      @test  typeof(a) == T
+    end
+  end
 
 end
