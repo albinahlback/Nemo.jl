@@ -104,6 +104,16 @@ end
 
 
 @testset "is_unimodular" begin
+
+  # Some trivial inputs
+  @test is_unimodular(matrix(ZZ,0,0,[])
+  @test is_unimodular(matrix(ZZ,1,1,[1]))
+  @test is_unimodular(matrix(ZZ,1,1,[-1]))
+  @test !is_unimodular(matrix(ZZ,1,1,[0]))
+  
+  @test_throws ArgumentError is_unimodular(matrix(ZZ,0,1,[]))
+  @test_throws ArgumentError is_unimodular(matrix(ZZ,0,0,[]); algorithm=:WRONG)
+
   U = matrix(ZZ, 3,3,  [ 3, 22, 46, 5, 35, 73, 4, 27, 56])
   M = matrix(ZZ, 3,3,  [-3, 22, 46, 5, 35, 73, 4, 27, 56])
 
@@ -117,7 +127,7 @@ end
                0,       -2,       71,        77,   999925,        1])
 
 
-  for k in 0:5
+  for k in 0:9
     @test is_unimodular(U^k)
     @test is_unimodular(U^k; algorithm=:CRT)
     @test is_unimodular(U^k; algorithm=:pauderis_storjohann)
