@@ -115,6 +115,11 @@ end
   @test !is_unimodular(2*identity_matrix(ZZ, 11))
   @test !is_unimodular(zero_matrix(ZZ, 11,11))
 
+  # This test increases coverage slightly
+  N = 1+prod(filter(is_prime, ZZ(2)^20:(ZZ(2)^20+ZZ(2)^11)))
+  @test !is_unimodular(N*identity_matrix(ZZ, 11))
+
+
   @test_throws ArgumentError is_unimodular(matrix(ZZ,0,1,[]))
   @test_throws ArgumentError is_unimodular(matrix(ZZ,0,0,[]); algorithm=:WRONG)
 
