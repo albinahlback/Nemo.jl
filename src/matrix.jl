@@ -523,25 +523,13 @@ function is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEle
   # (but we avoid P-S if the space estimate is too large).
   # M is a modulus satisfying M > 2^30;
   # det_mod_m is det(A) mod M [!not checked!]: it is either +1 or -1.
-  if !is_square(A)
-    throw(ArgumentError("Matrix must be square"))
-  end
-  if abs(det_mod_m) != 1
-    throw(ArgumentError("det_mod_m must be +1 or -1"))
-  end
-  if M <= 2^30
-    throw(ArgumentError("modulus must be greater than 2^30"))
-  end
-  if !(algorithm in [:auto, :CRT, :pauderis_storjohann])
-    throw(ArgumentError("algorithm must be one of [:CRT, :pauderis_storjohann, :auto]"))
-  end
+  is_square(A) || throw(ArgumentError("Matrix must be square"))
+  abs(det_mod_m) == 1 || throw(ArgumentError("det_mod_m must be +1 or -1"))
+  M >  2^30 || throw(ArgumentError("modulus must be greater than 2^30"))
+  (algorithm in [:auto, :CRT, :pauderis_storjohann]) || throw(ArgumentError("algorithm must be one of [:CRT, :pauderis_storjohann, :auto]"))
   # Deal with two trivial cases -- does this make sense here???
-  if nrows(A) == 0
-    return true
-  end
-  if nrows(A) == 1
-    return (abs(A[1,1]) == 1)
-  end
+  nrows(A) == 0 && return true
+  nrows(A) == 1 && return (abs(A[1,1]) == 1)
   @vprintln(:UnimodVerif,1,"is_unimodular_given_det_mod_m starting")
   if algorithm == :pauderis_storjohann
     @vprintln(:UnimodVerif,1,"User specified Pauderis_Storjohann --> delegating")
