@@ -111,6 +111,10 @@ end
   @test is_unimodular(matrix(ZZ,1,1,[-1]))
   @test !is_unimodular(matrix(ZZ,1,1,[0]))
   
+  @test is_unimodular(identity_matrix(ZZ, 11))
+  @test !is_unimodular(2*identity_matrix(ZZ, 11))
+  @test !is_unimodular(zero_matrix(ZZ, 11,11))
+
   @test_throws ArgumentError is_unimodular(matrix(ZZ,0,1,[]))
   @test_throws ArgumentError is_unimodular(matrix(ZZ,0,0,[]); algorithm=:WRONG)
 
