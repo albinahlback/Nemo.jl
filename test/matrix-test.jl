@@ -136,7 +136,8 @@ end
                0,       -2,       71,        77,   999925,        1])
 
 
-  for k in 0:9
+  # Need larger values of k to increase coverage
+  for k in 0:25
     @test is_unimodular(U^k)
     @test is_unimodular(U^k; algorithm=:CRT)
     @test is_unimodular(U^k; algorithm=:pauderis_storjohann)
