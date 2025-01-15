@@ -106,7 +106,7 @@ end
 @testset "is_unimodular" begin
 
   # Some trivial inputs
-  @test is_unimodular(matrix(ZZ,0,0,[])
+  @test is_unimodular(matrix(ZZ,0,0,[]))
   @test is_unimodular(matrix(ZZ,1,1,[1]))
   @test is_unimodular(matrix(ZZ,1,1,[-1]))
   @test !is_unimodular(matrix(ZZ,1,1,[0]))
