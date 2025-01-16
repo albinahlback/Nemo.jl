@@ -373,6 +373,7 @@ export is_uinf
 export is_undefined
 export is_unit
 export is_unknown
+export is_unimodular
 export is_upper_triangular
 export is_zero_entry
 export is_zero_row

@@ -193,6 +193,7 @@ import AbstractAlgebra: set_attribute!
 import AbstractAlgebra: Solve
 import AbstractAlgebra: terse
 import AbstractAlgebra: truncate!
+import AbstractAlgebra: add_verbosity_scope
 
 AbstractAlgebra.@include_deprecated_bindings()
 
@@ -358,6 +359,8 @@ function __init__()
   end
 
   @ccall libflint.flint_set_abort(@cfunction(flint_abort, Nothing, ())::Ptr{Nothing})::Nothing
+
+  add_verbosity_scope(:UnimodVerif)
 
   if AbstractAlgebra.should_show_banner() && get(ENV, "NEMO_PRINT_BANNER", "true") != "false"
     show_banner()

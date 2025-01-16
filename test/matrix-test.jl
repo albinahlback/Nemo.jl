@@ -101,3 +101,60 @@ end
 
   # eigenvalues_simple not defined for integer matrices, so not tested.
 end
+
+
+@testset "is_unimodular" begin
+
+  # Some trivial inputs
+  @test is_unimodular(matrix(ZZ,0,0,[]))
+  @test is_unimodular(matrix(ZZ,1,1,[1]))
+  @test is_unimodular(matrix(ZZ,1,1,[-1]))
+  @test !is_unimodular(matrix(ZZ,1,1,[0]))
+  
+  @test is_unimodular(identity_matrix(ZZ, 11))
+  @test !is_unimodular(2*identity_matrix(ZZ, 11))
+  @test !is_unimodular(zero_matrix(ZZ, 11,11))
+
+  # This test increases coverage slightly
+  N = 1+prod(filter(is_prime, ZZ(2)^20:(ZZ(2)^20+ZZ(2)^11)))
+  @test !is_unimodular(N*identity_matrix(ZZ, 11))
+
+
+  @test_throws ArgumentError is_unimodular(matrix(ZZ,0,1,[]))
+  @test_throws ArgumentError is_unimodular(matrix(ZZ,0,0,[]); algorithm=:WRONG)
+
+  U = matrix(ZZ, 3,3,  [ 3, 22, 46, 5, 35, 73, 4, 27, 56])
+  M = matrix(ZZ, 3,3,  [-3, 22, 46, 5, 35, 73, 4, 27, 56])
+
+  # U6 is "small" and triggers the 2nd loop in P-S method
+  U6 = matrix(ZZ, 6,6,
+              [1,      -76,       87,       -57,      -41,   999950,
+               0,        1,        0,         0,        0,        0,
+               0,   999942,        1,         0,        0,        0,
+               0,      -48,   999963,         1,        0,        0,
+               0,       91,      -24,   1000012,        1,        0,
+               0,       -2,       71,        77,   999925,        1])
+
+
+  # Need larger values of k to increase coverage
+  for k in 0:25
+    @test is_unimodular(U^k)
+    @test is_unimodular(U^k; algorithm=:CRT)
+    @test is_unimodular(U^k; algorithm=:pauderis_storjohann)
+    @test is_unimodular(U^k; algorithm=:auto)
+    @test is_unimodular(-U^k)
+    @test is_unimodular(-U^k; algorithm=:CRT)
+    @test is_unimodular(-U^k; algorithm=:pauderis_storjohann)
+    @test is_unimodular(-U^k; algorithm=:auto)
+  end
+
+  @test is_unimodular(U6)
+  @test is_unimodular(U6; algorithm=:CRT)
+  @test is_unimodular(U6; algorithm=:pauderis_storjohann)
+  @test is_unimodular(U6; algorithm=:auto)
+
+  @test !is_unimodular(M)
+  @test !is_unimodular(M; algorithm=:CRT)
+  @test !is_unimodular(M; algorithm=:pauderis_storjohann)
+  @test !is_unimodular(M; algorithm=:auto)
+end
