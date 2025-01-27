@@ -744,7 +744,7 @@ end
   @test nrows(K) == 2
 end
 
-#= Not implemented in Flint yet
+#= Not implemented in FLINT yet
 
 @testset "ZZModMatrix.lu" begin
 
@@ -943,7 +943,7 @@ end
   @test b == S([ 1 2 3; 3 2 1; 0 0 2])
   @test parent(b) == S
 
-  #= Not implemented in Flint yet
+  #= Not implemented in FLINT yet
   lift!(c,a)
 
   @test c == S([ 1 2 3; 3 2 1; 0 0 2])

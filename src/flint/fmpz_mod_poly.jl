@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  ZZModPolyRingElem.jl : Flint ZZModPolyRingElem (polynomials over Z/nZ, large modulus)
+#  ZZModPolyRingElem.jl : FLINT ZZModPolyRingElem (polynomials over Z/nZ, large modulus)
 #
 ################################################################################
 

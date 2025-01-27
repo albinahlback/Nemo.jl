@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fmpz_mod_mpoly.jl : Flint multivariate polynomials over ZZModRingElem and FpFieldElem
+#   fmpz_mod_mpoly.jl : FLINT multivariate polynomials over ZZModRingElem and FpFieldElem
 #                       (ZZModRingElem is left out for the time being)
 #
 ###############################################################################

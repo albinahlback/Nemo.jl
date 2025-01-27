@@ -12,7 +12,7 @@ end
 Nemo allows the construction of finite field embeddings making use of the
 algorithm of Bosma, Cannon and Steel behind the scenes to ensure compatibility.
 Critical routines (e.g. polynomial factorization, matrix computations) are
-provided by the C library Flint, whereas high level tasks are written directly in Nemo.
+provided by the C library FLINT, whereas high level tasks are written directly in Nemo.
 
 ## Embedding functionality
 

@@ -7,7 +7,7 @@ end
 
 # Padics
 
-P-adic fields are provided in Nemo by Flint. This allows construction of
+P-adic fields are provided in Nemo by FLINT. This allows construction of
 $p$-adic fields for any prime $p$.
 
 P-adic fields are constructed using the `padic_field` function.
@@ -18,7 +18,7 @@ objects.
 
  Library | Field            | Element type | Parent type
 ---------|----------------|----------------|---------------------
-Flint    | $\mathbb{Q}_p$ | `PadicFieldElem`        | `PadicField`
+FLINT    | $\mathbb{Q}_p$ | `PadicFieldElem`        | `PadicField`
 
 All the $p$-adic field types belong to the `Field` abstract type and the
 $p$-adic field element types belong to the `FieldElem` abstract type.

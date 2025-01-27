@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   ZZPolyRingElem.jl : Flint polynomials over ZZRingElem
+#   ZZPolyRingElem.jl : FLINT polynomials over ZZRingElem
 #
 ###############################################################################
 

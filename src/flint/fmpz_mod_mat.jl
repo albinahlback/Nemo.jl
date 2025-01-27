@@ -267,7 +267,7 @@ end
 #
 ################################################################################
 
-#= Not implemented in Flint yet
+#= Not implemented in FLINT yet
 
 function ^(x::T, y::Int) where T <: Zmod_fmpz_mat
 if y < 0
@@ -439,7 +439,7 @@ end
 #
 ################################################################################
 
-#= Not implemented in Flint yet
+#= Not implemented in FLINT yet
 
 function lu!(P::Perm, x::T) where T <: Zmod_fmpz_mat
 P.d .-= 1

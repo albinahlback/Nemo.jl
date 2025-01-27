@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   QQMatrix.jl : Flint matrices over the rationals
+#   QQMatrix.jl : FLINT matrices over the rationals
 #
 ###############################################################################
 

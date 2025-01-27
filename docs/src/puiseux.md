@@ -26,7 +26,7 @@ Base ring         | Library            | Element type                       | Pa
 ------------------|--------------------|--------------------------------------------------|----------------------------------------------
 Generic ring $R$  | AbstractAlgebra.jl | `Generic.PuiseuxSeriesRingElem{T}                | `Generic.PuiseuxSeriesRing{T}`
 Generic field $K$ | AbstractAlgebra.jl | `Generic.PuiseuxSeriesFieldElem{T}               | `Generic.PuiseuxSeriesField{T}`
-$\mathbb{Z}$      | Flint              | `FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}`| `FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}`
+$\mathbb{Z}$      | FLINT              | `FlintPuiseuxSeriesRingElem{ZZLaurentSeriesRingElem}`| `FlintPuiseuxSeriesRing{ZZLaurentSeriesRingElem}`
 
 For convenience, `FlintPuiseuxSeriesRingElem` and `FlintPuiseuxSeriesFieldElem` both
 belong to a union type called `FlintPuiseuxSeriesElem`.

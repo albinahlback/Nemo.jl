@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  fmpz_mod_poly.jl: Flint fmpz_mod_poly (polynomials over Z/nZ, large modulus)
+#  fmpz_mod_poly.jl: FLINT fmpz_mod_poly (polynomials over Z/nZ, large modulus)
 #
 ################################################################################
 

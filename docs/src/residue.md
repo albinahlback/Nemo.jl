@@ -25,8 +25,8 @@ Nemo are given in the following table.
 Base ring                   | Library            | Element type     | Parent type
 ----------------------------|--------------------|------------------|--------------------
 Generic ring $R$            | AbstractAlgebra.jl | `EuclideanRingResidueRingElem{T}` | `EuclideanRingResidueRing{T}`
-$\mathbb{Z}$ (Int modulus)  | Flint              | `zzModRingElem`  | `zzModRing`
-$\mathbb{Z}$ (ZZ modulus)   | Flint              | `ZZModRingElem`  | `ZZModRing`
+$\mathbb{Z}$ (Int modulus)  | FLINT              | `zzModRingElem`  | `zzModRing`
+$\mathbb{Z}$ (ZZ modulus)   | FLINT              | `ZZModRingElem`  | `ZZModRing`
 
 The modulus $a$ of a residue ring is stored in its parent object.
 

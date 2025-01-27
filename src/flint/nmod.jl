@@ -451,7 +451,7 @@ end
 ###############################################################################
 
 function residue_ring(R::ZZRing, n::Int; cached::Bool=true)
-  # Modulus of zero cannot be supported. E.g. Flint library could not be expected to
+  # Modulus of zero cannot be supported. E.g. FLINT library could not be expected to
   # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
   n <= 0 && throw(DomainError(n, "Modulus must be positive"))
   S = zzModRing(UInt(n), cached)

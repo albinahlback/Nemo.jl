@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   ZZLaurentSeriesRingElem.jl : Laurent series over Flint ZZRingElem
+#   ZZLaurentSeriesRingElem.jl : Laurent series over FLINT ZZRingElem
 #
 ###############################################################################
 

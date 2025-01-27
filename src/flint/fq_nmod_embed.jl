@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fq_nmod_embed.jl : Flint finite fields embeddings
+#   fq_nmod_embed.jl : FLINT finite fields embeddings
 #
 ###############################################################################
 

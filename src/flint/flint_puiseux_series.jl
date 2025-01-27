@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   flint_puiseux_series.jl : Puiseux series over Flint rings and fields
+#   flint_puiseux_series.jl : Puiseux series over FLINT rings and fields
 #
 ###############################################################################
 

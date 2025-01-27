@@ -9,7 +9,7 @@ rings using a specialised C library. The types of elements of the respective rin
 other mathematical structures are given, and in parentheses we list the types of the
 parent objects of the given rings and structures.
 
-  - Flint
+  - FLINT
      - `ZZRingElem` (`ZZRing`)
      - `QQFieldElem` (`QQField`)
      - `zzModRingElem` (`zzModRing`)

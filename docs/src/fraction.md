@@ -46,7 +46,7 @@ information is mainly of concern to developers).
 Base ring        | Library            | Element type               | Parent type
 -----------------|--------------------|----------------------------|----------------------
 Generic ring $R$ | AbstractAlgebra.jl | `Generic.FracFieldElem{T}` | `Generic.FracField{T}`
-$\mathbb{Z}$     | Flint              | `QQFieldElem`              | `QQField`
+$\mathbb{Z}$     | FLINT              | `QQFieldElem`              | `QQField`
 
 All fraction element types belong to the abstract type `FracElem` and all of
 the fraction field types belong to the abstract type `FracField`. This enables

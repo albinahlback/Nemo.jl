@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fqPolyRepMPolyRingElem.jl : Flint multivariate polynomials over fqPolyRepFieldElem
+#   fqPolyRepMPolyRingElem.jl : FLINT multivariate polynomials over fqPolyRepFieldElem
 #
 ###############################################################################
 

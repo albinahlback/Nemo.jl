@@ -20,13 +20,13 @@ information is mainly of concern to developers).
 Base ring                             | Library             | Element type        | Parent type
 --------------------------------------|---------------------|---------------------|----------------------
 Generic ring $R$                      | AbstractAlgebra.jl  | `Generic.Mat{T}`    | `Generic.MatSpace{T}`
-$\mathbb{Z}$                          | Flint               | `ZZMatrix`          | `ZZMatrixSpace`
-$\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint               | `zzModMatrix`       | `zzModMatrixSpace`
-$\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint               | `ZZModMatrix`       | `ZZModMatrixSpace`
-$\mathbb{Q}$                          | Flint               | `QQMatrix`          | `QQMatrixSpace`
-$\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | Flint               | `fpMatrix`          | `fpMatrixSpace`
-$\mathbb{F}_{p^n}$ (small $p$)        | Flint               | `fqPolyRepMatrix`   | `fqPolyRepMatrixSpace`
-$\mathbb{F}_{p^n}$ (large $p$)        | Flint               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace`
+$\mathbb{Z}$                          | FLINT               | `ZZMatrix`          | `ZZMatrixSpace`
+$\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | FLINT               | `zzModMatrix`       | `zzModMatrixSpace`
+$\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | FLINT               | `ZZModMatrix`       | `ZZModMatrixSpace`
+$\mathbb{Q}$                          | FLINT               | `QQMatrix`          | `QQMatrixSpace`
+$\mathbb{Z}/p\mathbb{Z}$ (small $p$)  | FLINT               | `fpMatrix`          | `fpMatrixSpace`
+$\mathbb{F}_{p^n}$ (small $p$)        | FLINT               | `fqPolyRepMatrix`   | `fqPolyRepMatrixSpace`
+$\mathbb{F}_{p^n}$ (large $p$)        | FLINT               | `FqPolyRepMatrix`   | `FqPolyRepMatrixSpace`
 $\mathbb{R}$ (arbitrary precision)    | Arb                 | `RealMatrix`        | `RealMatrixSpace`
 $\mathbb{C}$ (arbitrary precision)    | Arb                 | `ComplexMatrix`     | `ComplexMatrixSpace`
 $\mathbb{R}$ (fixed precision)        | Arb                 | `ArbMatrix`         | `ArbMatrixSpace`
@@ -50,7 +50,7 @@ All matrix spaces in Nemo provide the matrix functionality of AbstractAlgebra:
 
 <https://nemocas.github.io/AbstractAlgebra.jl/stable/matrix>
 
-Some of this functionality is provided in Nemo by C libraries, such as Flint,
+Some of this functionality is provided in Nemo by C libraries, such as FLINT,
 for various specific rings.
 
 In the following, we list the functionality which is provided in addition to the generic

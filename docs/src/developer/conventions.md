@@ -20,13 +20,13 @@ the words, e.g. `zip` and `jacobi_symbol`.
 We follow these conventions in Nemo with some exceptions:
 
 * When interfacing C libraries the types use the same spelling and
-  capitalisation in Nemo as they do in C, e.g. the Flint library's `ZZPolyRingElem`
+  capitalisation in Nemo as they do in C, e.g. the FLINT library's `ZZPolyRingElem`
   remains uncapitalised in Nemo.
 
 * Types such as `fpPolyRingElem` which don't exist under that name on the C side
   also use the lowercase convention as they wrap an actual C type which must be
   split into more than one type on the Julia side. For example `zzModPolyRingElem` and
-  `fpPolyRingElem` on the Julia side both represent Flint `zzModPolyRingElem`'s on the C side.
+  `fpPolyRingElem` on the Julia side both represent FLINT `zzModPolyRingElem`'s on the C side.
 
 * Types of rings and fields, modules, maps, etc. are capitalised whether they
   correspond to a C type or not, e.g. `fqPolyRepField` for the type of an
