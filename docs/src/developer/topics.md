@@ -64,14 +64,14 @@ code in AbstractAlgebra, but similar problems exist for the generic finitely
 presented module code in AbstractAlgebra, even when used over Nemo integers.
 Thus the Julia definition of `rem` will not suffice.
 
-Furthermore, as Nemo wraps Flint, it is convenient that Euclidean division
-inside Nemo should operate the way Flint operates. This is critical if for
-example one wants the result of a Hermite normal form coming from Flint to be
+Furthermore, as Nemo wraps FLINT, it is convenient that Euclidean division
+inside Nemo should operate the way FLINT operates. This is critical if for
+example one wants the result of a Hermite normal form coming from FLINT to be
 reduced using the same definition of Euclidean remainder as used elsewhere
 throughout the Nemo module and to return the same answers as the generic HNF
 code in AbstractAlgebra for example.
 
-In particular, Flint defines Euclidean remainder over the integers in line with
+In particular, FLINT defines Euclidean remainder over the integers in line with
 the Julia function `mod`, namely by returning the smallest remainder with the
 same sign as the *divisor*, i.e. `mod(1, 3) == 1` but `mod(1, -3) == -2`.
 
@@ -93,13 +93,13 @@ aware that many tickets will be opened complaining about some inconsistency.
 
 When reflecting on the choice we have made, one must consider the following:
 
-* Nemo must internally behave as Flint does for consistency
+* Nemo must internally behave as FLINT does for consistency
 * There are also functions such as `powmod`, `invmod` that reduce as per mod
 * HNF requires a consistent set of representatives for uniqueness over `ZZ`
 
 Also note that Julia's `rem` does not provide symmetric mod, a misconception
 that often arises. The issues here are independent of the decision to use
-positive remainder (for positive modulus) in Flint, rather than symmetric mod.
+positive remainder (for positive modulus) in FLINT, rather than symmetric mod.
 
 We are aware that the conventions we have chosen have inconsistencies with
 Julia and do not have the nice property that `div`, `rem` and `divrem` are a
@@ -188,7 +188,7 @@ matrices underlying generic Nemo matrices for this reason.
 In AbstractAlgebra we define a submodule called Generic. The purpose of this
 module is to allow generic constructions over a given base ring. For example
 in Nemo, `R, x = Generic.polynomial_ring(ZZ, "x")` will construct a generic
-polynomial ring over Nemo integers instead of constructing a Flint polynomial
+polynomial ring over Nemo integers instead of constructing a FLINT polynomial
 ring.
 
 In other words `x` will have the type `Generic.Poly{ZZRingElem}` instead of the
@@ -198,7 +198,7 @@ The ability to construct generic polynomials and matrices and the like is
 useful for test code and for tracking down bugs in basic arithmetic. It is
 also useful for performance comparison of arithmetic defined for generic ring
 constructions vs the specialised implementations provided by C libraries like
-Flint.
+FLINT.
 
 Whilst most developers will not need to use the Generic module specifically,
 unless they have such needs, all Nemo developers need to understand how to
@@ -321,22 +321,22 @@ In the first instance, functions should never modify their inputs. But further
 problems can also occur if the output of an unsafe operator happens to alias
 one of the other inputs. Such cases need to be handled exceptionally carefully.
 
-A second issue arises as Nemo is based on Flint, which has its own aliasing
+A second issue arises as Nemo is based on FLINT, which has its own aliasing
 rules which are distinct from the default expectation in Julia. This leads to
 some interesting corner cases.
 
-In particularly, Flint always allows aliasing of inputs and outputs in its
+In particularly, FLINT always allows aliasing of inputs and outputs in its
 polynomial functions but expects matrix functions to have output matrices that
 are distinct from their inputs, except in a handful of functions that are
 specially documented to be inplace operations.
 
 Moreover, when assigning an element to a coefficient of a polynomial or entry
-of a matrix Flint always makes a copy of the element being assigned to that
+of a matrix FLINT always makes a copy of the element being assigned to that
 location. In Julia however, if one assigns an element to some index of an
 array, the existing object at that location is replaced with the new object.
 This means that inplace modification of Julia array elements is not safe as it
 would modify the original object that was assigned to that location, whereas in
-Flint inplace modification is highly desirable for performance reasons and is
+FLINT inplace modification is highly desirable for performance reasons and is
 completely safe due to the fact that a copy was made when the value was
 assigned to that location.
 

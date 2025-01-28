@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fq_default_embed.jl : Flint finite fields embeddings
+#   fq_default_embed.jl : FLINT finite fields embeddings
 #
 ###############################################################################
 

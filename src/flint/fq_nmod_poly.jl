@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  fq_nmod_poly.jl: Flint fq_mod_poly (Polynomials over FqNmodFiniteField)
+#  fq_nmod_poly.jl: FLINT fq_mod_poly (Polynomials over FqNmodFiniteField)
 #
 ################################################################################
 

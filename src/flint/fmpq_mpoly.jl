@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   QQMPolyRingElem.jl : Flint multivariate polynomials over QQFieldElem
+#   QQMPolyRingElem.jl : FLINT multivariate polynomials over QQFieldElem
 #
 ###############################################################################
 

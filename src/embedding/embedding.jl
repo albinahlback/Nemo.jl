@@ -172,7 +172,7 @@ Embed $k$ in $K$ without worrying about compatibility conditions.
 """
 function embed_any(k::T, K::T) where T <: FinField
 
-  # We call the Flint algorithms directly, currently this is based on
+  # We call the FLINT algorithms directly, currently this is based on
   # factorization
 
   M, N = embed_matrices(k, K)

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   nmod_mpoly.jl : Flint multivariate polynomials over nmod and GaloisField
+#   nmod_mpoly.jl : FLINT multivariate polynomials over nmod and GaloisField
 #
 ###############################################################################
 

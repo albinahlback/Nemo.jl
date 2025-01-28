@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   ZZMPolyRingElem.jl : Flint multivariate polynomials over ZZRingElem
+#   ZZMPolyRingElem.jl : FLINT multivariate polynomials over ZZRingElem
 #
 ###############################################################################
 

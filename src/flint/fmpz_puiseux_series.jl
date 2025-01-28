@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fmpz_puiseux_series.jl : Puiseux series over Flint ZZRingElem integers
+#   fmpz_puiseux_series.jl : Puiseux series over FLINT ZZRingElem integers
 #
 ###############################################################################
 

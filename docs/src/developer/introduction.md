@@ -36,7 +36,7 @@ Nowadays we see AbstractAlgebra to provide three things to Nemo:
 
 Nemo itself is now more or less just a wrapper of four C libraries:
 
-* Flint : polynomials and matrices over Z, Q, Z/nZ, Qp, Fq
+* FLINT : polynomials and matrices over Z, Q, Z/nZ, Qp, Fq
 * Arb : polynomials, matrices and special functions over balls over R and C
 * Antic : algebraic number field element arithmetic
 * Calcium : exact real and complex numbers, including algebraic numbers
@@ -55,17 +55,17 @@ In the `src` directory of Nemo are four directories `flint`, `arb`, `antic` and
 `test` directory is similarly organised.
 
 Within each of these directories is a set of files, one per module within
-the C libraries, e.g. the `fmpz.jl` file wraps the Flint `fmpz` module for
-multiple precision integers. The `fmpz_poly.jl` file wraps the Flint
+the C libraries, e.g. the `fmpz.jl` file wraps the FLINT `fmpz` module for
+multiple precision integers. The `fmpz_poly.jl` file wraps the FLINT
 univariate polynomials over `fmpz` integers, and so on.
 
-The `QQFieldElem` prefix is for Flint rationals, `FqPolyRepFieldElem` for Flint finite fields with
+The `QQFieldElem` prefix is for FLINT rationals, `FqPolyRepFieldElem` for FLINT finite fields with
 multiprecision characteristic, `fqPolyRepFieldElem` is the same but for single word
 characteristic. The `PadicFieldElem` prefix is for the field of p-adic numbers for a
 given `p`. The `zzModRingElem` prefix is for `Z/nZ` for a given `n`. The `gfp` prefix is
 the same as `Z/nZ` but where `n` is prime, so that we are dealing with a field.
 
-The `FlintTypes.jl` file contains the implementation of all the Flint types.
+The `FlintTypes.jl` file contains the implementation of all the FLINT types.
 
 In the `antic` directory, `AbsSimpleNumFieldElem` is for elements of a number field.
 
@@ -107,7 +107,7 @@ Also in the `src` directory is a subdirectory called `Julia`. This is where we
 give our own implementations of functionality for Julia `Integer`s and
 `Rational`s and various other basic rings implemented in terms of Julia types.
 These are provided so that the package will work as a pure Julia package,
-replacing many of the rings and fields that would be available in Flint and
+replacing many of the rings and fields that would be available in FLINT and
 the other C libraries with Julia equivalents.
 
 Note that some of the implementations we give there would conflict with `Base`

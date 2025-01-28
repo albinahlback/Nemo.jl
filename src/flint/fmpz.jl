@@ -43,7 +43,7 @@ parent_type(::Type{ZZRingElem}) = ZZRing
 @doc raw"""
     parent(a::ZZRingElem)
 
-Returns the unique Flint integer parent object `ZZ`.
+Returns the unique FLINT integer parent object `ZZ`.
 """
 parent(a::ZZRingElem) = ZZ
 
@@ -2803,7 +2803,7 @@ function rand(rng::AbstractRNG, sp::SamplerFmpz)
 end
 
 #TODO
-# need to be mapped onto proper Flint primitives
+# need to be mapped onto proper FLINT primitives
 # flints needs a proper interface to randomness - I think
 # currently one simply cannot use it at all
 #

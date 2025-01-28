@@ -1,4 +1,4 @@
-# Types of all Flint-backed matrices
+# Types of all FLINT-backed matrices
 const _FieldMatTypes = Union{QQMatrix, fpMatrix, FpMatrix, FqMatrix, fqPolyRepMatrix, FqPolyRepMatrix}
 const _MatTypes = Union{_FieldMatTypes, ZZMatrix, zzModMatrix, ZZModMatrix}
 

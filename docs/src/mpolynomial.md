@@ -19,11 +19,11 @@ information is mainly of concern to developers).
 Base ring                                   | Library             | Element type             | Parent type
 --------------------------------------------|---------------------|--------------------------|----------------------
 Generic ring $R$                            | AbstractAlgebra.jl  | `Generic.MPoly{T}`       | `Generic.MPolyRing{T}`
-$\mathbb{Z}$                                | Flint               | `ZZMPolyRingElem`        | `ZZMPolyRing`
-$\mathbb{Z}/n\mathbb{Z}$ (small $n$)        | Flint               | `zzModMPolyRingElem`     | `zzModMPolyRing`
-$\mathbb{Q}$                                | Flint               | `QQMPolyRingElem`        | `QQMPolyRing`
-$\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | Flint               | `fpMPolyRingElem`        | `fpMPolyRing`
-$\mathbb{F}_{p^n}$ (small $p$)              | Flint               | `fqPolyRepMPolyRingElem` | `fqPolyRepMPolyRing`
+$\mathbb{Z}$                                | FLINT               | `ZZMPolyRingElem`        | `ZZMPolyRing`
+$\mathbb{Z}/n\mathbb{Z}$ (small $n$)        | FLINT               | `zzModMPolyRingElem`     | `zzModMPolyRing`
+$\mathbb{Q}$                                | FLINT               | `QQMPolyRingElem`        | `QQMPolyRing`
+$\mathbb{Z}/p\mathbb{Z}$ (small prime $p$)  | FLINT               | `fpMPolyRingElem`        | `fpMPolyRing`
+$\mathbb{F}_{p^n}$ (small $p$)              | FLINT               | `fqPolyRepMPolyRingElem` | `fqPolyRepMPolyRing`
 
 The string representation of the variables and the base ring $R$ of a generic
 polynomial is stored in its parent object. 

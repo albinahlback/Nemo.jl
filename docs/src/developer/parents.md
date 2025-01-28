@@ -44,7 +44,7 @@ language not built around this model. We discuss some of these issues below.
 As all elements and parents in Nemo are objects, those objects have types
 which we refer to as the element type and parent type respectively.
 
-For example, Flint integers have type `ZZRingElem` and the parent object they all
+For example, FLINT integers have type `ZZRingElem` and the parent object they all
 belong to, `ZZ` has type `ZZRing`.
 
 More complex parents and elements are parameterised. For example, generic
@@ -53,14 +53,14 @@ base ring of a ring `S` can be obtained by the call `base_ring(S)`.
 
 We have found it extremely useful to parameterise the type of both the parent
 and element objects of such a ring by the type of the elements of the base
-ring. Thus for example, a generic polynomial with Flint integer coefficients
+ring. Thus for example, a generic polynomial with FLINT integer coefficients
 would have type `Poly{ZZRingElem}`.
 
-In practice Flint already implements univariate polynomials over Flint
+In practice FLINT already implements univariate polynomials over FLINT
 integers, and these have type `ZZPolyRingElem`. But both `ZZPolyRingElem` and the
 generic polynomials `Poly{ZZRingElem}` belong to the abstract type `PolyRingElem{ZZRingElem}`
 making it possible to write functions for all univariate polynomials over
-Flint integers.
+FLINT integers.
 
 Given a specific element type or parent type it is possible to compute one
 from the other with the functions `elem_type` and `parent_type`. For example
@@ -106,7 +106,7 @@ create one over the same ring with different dimensions `r x c` by calling
 `similar(M, r, c)`.
 
 The `similar` system is sophisticated enough to know that there is no native
-type provided by Flint/Antic for matrices and polynomials over a number field.
+type provided by FLINT/Antic for matrices and polynomials over a number field.
 The system knows that in such cases it must create a generic matrix or
 polynomial over the given number field.
 

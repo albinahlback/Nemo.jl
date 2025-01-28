@@ -7,7 +7,7 @@ end
 
 # Integers
 
-The default integer type in Nemo is provided by Flint. The associated ring of
+The default integer type in Nemo is provided by FLINT. The associated ring of
 integers is represented by the constant parent object called `ZZ`.
 
 For convenience we define
@@ -25,7 +25,7 @@ providing them.
 
  Library        | Element type  | Parent type
 ----------------|---------------|--------------------
-Flint           | `ZZRingElem`        | `ZZRing`
+FLINT           | `ZZRingElem`        | `ZZRing`
 
 All integer element types belong directly to the abstract type `RingElem` and
 all the integer ring parent object types belong to the abstract type `Ring`.
@@ -46,7 +46,7 @@ AbstractAlgebra.jl.
 
 <https://nemocas.github.io/AbstractAlgebra.jl/stable/euclidean_interface>
 
-Below, we describe the functionality that is specific to the Nemo/Flint integer ring.
+Below, we describe the functionality that is specific to the Nemo/FLINT integer ring.
 
 ### Constructors
 
@@ -479,7 +479,7 @@ b = rand_bits_prime(ZZ, 7)
 
 # Complex Integers
 
-The Gaussian integer type in Nemo is provided by a pair of Flint integers.
+The Gaussian integer type in Nemo is provided by a pair of FLINT integers.
 The associated ring of integers and the fraction field can be retrieved by
 `Nemo.GaussianIntegers()` and `Nemo.GaussianRationals()`.
 

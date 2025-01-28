@@ -8,7 +8,7 @@ end
 # Qadics
 
 Q-adic fields, that is, unramified extensions of p-adic fields, are provided in
-Nemo by Flint. This allows construction of $q$-adic fields for any prime power
+Nemo by FLINT. This allows construction of $q$-adic fields for any prime power
 $q$.
 
 Q-adic fields are constructed using the `qadic_field` function.
@@ -19,7 +19,7 @@ objects.
 
  Library | Field            | Element type | Parent type
 ---------|----------------|----------------|---------------------
-Flint    | $\mathbb{Q}_q$ | `QadicFieldElem`        | `QadicField`
+FLINT    | $\mathbb{Q}_q$ | `QadicFieldElem`        | `QadicField`
 
 All the $q$-adic field types belong to the `Field` abstract type and the
 $q$-adic field element types belong to the `FieldElem` abstract type.
@@ -102,7 +102,7 @@ julia> f = ZZ(1)//7^2 + ZZ(2)//7 + 3 + 4*7 + O(R, 7^2)
 
 Beware that the expression `1 + 2*p + 3*p^2 + O(R, p^n)` is actually computed
 as a normal Julia expression. Therefore if `{Int}` values are used instead
-of Flint integers or Julia bignums, overflow may result in evaluating the
+of FLINT integers or Julia bignums, overflow may result in evaluating the
 value.
 
 ### Basic manipulation

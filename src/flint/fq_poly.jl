@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  fq_poly.jl: Flint fq_poly (Polynomials over FqFiniteField)
+#  fq_poly.jl: FLINT fq_poly (Polynomials over FqFiniteField)
 #
 ################################################################################
 

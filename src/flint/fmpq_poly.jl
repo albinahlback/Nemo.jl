@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   QQPolyRingElem.jl : Flint polynomials over QQFieldElem
+#   QQPolyRingElem.jl : FLINT polynomials over QQFieldElem
 #
 ###############################################################################
 

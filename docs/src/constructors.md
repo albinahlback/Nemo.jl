@@ -34,7 +34,7 @@ modulo $n$ for a multiprecision modulus $n$ cannot be modeled using types alone.
 Instead of using types to construct objects in Nemo, we use special objects that we
 refer to as parent objects. They behave a lot like Julia types.
 
-Consider the following simple example, to create a Flint multiprecision integer:
+Consider the following simple example, to create a FLINT multiprecision integer:
 
 ```jldoctest
 julia> n = ZZ(12345678765456787654567890987654567898765678909876567890)

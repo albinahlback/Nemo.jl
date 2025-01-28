@@ -9,7 +9,7 @@ Julia programming language. Our aim is to provide a highly performant package co
 
 Nemo consists of wrappers of specialised C/C++ libraries:
 
-  - Flint    <http://flintlib.org/>
+  - FLINT    <http://flintlib.org/>
   - Arb      <https://arblib.org/>
   - Antic    <https://github.com/wbhart/antic/>
   - Calcium  <https://fredrikj.net/calcium/>

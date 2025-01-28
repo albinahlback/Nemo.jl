@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  nmod_poly.jl : Flint nmod_poly (polynomials over Z/nZ, small modulus)
+#  nmod_poly.jl : FLINT nmod_poly (polynomials over Z/nZ, small modulus)
 #
 ################################################################################
 

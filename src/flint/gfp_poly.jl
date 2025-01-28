@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  gfp_poly.jl: Flint gfp_poly (polynomials over Z/pZ, small prime modulus)
+#  gfp_poly.jl: FLINT gfp_poly (polynomials over Z/pZ, small prime modulus)
 #
 ################################################################################
 

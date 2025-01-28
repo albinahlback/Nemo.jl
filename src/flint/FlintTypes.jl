@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   FlintTypes.jl : Parent and object types for Flint
+#   FlintTypes.jl : Parent and object types for FLINT
 #
 ###############################################################################
 
@@ -201,7 +201,7 @@ mutable struct QQFieldElem <: FracElem{ZZRingElem}
       az = -ZZ(a)
       set!(z, az, bz)
     else
-      if b < 0 # Flint requires positive denominator
+      if b < 0 # FLINT requires positive denominator
         b = -b
         a = -a
       end
@@ -463,7 +463,7 @@ For the modulus being an [`Int`](@ref) see [`zzModRing`](@ref).
   ninv::fmpz_mod_ctx_struct
 
   function ZZModRing(n::ZZRingElem, cached::Bool=true)
-    # Modulus of zero cannot be supported. E.g. Flint library could not be expected to
+    # Modulus of zero cannot be supported. E.g. FLINT library could not be expected to
     # do matrices over Z/0 using a Z/nZ type. The former is multiprecision, the latter not.
     n <= 0 && throw(DomainError(n, "Modulus must be positive"))
 
