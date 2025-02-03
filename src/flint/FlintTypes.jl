@@ -3863,7 +3863,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   function zzModMatrix(r::Int, c::Int, n::UInt)
     z = new()
     if false
-      @ccall libflint.nmod_mat_init(z::Ref{fpMatrix}, r::Int, c::Int, n::UInt)::Nothing
+      @ccall libflint.nmod_mat_init(z::Ref{zzModMatrix}, r::Int, c::Int, n::UInt)::Nothing
       finalizer(_nmod_mat_clear_fn, z)
     else
       m = r*c
@@ -3876,7 +3876,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
       z.rows = z.entries + m*8
       z.r = r
       z.c = c
-      @ccall libflint.nmod_mat_set_mod(z::Ref{fpMatrix}, n::UInt)::Nothing
+      @ccall libflint.nmod_mat_set_mod(z::Ref{zzModMatrix}, n::UInt)::Nothing
       zero!(z)
     end
     return z
@@ -3957,9 +3957,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   end
 
   function zzModMatrix(n::UInt, b::ZZMatrix)
-    z = new()
-    @ccall libflint.nmod_mat_init(z::Ref{zzModMatrix}, b.r::Int, b.c::Int, n::UInt)::Nothing
-    finalizer(_nmod_mat_clear_fn, z)
+    z = zzModMatrix(b.r, b.c, n)
     @ccall libflint.fmpz_mat_get_nmod_mat(z::Ref{zzModMatrix}, b::Ref{ZZMatrix})::Nothing
     return z
   end
