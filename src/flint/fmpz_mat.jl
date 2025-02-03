@@ -558,6 +558,11 @@ function mod_sym!(M::ZZMatrix, B::ZZRingElem)
 end
 mod_sym!(M::ZZMatrix, B::Integer) = mod_sym!(M, ZZRingElem(B))
 
+function mod_sym!(M::ZZMatrix, N::ZZMatrix, B::ZZRingElem)
+  @assert !iszero(B)
+  @ccall libflint.fmpz_mat_scalar_smod(M::Ref{ZZMatrix}, N::Ref{ZZMatrix}, B::Ref{ZZRingElem})::Nothing
+end
+
 @doc raw"""
     mod_sym(M::ZZMatrix, p::ZZRingElem) -> ZZMatrix
 
