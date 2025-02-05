@@ -51,6 +51,10 @@ mutable struct ZZRingElem <: RingElem
     return z
   end
 
+  #this creates an ZZRingElem (fmpz) without a finalizer. Thus you need to
+  #manually call `_fmpz_clean_fn` on it after use.
+  #by bypassing the GC, this makes temorary variables more efficient.
+  #if this makes no sense, don't use it....
   function ZZRingElem(::Val{:raw})
     z = new(0)
     return z
