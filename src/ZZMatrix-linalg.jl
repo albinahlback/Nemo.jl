@@ -935,7 +935,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
       tau = induce_rational_reconstruction(mu, mex)
       if tau[1]
         GC.enable(GC_d)
-        return mu, m
+        return tau[2], tau[3]
       end
       GC.gc()
       GC.enable(false)
