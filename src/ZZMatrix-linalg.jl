@@ -384,9 +384,9 @@ end
 function dixon_init!(D::DixonCtx, A::ZZMatrix, B::ZZMatrix; side::Symbol = :right)
 
   if side == :right
-    @assert nrows(B) == ncols(A)
+    @assert nrows(B) == nrows(A)
   else
-    @assert ncols(B) == nrows(A)
+    @assert ncols(B) == ncols(A)
   end
 
   if isdefined(D, :A)
