@@ -51,6 +51,15 @@ mutable struct ZZRingElem <: RingElem
     return z
   end
 
+  #this creates an ZZRingElem (fmpz) without a finalizer. Thus you need to
+  #manually call `_fmpz_clean_fn` on it after use.
+  #by bypassing the GC, this makes temorary variables more efficient.
+  #if this makes no sense, don't use it....
+  function ZZRingElem(::Val{:raw})
+    z = new(0)
+    return z
+  end
+
   function ZZRingElem(x::Int)
     z = new()
     @ccall libflint.fmpz_init_set_si(z::Ref{ZZRingElem}, x::Int)::Nothing
@@ -3857,8 +3866,23 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
 
   function zzModMatrix(r::Int, c::Int, n::UInt)
     z = new()
-    @ccall libflint.nmod_mat_init(z::Ref{zzModMatrix}, r::Int, c::Int, n::UInt)::Nothing
-    finalizer(_nmod_mat_clear_fn, z)
+    if false
+      @ccall libflint.nmod_mat_init(z::Ref{zzModMatrix}, r::Int, c::Int, n::UInt)::Nothing
+      finalizer(_nmod_mat_clear_fn, z)
+    else
+      m = r*c
+      u = Vector{Int}(undef, m + r)
+      z.entries = reinterpret(Ptr{Cvoid}, pointer(u))
+      for i=1:r
+        u[i+m] = z.entries + (i-1)*c*8
+      end
+      z.view_parent = u
+      z.rows = z.entries + m*8
+      z.r = r
+      z.c = c
+      @ccall libflint.nmod_mat_set_mod(z::Ref{zzModMatrix}, n::UInt)::Nothing
+      zero!(z)
+    end
     return z
   end
 
@@ -3937,9 +3961,7 @@ mutable struct zzModMatrix <: MatElem{zzModRingElem}
   end
 
   function zzModMatrix(n::UInt, b::ZZMatrix)
-    z = new()
-    @ccall libflint.nmod_mat_init(z::Ref{zzModMatrix}, b.r::Int, b.c::Int, n::UInt)::Nothing
-    finalizer(_nmod_mat_clear_fn, z)
+    z = zzModMatrix(b.r, b.c, n)
     @ccall libflint.fmpz_mat_get_nmod_mat(z::Ref{zzModMatrix}, b::Ref{ZZMatrix})::Nothing
     return z
   end
@@ -4236,8 +4258,23 @@ mutable struct fpMatrix <: MatElem{fpFieldElem}
 
   function fpMatrix(r::Int, c::Int, n::UInt)
     z = new()
-    @ccall libflint.nmod_mat_init(z::Ref{fpMatrix}, r::Int, c::Int, n::UInt)::Nothing
-    finalizer(_nmod_mat_clear_fn, z)
+    if false
+      @ccall libflint.nmod_mat_init(z::Ref{fpMatrix}, r::Int, c::Int, n::UInt)::Nothing
+      finalizer(_gfp_mat_clear_fn, z)
+    else
+      m = r*c
+      u = Vector{Int}(undef, m + r)
+      z.entries = reinterpret(Ptr{Cvoid}, pointer(u))
+      for i=1:r
+        u[i+m] = z.entries + (i-1)*c*8
+      end
+      z.view_parent = u
+      z.rows = z.entries + m*8
+      z.r = r
+      z.c = c
+      @ccall libflint.nmod_mat_set_mod(z::Ref{fpMatrix}, n::UInt)::Nothing
+      zero!(z)
+    end
     return z
   end
 
