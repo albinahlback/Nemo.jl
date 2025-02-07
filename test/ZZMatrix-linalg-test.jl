@@ -5,12 +5,12 @@
   for i = [1,5,10]
     s, d = Nemo.dixon_solve(A^i, b)
     @test A^i*s == d*b
-    s, d = Nemo.dixon_solve(A^i, transpose(b)); side = :left
+    s, d = Nemo.dixon_solve(A^i, transpose(b); side = :left)
     @test s*A^i == d*transpose(b)
 
     s, d = Nemo.dixon_solve(A^i, bb)
     @test A^i*s == d*bb
-    s, d = Nemo.dixon_solve(A^i, transpose(bb)); side = :left
+    s, d = Nemo.dixon_solve(A^i, transpose(bb); side = :left)
     @test s*A^i == d*transpose(bb)
   end
 end
