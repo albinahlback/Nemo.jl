@@ -383,9 +383,11 @@ end
 
 function dixon_init!(D::DixonCtx, A::ZZMatrix, B::ZZMatrix; side::Symbol = :right)
 
+  sB = size(B)
   if side == :right
     @assert nrows(B) == nrows(A)
   else
+    sB = (sB[2], sB[1])
     @assert ncols(B) == ncols(A)
   end
 
@@ -394,7 +396,7 @@ function dixon_init!(D::DixonCtx, A::ZZMatrix, B::ZZMatrix; side::Symbol = :righ
   end
 
   if isdefined(D, :x)
-    @assert size(D.x) == size(B)
+    @assert size(D.x) == sB
   end
 
   if side == :right
@@ -460,7 +462,7 @@ function dixon_init!(D::DixonCtx, A::ZZMatrix, B::ZZMatrix; side::Symbol = :righ
 
   while true
     push!(D.crt_primes, xp)
-    push!(D.A_mod, map_entries(Nemo.fpField(UInt(xp), false), A))
+    push!(D.A_mod, map_entries(Nemo.fpField(UInt(xp), false), D.A))
     mul!(pr, pr, xp)
     if pr > maxA
       break
@@ -590,6 +592,8 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     end
     divexact!(d, d, ZZ(D.p))
   end
+  @show _t = D.A*D.x - _B
+  @show map(x-> is_zero(x) ? -1 : valuation(x, D.p), _t)
   fl, num, den = induce_rational_reconstruction(D.x, ppow)
   @assert fl
 
