@@ -592,8 +592,6 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     end
     divexact!(d, d, ZZ(D.p))
   end
-  @show _t = D.A*D.x - _B
-  @show map(x-> is_zero(x) ? -1 : valuation(x, D.p), _t)
   fl, num, den = induce_rational_reconstruction(D.x, ppow)
   @assert fl
 
