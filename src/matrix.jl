@@ -422,7 +422,7 @@ function _det(a::fpMatrix)
   return r
 end
 
-function map_entries!(a::fpMatrix, k::Nemo.fpField, A::ZZMatrix)
+function map_entries!(k::Nemo.fpField, a::fpMatrix, A::ZZMatrix)
   ccall((:nmod_mat_set_mod, Nemo.libflint), Cvoid, (Ref{fpMatrix}, UInt), a, k.n)
   ccall((:fmpz_mat_get_nmod_mat, Nemo.libflint), Cvoid, (Ref{fpMatrix}, Ref{ZZMatrix}), a, A)
   a.base_ring = k  # exploiting that the internal repr is the indep of char
@@ -433,22 +433,11 @@ function Base.copy!(A::ZZMatrix, B::ZZMatrix)
   ccall((:fmpz_mat_set, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{ZZMatrix}), A, B)
 end
 
-function Nemo.sub!(A::ZZMatrix, m::Int)
+function sub!(A::ZZMatrix, B::ZZMatrix, m::Int)
   for i=1:nrows(A)
     A_p = Nemo.mat_entry_ptr(A, i, i)
-    sub!(A_p, A_p, m)
-  end
-  return A
-end
-
-# No allocations; also faster than *=
-function Nemo.mul!(A::ZZMatrix, m::ZZRingElem)
-  for i=1:nrows(A)
-    A_p = Nemo.mat_entry_ptr(A, i, 1)
-    for j=1:ncols(A)
-      mul!(A_p, A_p, m)
-      A_p += sizeof(Int)
-    end
+    B_p = Nemo.mat_entry_ptr(B, i, i)
+    sub!(A_p, B_p, m)
   end
   return A
 end
@@ -495,11 +484,12 @@ function is_unimodular(A::ZZMatrix; algorithm=:auto)
   A_mod_p = identity_matrix(Nemo.Native.GF(2), nrows(A))
   while nbits(M) <= target_bitsize_modulus
     @vprint(:UnimodVerif,2,".")
-    p = next_prime(p + rand(1:2^10))  # increment by a random step to a prime
+    p = next_prime(p + rand(1:2^10), false) # increment by a random step to a prime
     ZZmodP = Nemo.Native.GF(p; cached = false, check = false)
-    map_entries!(A_mod_p, ZZmodP, A)
-    @vtime :UnimodVerif 2   det_mod_p = Int(_det(A_mod_p))
-    if det_mod_p > p/2
+    map_entries!(ZZmodP, A_mod_p, A)
+    @vtime :UnimodVerif 2  det_mod_p = Int(_det(A_mod_p))
+    p2 = p>>1
+    if det_mod_p > p2
       det_mod_p -= p
     end
     if abs(det_mod_p) != 1
@@ -511,12 +501,11 @@ function is_unimodular(A::ZZMatrix; algorithm=:auto)
     det_mod_m = det_mod_p
     mul!(M, M, p)
   end
-  return is_unimodular_given_det_mod_m(A, det_mod_m, M; algorithm=algorithm)
+  return _is_unimodular_given_det_mod_m(A, det_mod_m, M; algorithm)
 end #function
 
 
-# THIS FUNCTION NOT OFFICIALLY DOCUMENTED -- not intended for public use.
-function is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingElem; algorithm=:auto)
+function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingElem; algorithm=:auto)
   # This UI is convenient for our sophisticated determinant algorithm.
   # We estimate cost of computing det by CRT and cost of doing Pauderis-Storjohann
   # unimodular verification then call whichever is likely to be faster
@@ -533,7 +522,7 @@ function is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEle
   @vprintln(:UnimodVerif,1,"is_unimodular_given_det_mod_m starting")
   if algorithm == :pauderis_storjohann
     @vprintln(:UnimodVerif,1,"User specified Pauderis_Storjohann --> delegating")
-    return is_unimodular_Pauderis_Storjohann_Hensel(A)
+    return _is_unimodular_Pauderis_Storjohann_Hensel(A)
   end
   n = ncols(A)
   Hrow = hadamard_bound2(A)
@@ -557,7 +546,7 @@ function is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEle
     if Estimate_PS < Estimate_CRT #=&& Space_estimate_PS < 2^32=#
       # Expected RAM requirement is not excessive, and
       # Pauderis-Storjohann is likely faster, so delegate to UniCertZ_hensel
-      return is_unimodular_Pauderis_Storjohann_Hensel(A)
+      return _is_unimodular_Pauderis_Storjohann_Hensel(A)
     end
   end
   if algorithm == :CRT
@@ -578,13 +567,13 @@ function is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEle
     end
     # advance to another prime which does not divide M:
     while true
-      p = next_prime(p+rand(1:stride))
+      p = next_prime(p+rand(1:stride), false)
       if !is_divisible_by(M,p)
         break
       end
     end
     ZZmodP = Nemo.Native.GF(p; cached = false, check = false)
-    map_entries!(A_mod_p, ZZmodP, A)
+    map_entries!(ZZmodP, A_mod_p, A)
     det_mod_p = _det(A_mod_p)
     if det_mod_p > p/2
       det_mod_p -= p
@@ -592,19 +581,24 @@ function is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEle
     if abs(det_mod_p) != 1 || det_mod_m != det_mod_p
       return false  # obviously not unimodular
     end
-    M *= p
+    mul!(M, M, p)
   end
   return true
 end
 
-# THIS FUNCTION NOT OFFICIALLY DOCUMENTED -- not intended for public use.
-# Pauderis-Storjohann unimodular verification/certification.
-# We use Hensel lifting to obtain the modular inverse B0
-# Seems to be faster than the CRT prototype (not incl. here)
-# VERBOSITY via :UnimodVerif
-function is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
+#DoublePlusOne complex ##############################
+
+#TODO: Hensel is slower than CRT if modulus is small(ish)
+
+function _PSH_init(A::ZZMatrix)
+  #computes a 
+  # modulus (X) in the paper
+  # the inverse of A mod x
+  # the exponent target for the lifting.
+
   n = nrows(A)
-  # assume ncols == n
+  @assert ncols(A) == n
+
   EntrySize = maximum(abs, A)
   entry_size_bits = maximum(nbits, A)
   e = max(16, 2+ceil(Int, 2*log2(n)+entry_size_bits))
@@ -618,8 +612,7 @@ function is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
   @vprintln(:UnimodVerif,1,"Hensel prime is p = $(p)")
   m = ZZ(p)
   ZZmodP = Nemo.Native.GF(p)
-  MatModP = matrix_space(ZZmodP,n,n)
-  B0 = lift(inv(MatModP(A)))
+  B0 = lift(inv(map_entries(ZZmodP, A))) #produces pos. lift
   mod_sym!(B0, m)
   delta = identity_matrix(base_ring(A), n)
   A_mod_m = identity_matrix(base_ring(A), n)
@@ -628,12 +621,12 @@ function is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
     @vprintln(:UnimodVerif,2,"Loop 1: nbits(m) = $(nbits(m))");
     copy!(A_mod_m, A)
     mm = m^2
-    mod_sym!(A_mod_m,mm)
+    mod_sym!(A_mod_m, mm)
     @vtime :UnimodVerif 2  mul!(delta, A_mod_m, B0)
-    sub!(delta, 1)
+    sub!(delta, delta, 1)
     divexact!(delta, m) # to make matrix product in line below cheaper
     @vtime :UnimodVerif 2 mul!(A_mod_m, B0, delta)
-    mul!(A_mod_m, m)
+    mul!(A_mod_m, A_mod_m, m)
     sub!(B0, B0, A_mod_m)
     m = mm
     mod_sym!(B0, m)
@@ -648,11 +641,23 @@ function is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
   k = 2+nbits(ceil(Int,k/log2(m)))
   @vprintln(:UnimodVerif,1,"Stage 2: max num iters is k=$(k)")
 
-  ZZmodM,_ = residue_ring(ZZ,m; cached = false)  # m is probably NOT prime
+  return m, B0, k
+end
+
+
+# THIS FUNCTION NOT OFFICIALLY DOCUMENTED -- not intended for public use.
+# Pauderis-Storjohann unimodular verification/certification.
+# We use Hensel lifting to obtain the modular inverse B0
+# Seems to be faster than the CRT prototype (not incl. here)
+# VERBOSITY via :UnimodVerif
+function _is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
+  n = nrows(A)
+  m, B0, k = _PSH_init(A)
+
   ##  @assert is_one(lift(MatModM(B0*A)))
   # Originally: R = (I-A*B0)/m
   R = A*B0
-  sub!(R, 1) #this is -R, but is_zero test is the same, and the loop starts by squaring
+  sub!(R, R, 1) #this is -R, but is_zero test is the same, and the loop starts by squaring
   divexact!(R, m)
   if is_zero(R)
     return true
@@ -661,9 +666,7 @@ function is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
   #ZZMatrix and ZZModMatrix are the same type. The modulus is
   #always passed in as an extra argument when needed...
   #mul! for ZZModMatrix is mul, followed by reduce.
-
-  B0_modm = deepcopy(B0)
-  mod_sym!(B0_modm, m)
+  #thus the code is not using ZZModMatrices at all...
 
   R_bar = zero_matrix(ZZ, n, n)
   M = zero_matrix(ZZ, n, n)
@@ -675,7 +678,7 @@ function is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
     mul!(R_bar, R, R)
     #Next 3 lines do:  M = lift(B0_modm*MatModM(R_bar));
     mod_sym!(R_bar, m)
-    mul!(M, B0_modm, R_bar)
+    mul!(M, B0, R_bar)
     mod_sym!(M, m)
     # Next 3 lines do: R = (R_bar - A*M)/m; but with less memory allocation
     mul!(R, A, M)
