@@ -433,6 +433,7 @@ include("Rings.jl")
 
 include("matrix.jl")
 include("poly.jl")
+include("ZZMatrix-linalg.jl")
 
 include("Infinity.jl")
 

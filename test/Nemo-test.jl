@@ -8,3 +8,5 @@ include("Infinity-test.jl")
 include("HeckeMiscLocalization-test.jl")
 include("matrix-test.jl")
 include("poly-test.jl")
+include("ZZMatrix-linalg-test.jl")
+

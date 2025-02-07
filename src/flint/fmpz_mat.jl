@@ -1803,8 +1803,21 @@ end
 #
 ###############################################################################
 
+function Base.copy!(A::ZZMatrix, B::ZZMatrix)
+  ccall((:fmpz_mat_set, Nemo.libflint), Cvoid, (Ref{ZZMatrix}, Ref{ZZMatrix}), A, B)
+end
+
 function zero!(z::ZZMatrixOrPtr)
   @ccall libflint.fmpz_mat_zero(z::Ref{ZZMatrix})::Nothing
+  return z
+end
+
+function zero_row!(z::ZZMatrix, i::Int)
+  z_ptr = mat_entry_ptr(z, i, 1)
+  for i=1:ncols(z)
+    zero!(z_ptr)
+    z_ptr += sizeof(Int)
+  end
   return z
 end
 
@@ -1826,6 +1839,15 @@ end
 function sub!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
   @ccall libflint.fmpz_mat_sub(z::Ref{ZZMatrix}, x::Ref{ZZMatrix}, y::Ref{ZZMatrix})::Nothing
   return z
+end
+
+function sub!(A::ZZMatrix, B::ZZMatrix, m::Int)
+  for i=1:nrows(A)
+    A_p = Nemo.mat_entry_ptr(A, i, i)
+    B_p = Nemo.mat_entry_ptr(B, i, i)
+    sub!(A_p, B_p, m)
+  end
+  return A
 end
 
 function mul!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
@@ -2151,3 +2173,4 @@ end
 ################################################################################
 
 mat_entry_ptr(A::ZZMatrix, i::Int, j::Int) = unsafe_load(A.rows, i) + (j-1)*sizeof(ZZRingElem)
+
