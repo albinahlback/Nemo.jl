@@ -721,8 +721,8 @@ function _renorm(U::ZZMatrix, m::ZZRingElem; start::Int = 1, last::Int = nrows(U
       mod_sym!(U_ptr, R_ptr, m, t)
       sub!(R_ptr, R_ptr, U_ptr)
       divexact!(R_ptr, R_ptr, m)
-      R_ptr += sizeof(Clong)
-      U_ptr += sizeof(Clong)
+      R_ptr += sizeof(Int)
+      U_ptr += sizeof(Int)
     end
     i += 1
     if i > nrows(U)
@@ -744,8 +744,8 @@ function _renorm(U::ZZMatrix, m::ZZRingElem; start::Int = 1, last::Int = nrows(U
           mod_sym!(U_ptr, R_ptr, m, t)
           sub!(R_ptr, R_ptr, U_ptr)
           divexact!(R_ptr, R_ptr, m)
-          R_ptr += sizeof(Clong)
-          U_ptr += sizeof(Clong)
+          R_ptr += sizeof(Int)
+          U_ptr += sizeof(Int)
         end
         i += 1
       end
@@ -768,8 +768,8 @@ function add_into!(A::ZZMatrix, C::ZZMatrix, c::Int)
     C_ptr = Nemo.mat_entry_ptr(C, i, 1)
     for j=1:ncols(A)
       add!(A_ptr, C_ptr)
-      A_ptr += sizeof(Clong)
-      C_ptr += sizeof(Clong)
+      A_ptr += sizeof(Int)
+      C_ptr += sizeof(Int)
     end
   end
 end
@@ -782,8 +782,8 @@ function sub_into!(A::ZZMatrix, C::ZZMatrix, c::Int)
     C_ptr = Nemo.mat_entry_ptr(C, i, 1)
     for j=1:ncols(A)
       sub!(A_ptr, C_ptr)
-      A_ptr += sizeof(Clong)
-      C_ptr += sizeof(Clong)
+      A_ptr += sizeof(Int)
+      C_ptr += sizeof(Int)
     end
   end
 end
