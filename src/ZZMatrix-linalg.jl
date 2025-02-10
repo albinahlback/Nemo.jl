@@ -282,7 +282,7 @@ end
 
 #adaptive rational_reconstruction: if solution is unbalanced with
 #denominator smaller than numerator
-function induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem)
+function induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; ErrorTolerant ::Bool = false)
   A = similar(a)
 
   T = ZZRingElem(Val(:raw))
@@ -754,6 +754,7 @@ function _renorm(U::ZZMatrix, m::ZZRingElem; start::Int = 1, last::Int = nrows(U
           end
           i += 1
         end
+        Nemo._fmpz_clear_fn(t)
         return U
       end
     end
