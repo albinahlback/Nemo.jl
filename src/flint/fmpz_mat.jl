@@ -1844,7 +1844,7 @@ function sub!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
 end
 
 function sub!(A::ZZMatrix, B::ZZMatrix, m::Int)
-  GC.@preserve A begin
+  GC.@preserve A B begin
     for i=1:nrows(A)
       A_p = Nemo.mat_entry_ptr(A, i, i)
       B_p = Nemo.mat_entry_ptr(B, i, i)
