@@ -1813,10 +1813,12 @@ function zero!(z::ZZMatrixOrPtr)
 end
 
 function zero_row!(z::ZZMatrix, i::Int)
-  z_ptr = mat_entry_ptr(z, i, 1)
-  for i=1:ncols(z)
-    zero!(z_ptr)
-    z_ptr += sizeof(Int)
+  GC.@preserve z begin
+    z_ptr = mat_entry_ptr(z, i, 1)
+    for i=1:ncols(z)
+      zero!(z_ptr)
+      z_ptr += sizeof(Int)
+    end
   end
   return z
 end
@@ -1842,10 +1844,12 @@ function sub!(z::ZZMatrixOrPtr, x::ZZMatrixOrPtr, y::ZZMatrixOrPtr)
 end
 
 function sub!(A::ZZMatrix, B::ZZMatrix, m::Int)
-  for i=1:nrows(A)
-    A_p = Nemo.mat_entry_ptr(A, i, i)
-    B_p = Nemo.mat_entry_ptr(B, i, i)
-    sub!(A_p, B_p, m)
+  GC.@preserve A begin
+    for i=1:nrows(A)
+      A_p = Nemo.mat_entry_ptr(A, i, i)
+      B_p = Nemo.mat_entry_ptr(B, i, i)
+      sub!(A_p, B_p, m)
+    end
   end
   return A
 end

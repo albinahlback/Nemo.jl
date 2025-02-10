@@ -291,23 +291,25 @@ function induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem)
   bN = ZZRingElem(Val(:raw))
   bD = ZZRingElem(Val(:raw))
   D = ZZRingElem(1)
-  for i=1:nrows(a)
-    a_ptr = Nemo.mat_entry_ptr(a, i, 1)
-    A_ptr = Nemo.mat_entry_ptr(A, i, 1)
-    for j=1:ncols(a)
-      Nemo.set!(T, a_ptr)
-      Nemo.mul!(T, T, D)
-      Nemo.mod!(T, T, b)
-      fl = ratrec!(n, d, T, b, bN, bD)
-      fl || return fl, A, D
-      if !isone(d)
-        mul!(D, D, d)
-        Nemo.mul!(A, A, d)
-      end
-      Nemo.set!(A_ptr, n)
+  GC.@preserve a A begin
+    for i=1:nrows(a)
+      a_ptr = Nemo.mat_entry_ptr(a, i, 1)
+      A_ptr = Nemo.mat_entry_ptr(A, i, 1)
+      for j=1:ncols(a)
+        Nemo.set!(T, a_ptr)
+        Nemo.mul!(T, T, D)
+        Nemo.mod!(T, T, b)
+        fl = ratrec!(n, d, T, b, bN, bD)
+        fl || return fl, A, D
+        if !isone(d)
+          mul!(D, D, d)
+          Nemo.mul!(A, A, d)
+        end
+        Nemo.set!(A_ptr, n)
 
-      a_ptr += sizeof(ZZRingElem)
-      A_ptr += sizeof(ZZRingElem)
+        a_ptr += sizeof(ZZRingElem)
+        A_ptr += sizeof(ZZRingElem)
+      end
     end
   end
   Nemo._fmpz_clear_fn(bN)
@@ -565,17 +567,19 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
 
     if ncols(_B) == 1
       n = nrows(D.A)
-      for i=1:n
-        Ay_ptr = mat_entry_ptr(D.Ay, i, 1)
-        A_ptr = mat_entry_ptr(D.A, i, 1)
-        d_ptr = mat_entry_ptr(d, i, 1)
-        zero!(Ay_ptr)
-        for j=1:n
-          y_ptr = Nemo.mat_entry_ptr(D.y_mod, j, 1)
-          addmul!(Ay_ptr, A_ptr, unsafe_load(y_ptr))
-          A_ptr += sizeof(ZZRingElem)
+      GC.@preserve D d begin 
+        for i=1:n
+          Ay_ptr = mat_entry_ptr(D.Ay, i, 1)
+          A_ptr = mat_entry_ptr(D.A, i, 1)
+          d_ptr = mat_entry_ptr(d, i, 1)
+          zero!(Ay_ptr)
+          for j=1:n
+            y_ptr = Nemo.mat_entry_ptr(D.y_mod, j, 1)
+            addmul!(Ay_ptr, A_ptr, unsafe_load(y_ptr))
+            A_ptr += sizeof(ZZRingElem)
+          end
+          sub!(d_ptr, d_ptr, Ay_ptr)
         end
-        sub!(d_ptr, d_ptr, Ay_ptr)
       end
     else
       C = CrtCtx_Mat(block)
@@ -712,44 +716,46 @@ function _renorm(U::ZZMatrix, m::ZZRingElem; start::Int = 1, last::Int = nrows(U
   t = ZZRingElem(Val(:raw))
 #  R =  zero_matrix(ZZ, 1, ncols(U))
   zero!(R)
-  while true
-    R_ptr = Nemo.mat_entry_ptr(R, 1, 1)
-    U_ptr = Nemo.mat_entry_ptr(U, i, 1)
-  
-    for j=1:ncols(U)
-      add!(R_ptr, R_ptr, U_ptr)
-      mod_sym!(U_ptr, R_ptr, m, t)
-      sub!(R_ptr, R_ptr, U_ptr)
-      divexact!(R_ptr, R_ptr, m)
-      R_ptr += sizeof(Int)
-      U_ptr += sizeof(Int)
-    end
-    i += 1
-    if i > nrows(U)
-      if i > last || is_zero(R)
-        Nemo._fmpz_clear_fn(t)
-        return U
+  GC.@preserve R U begin
+    while true
+      R_ptr = Nemo.mat_entry_ptr(R, 1, 1)
+      U_ptr = Nemo.mat_entry_ptr(U, i, 1)
+    
+      for j=1:ncols(U)
+        add!(R_ptr, R_ptr, U_ptr)
+        mod_sym!(U_ptr, R_ptr, m, t)
+        sub!(R_ptr, R_ptr, U_ptr)
+        divexact!(R_ptr, R_ptr, m)
+        R_ptr += sizeof(Int)
+        U_ptr += sizeof(Int)
       end
-      while !is_zero(R)
-        if i > last
+      i += 1
+      if i > nrows(U)
+        if i > last || is_zero(R)
           Nemo._fmpz_clear_fn(t)
           return U
         end
-        U.r += 1
-        @assert U.r <= last
-        U_ptr = Nemo.mat_entry_ptr(U, i, 1)
-        R_ptr = Nemo.mat_entry_ptr(R, 1, 1)
-   
-        for j=1:ncols(U)
-          mod_sym!(U_ptr, R_ptr, m, t)
-          sub!(R_ptr, R_ptr, U_ptr)
-          divexact!(R_ptr, R_ptr, m)
-          R_ptr += sizeof(Int)
-          U_ptr += sizeof(Int)
+        while !is_zero(R)
+          if i > last
+            Nemo._fmpz_clear_fn(t)
+            return U
+          end
+          U.r += 1
+          @assert U.r <= last
+          U_ptr = Nemo.mat_entry_ptr(U, i, 1)
+          R_ptr = Nemo.mat_entry_ptr(R, 1, 1)
+     
+          for j=1:ncols(U)
+            mod_sym!(U_ptr, R_ptr, m, t)
+            sub!(R_ptr, R_ptr, U_ptr)
+            divexact!(R_ptr, R_ptr, m)
+            R_ptr += sizeof(Int)
+            U_ptr += sizeof(Int)
+          end
+          i += 1
         end
-        i += 1
+        return U
       end
-      return U
     end
   end
 end
@@ -763,13 +769,15 @@ end
 #add!(view(A, c+1:end, :), C) (but without the view)
 function add_into!(A::ZZMatrix, C::ZZMatrix, c::Int)
   A.r = max(A.r, C.r+c)
-  for i=1:nrows(C)
-    A_ptr = Nemo.mat_entry_ptr(A, i+c, 1)
-    C_ptr = Nemo.mat_entry_ptr(C, i, 1)
-    for j=1:ncols(A)
-      add!(A_ptr, C_ptr)
-      A_ptr += sizeof(Int)
-      C_ptr += sizeof(Int)
+  GC.@preserve A C begin
+    for i=1:nrows(C)
+      A_ptr = Nemo.mat_entry_ptr(A, i+c, 1)
+      C_ptr = Nemo.mat_entry_ptr(C, i, 1)
+      for j=1:ncols(A)
+        add!(A_ptr, C_ptr)
+        A_ptr += sizeof(Int)
+        C_ptr += sizeof(Int)
+      end
     end
   end
 end
@@ -777,13 +785,15 @@ end
 #sub!(view(A, c+1:end, :), C) (but without the view)
 function sub_into!(A::ZZMatrix, C::ZZMatrix, c::Int)
   A.r = max(A.r, C.r+c)
-  for i=1:nrows(C)
-    A_ptr = Nemo.mat_entry_ptr(A, i+c, 1)
-    C_ptr = Nemo.mat_entry_ptr(C, i, 1)
-    for j=1:ncols(A)
-      sub!(A_ptr, C_ptr)
-      A_ptr += sizeof(Int)
-      C_ptr += sizeof(Int)
+  GC.@preserve A C begin
+    for i=1:nrows(C)
+      A_ptr = Nemo.mat_entry_ptr(A, i+c, 1)
+      C_ptr = Nemo.mat_entry_ptr(C, i, 1)
+      for j=1:ncols(A)
+        sub!(A_ptr, C_ptr)
+        A_ptr += sizeof(Int)
+        C_ptr += sizeof(Int)
+      end
     end
   end
 end
