@@ -2618,6 +2618,14 @@ end
 
 #
 
+function tdiv_q!(a::ZZRingElem, b::ZZRingElem, c::ZZRingElem)
+  ccall((:fmpz_tdiv_q, Nemo.libflint), Cvoid, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), a, b, c)
+end
+
+function shift_right!(a::ZZRingElem, b::ZZRingElem, i::Int)
+  @ccall Nemo.libflint.fmpz_fdiv_q_2exp(a::Ref{ZZRingElem}, b::Ref{ZZRingElem}, i::Int)::Nothing
+end
+
 function pow!(z::ZZRingElemOrPtr, a::ZZRingElemOrPtr, b::Integer)
   @ccall libflint.fmpz_pow_ui(z::Ref{ZZRingElem}, a::Ref{ZZRingElem}, UInt(b)::UInt)::Nothing
   return z
@@ -3225,3 +3233,5 @@ function resultant(f::ZZPolyRingElem, g::ZZPolyRingElem, d::ZZRingElem, nb::Int)
   @ccall libflint.fmpz_poly_resultant_modular_div(z::Ref{ZZRingElem}, f::Ref{ZZPolyRingElem}, g::Ref{ZZPolyRingElem}, d::Ref{ZZRingElem}, nb::Int)::Nothing
   return z
 end
+
+
