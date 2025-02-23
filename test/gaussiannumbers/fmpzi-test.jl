@@ -214,12 +214,8 @@ end
   @test b == A && a == B
 end
 
-function test_elem(R::Nemo.ZZiRing)
-  return rand_bits(R, rand(0:200))
-end
-
 @testset "ZZiRingElem.conformance_tests" begin
-  test_Ring_interface(ZZi)
-  test_EuclideanRing_interface(ZZi)
+  ConformanceTests.test_Ring_interface(ZZi)
+  ConformanceTests.test_EuclideanRing_interface(ZZi)
 end
 

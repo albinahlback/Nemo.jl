@@ -1,11 +1,7 @@
 import Nemo: AbstractAlgebra.PrettyPrinting
 
-function test_elem(R::QQField)
-  return rand_bits(ZZ, rand(0:100))//rand_bits(ZZ, rand(1:100))
-end
-
 @testset "QQFieldElem.conformance_tests" begin
-  test_Field_interface_recursive(QQ)
+  ConformanceTests.test_Field_interface_recursive(QQ)
 end
 
 @testset "QQFieldElem.issingletontype" begin
@@ -699,6 +695,3 @@ end
   @test is_power(QQ(1//2), 2)[1] == false
   @test is_power(QQ(4//9), 2) == (true, 2//3)
 end
-
-include("fmpq_rel_series-test.jl")
-include("fmpq_abs_series-test.jl")
