@@ -282,7 +282,17 @@ end
 
 #adaptive rational_reconstruction: if solution is unbalanced with
 #denominator smaller than numerator
-function induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; ErrorTolerant ::Bool = false)
+@doc raw"""
+    _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true) -> Bool, ZZMatrix, ZZRingElem
+
+Apply rational reconstruction to all entries in the matrix `a` in the attempt
+to find `D` (over ZZ) and `n` (in ZZ) such that `an - D` is divisible by `b`.
+Should be used mainly if a common denominator is expected as `rational_reconstrucion`
+  is called for each entry in `a` and the denominators are accumulated.
+"""
+function _induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = false)
+  @req !error_tolerant || !unbalanced "only one of `error_tolerant` and `unbalanced` can be used at a time"
+
   A = similar(a)
 
   T = ZZRingElem(Val(:raw))
@@ -299,7 +309,11 @@ function induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; ErrorToleran
         Nemo.set!(T, a_ptr)
         Nemo.mul!(T, T, D)
         Nemo.mod!(T, T, b)
-        fl = ratrec!(n, d, T, b, bN, bD)
+        if unbalanced
+          fl = _ratrec!(n, d, T, b, bN, bD)
+        else
+          fl, n, d = _rational_reconstruction(T, b; error_tolerant)
+        end
         fl || return fl, A, D
         if !isone(d)
           mul!(D, D, d)
@@ -321,38 +335,21 @@ function induce_rational_reconstruction(a::ZZMatrix, b::ZZRingElem; ErrorToleran
   return true, A, D
 end
 
-#output sensitive rational_reconstruction, in particular if
-#numerator is larger than den 
-function ratrec!(n::ZZRingElem, d::ZZRingElem, a::ZZRingElem, b::ZZRingElem, N::ZZRingElem = ZZ(), D::ZZRingElem= ZZ())
-  k = nbits(b)
-  l = 1
-  set!(N, b)
-  set!(D, 2)
+@doc raw"""
+    _induce_rational_reconstruction_nosplit(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = true) -> Bool, QQMatrix
 
-#  @assert 0<a<b
-  done = false
-  while !done && D <= N
-    Nemo.mul!(D, D, D)
-    tdiv_q!(N, b, D)
-    shift_right!(N, N, 1)
-    if D>N
-      @ccall Nemo.libflint.fmpz_root(N::Ref{ZZRingElem}, b::Ref{ZZRingElem}, 2::Int)::Nothing
-      shift_right!(D, N, 1)
-      done = true
-    end
+Apply rational reconstruction to all entries in the matrix `a` in the attempt
+to find `D` (over QQ) such that `a - D` is divisible by `b`.
 
-#    @assert 2*N*D < b
-
-    fl = ccall((:_fmpq_reconstruct_fmpz_2, Nemo.libflint), Bool, (Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}, Ref{ZZRingElem}), n, d, a, b, N, D)
-
-    if fl && (nbits(n)+nbits(d) < k - 30 || D>N)
-      return fl
-    end
-    l += 1
-  end
-  return false
+See also [`rational_reconstruction`](@ref) for an explanation of the parameters
+  and [`induce_rational_reconstruction`](@ref) for a version returing the numerator matrix and the denominator seperately.
+"""
+function _induce_rational_reconstruction_nosplit(a::ZZMatrix, b::ZZRingElem; error_tolerant ::Bool = false, unbalanced::Bool = false)
+  fl, n, d = _induce_rational_reconstruction( a, b; error_tolerant, unbalanced)
+  D = matrix(QQ, n)*QQ(ZZ(1), d)
+  return fl, D
 end
-
+ 
 function change_prime!(a::fpMatrix, p::UInt)
   @ccall libflint.nmod_mat_set_mod(a::Ref{fpMatrix}, p::UInt)::Nothing
 end
@@ -516,7 +513,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
       nexti = ceil(Int,(i*1.4)) + 1;
       #TODO: maybe col by col? to stop doing cols that are already there?
       #main use currently is 1 col anyway
-      fl, num, den = induce_rational_reconstruction(D.x, ppow)
+      fl, num, den = _induce_rational_reconstruction(D.x, ppow; unbalanced = true)
 
       if fl
 #        @show fl = (D.A*num == den*_B)
@@ -596,7 +593,7 @@ function dixon_solve(D::DixonCtx, B::ZZMatrix; side::Symbol = :right, block::Int
     end
     divexact!(d, d, ZZ(D.p))
   end
-  fl, num, den = induce_rational_reconstruction(D.x, ppow)
+  fl, num, den = _induce_rational_reconstruction(D.x, ppow; unbalanced = true)
   @assert fl
 
   if side == :right
@@ -879,7 +876,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
 
   if is_zero(R)
     mu = vcat([_to_base!(t, m) for t = allV]...)
-    tau = induce_rational_reconstruction(mu, m)
+    tau = _induce_rational_reconstruction(mu, m; unbalanced = true)
     @assert tau[1]
     GC.enable(GC_d)
     return tau[2], tau[3]
@@ -939,11 +936,11 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
 
     mex = m^(2*ex)
     mu = vcat([_to_base!(t[:, 1:1], m) for t = allV]...)
-    tau = induce_rational_reconstruction(mu, mex)
+    tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
     if tau[1]
       GC.enable(true)
       mu = vcat([_to_base!(deepcopy(t), m) for t = allV]...)
-      tau = induce_rational_reconstruction(mu, mex)
+      tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
       if tau[1]
         GC.enable(GC_d)
         return tau[2], tau[3]
@@ -953,7 +950,7 @@ function UniCertSolve(A::ZZMatrix, U::ZZMatrix)
     end
   end
   mu = vcat([_to_base!(t, m) for t = allV]...)
-  tau = induce_rational_reconstruction(mu, mex)
+  tau = _induce_rational_reconstruction(mu, mex; unbalanced = true)
   @assert tau[1]
   GC.enable(GC_d)
   return tau[2], tau[3]
