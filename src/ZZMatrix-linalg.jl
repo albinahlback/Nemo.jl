@@ -18,7 +18,7 @@
 #######################################################
 
 function _det(a::fpMatrix)
-  a.r < 10 && return lift(det(a))
+  a.r < 9 && return det(a).data  # inspired by FLINT source code
   #_det avoids a copy: det is computed destructively
   r = ccall((:_nmod_mat_det, Nemo.libflint), UInt, (Ref{fpMatrix}, ), a)
   return r
@@ -35,7 +35,7 @@ end
     is_unimodular(A::ZZMatrix)
     is_unimodular(A::ZZMatrix; algorithm=:auto)
 
-Determine whether `A` is unimodular, i.e. whether `abs(det(A)) == 1`.
+Determine whether a square matrix `A` is unimodular, i.e. whether `abs(det(A)) == 1`.
 The method used is either that of Pauderis--Storjohann or using CRT;
 the choice is made based on cost estimates for the two approaches.
 
@@ -51,12 +51,8 @@ function is_unimodular(A::ZZMatrix; algorithm=:auto)
   # Call this function when no extra info about the matrix is available.
   # It does a preliminary check that det(A) is +/-1 modulo roughly 2^100.
   # If so, then delegate the complete check to is_unimodular_given_det_mod_m
-  if !is_square(A)
-    throw(ArgumentError("Matrix must be square"))
-  end
-  if !(algorithm in [:auto, :CRT, :pauderis_storjohann])
-    throw(ArgumentError("algorithm must be one of [:CRT, :pauderis_storjohann, :auto]"))
-  end
+  @req  is_square(A)  "Matrix must be square"
+  @req (algorithm in [:auto, :CRT, :pauderis_storjohann])  "algorithm must be one of [:CRT, :pauderis_storjohann, :auto]"
   # Deal with two trivial cases
   if nrows(A) == 0
     return true
@@ -76,19 +72,20 @@ function is_unimodular(A::ZZMatrix; algorithm=:auto)
     p = next_prime(p + rand(1:2^10), false) # increment by a random step to a prime
     ZZmodP = Nemo.Native.GF(p; cached = false, check = false)
     map_entries!(ZZmodP, A_mod_p, A)
-    @vtime :UnimodVerif 2  det_mod_p = Int(_det(A_mod_p))
-    p2 = p>>1
-    if det_mod_p > p2
-      det_mod_p -= p
-    end
-    if abs(det_mod_p) != 1
+    @vtime :UnimodVerif 2  det_mod_p = _det(A_mod_p)
+    if det_mod_p != 1 && det_mod_p != p-1
       return false  # obviously not unimodular
     end
-    if det_mod_m != 0 && det_mod_m != det_mod_p
+    if det_mod_m == 0 # first iteration: so just set the value of det_mod_m
+      det_mod_m = (det_mod_p == 1) ? 1 : -1;
+    elseif det_mod_m == 1
+      if det_mod_p != 1
+        return false  # obviously not unimodular
+      end
+    elseif det_mod_p == 1 # we know that here det_mod_m == -1
       return false  # obviously not unimodular
     end
-    det_mod_m = det_mod_p
-    mul!(M, M, p)
+    M = mul!(M, p)
   end
   return _is_unimodular_given_det_mod_m(A, det_mod_m, M; algorithm)
 end #function
@@ -108,7 +105,7 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
   # Deal with two trivial cases -- does this make sense here???
   nrows(A) == 0 && return true
   nrows(A) == 1 && return (abs(A[1,1]) == 1)
-  @vprintln(:UnimodVerif,1,"is_unimodular_given_det_mod_m starting")
+  @vprintln(:UnimodVerif,1,"is_unimodular_given_det_mod_m starting; det_mod_m=$(det_mod_m)")
   if algorithm == :pauderis_storjohann
     @vprintln(:UnimodVerif,1,"User specified Pauderis_Storjohann --> delegating")
     return _is_unimodular_Pauderis_Storjohann_Hensel(A)
@@ -117,7 +114,7 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
   Hrow = hadamard_bound2(A)
   Hcol = hadamard_bound2(transpose(A))
   DetBoundSq = min(Hrow, Hcol)
-  Hbits = 1+div(nbits(DetBoundSq),2)
+  Hbits = 1+div(1+nbits(DetBoundSq),2)
   @vprintln(:UnimodVerif,1,"Hadamard bound in bits $(Hbits)")
   if algorithm == :auto
     # Estimate whether better to "climb out" with CRT or use Pauderis-Storjohann
@@ -146,7 +143,7 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
   # in CRT loop start with 22 bit primes; if we reach threshold (empirical), jump to much larger primes.
   p = 2^21; stride = 2^10; threshold = 5000000;
   A_mod_p = zero_matrix(Nemo.Native.GF(2), nrows(A), ncols(A))
-  while nbits(M) < Hbits
+  while nbits(M) <= Hbits
     @vprint(:UnimodVerif,2,".")
     # Next lines increment p (by random step up to stride) to a prime not dividing M
     if p > threshold && p < threshold+stride
@@ -163,14 +160,13 @@ function _is_unimodular_given_det_mod_m(A::ZZMatrix, det_mod_m::Int, M::ZZRingEl
     end
     ZZmodP = Nemo.Native.GF(p; cached = false, check = false)
     map_entries!(ZZmodP, A_mod_p, A)
-    det_mod_p = _det(A_mod_p)
-    if det_mod_p > p/2
-      det_mod_p -= p
-    end
-    if abs(det_mod_p) != 1 || det_mod_m != det_mod_p
+    det_mod_p = _det(A_mod_p) # type is UInt
+    @vprintln(:UnimodVerif,3, "p=$(p)  det_mod_p=$(det_mod_p)")
+    verified_mod_p = (det_mod_m == 1) ? (det_mod_p == 1) : (det_mod_p == p-1)
+    if !verified_mod_p
       return false  # obviously not unimodular
     end
-    mul!(M, M, p)
+    M = mul!(M, p)
   end
   return true
 end
@@ -180,16 +176,14 @@ end
 #TODO: Hensel is slower than CRT if modulus is small(ish)
 
 function _PSH_init(A::ZZMatrix)
-  #computes a 
+  #computes 3 things:
   # modulus (X) in the paper
-  # the inverse of A mod x
+  # the inverse of A mod X
   # the exponent target for the lifting.
 
   n = nrows(A)
-  @assert ncols(A) == n
-
   EntrySize = maximum(abs, A)
-  entry_size_bits = maximum(nbits, A)
+  entry_size_bits = nbits(EntrySize)
   e = max(16, 2+ceil(Int, 2*log2(n)+entry_size_bits))
   ModulusLWB = ZZ(2)^e
   @vprintln(:UnimodVerif,1,"ModulusLWB is 2^$(e)")
@@ -240,6 +234,7 @@ end
 # Seems to be faster than the CRT prototype (not incl. here)
 # VERBOSITY via :UnimodVerif
 function _is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
+  @assert  is_square(A)
   n = nrows(A)
   m, B0, k = _PSH_init(A)
 
@@ -257,6 +252,7 @@ function _is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
   #mul! for ZZModMatrix is mul, followed by reduce.
   #thus the code is not using ZZModMatrices at all...
 
+  # Two workspace matrices to avoid repeated alloc/dealloc
   R_bar = zero_matrix(ZZ, n, n)
   M = zero_matrix(ZZ, n, n)
 
@@ -266,8 +262,8 @@ function _is_unimodular_Pauderis_Storjohann_Hensel(A::ZZMatrix)
 
     mul!(R_bar, R, R)
     #Next 3 lines do:  M = lift(B0_modm*MatModM(R_bar));
-    mod_sym!(R_bar, m)
-    mul!(M, B0, R_bar)
+    mod_sym!(M, R_bar, m)
+    mul!(M, B0, M)
     mod_sym!(M, m)
     # Next 3 lines do: R = (R_bar - A*M)/m; but with less memory allocation
     mul!(R, A, M)
