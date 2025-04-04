@@ -4,6 +4,7 @@ testlist = [
 # Julia extensions
   "julia/Float-test.jl",
   "julia/Integer-test.jl",
+  "julia/Rational-test.jl",
 # Fields-test.jl
   "flint/fmpq-test.jl",
   "flint/gfp-test.jl",
