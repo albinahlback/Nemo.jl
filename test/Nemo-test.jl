@@ -3,6 +3,7 @@ testlist = [
   "Aqua.jl",
 # Julia extensions
   "julia/Float-test.jl",
+  "julia/Integer-test.jl",
 # Fields-test.jl
   "flint/fmpq-test.jl",
   "flint/gfp-test.jl",
